@@ -1,0 +1,14 @@
+# Eclipse settings folder
+.settings/*
+
+# Meta Information (MANIFEST)
+META-INF/*
+
+# Server log files
+logs/*
+
+# Binary files
+bin/*
+
+# Hibernate configuration file
+src/hibernate.cfg.xml
