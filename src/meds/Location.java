@@ -358,7 +358,9 @@ public class Location
             .add(this.square ? "1" : "0")
             .add(this.safeRegion ? "1" : "0")
             .add(this.pictureTime)
-            .add(this.keeperTime);
+            .add(this.keeperTime)
+            .add(this.regionId)
+            .add("0"); // TODO: Determine the source of this value.
     }
 
     public void addCorpse(Corpse corpse)
