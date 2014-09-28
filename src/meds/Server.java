@@ -10,9 +10,9 @@ import meds.logging.Logging;
 
 public class Server
 {
-    public static final int Build = 16910084;
+    public static final int Build = 33554433; // 2.0.0.0
 
-    public static final int MaxAllowedBuild = 16910095;
+    public static final int MaxAllowedBuild = 33554437; // 2.0.0.5
 
     private static int startTimeMillis;
     private static Server instance;
