@@ -8,13 +8,16 @@ public enum ClientOpcodes
     Ping("0"),
     SetHome("acity"),
     Attack("at"),
+    BuyBackItem("bbi"), // Appeared in 2.0.0.0
     BuyItem("bi"),
     BankExchange("chp"),
     DestroyItem("di"),
+    GetLocationInfo("gei"), // Appeared in 2.0.0.0
     EnterGuild("gg"),
     GetItemInfo("gii"),
     GetInn("ginn"),
     GuildLearn("gl"),
+    GuildLessonsInfo("gni"), // Appeared in 2.0.0.0 after new guild system.
     Movement("go"),
     GetGuildLevels("glvl"),
     EnterShop("gs"),
@@ -22,6 +25,7 @@ public enum ClientOpcodes
     InnFilter("ift"),
     InnGet("ig"),
     InnStore("is"),
+    LearnGuildInfo("lni"), // Appeared in 2.0.0.0 after new guild system.
     Login("login"),
     Ready("lur"),
     PutMoney("pm"),
@@ -29,6 +33,7 @@ public enum ClientOpcodes
     QuestListFilter("qf"),
     GetQuestInfo("qi"),
     QuestInfoForAccept("qre"),
+    RegionLocations("r"),
     SwapItem("ri"),
     Relax("rx"),
     SetAutoLoot("sal"),

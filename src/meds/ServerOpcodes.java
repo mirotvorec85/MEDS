@@ -3,6 +3,7 @@ package meds;
 public enum ServerOpcodes
 {
     Aura("a"),
+    BuyBackList("bbl"), // Appeared in 2.0.0.0
     CultInfo("ci"),
     BonusMagicParameter("cms"),
     UpdateQuest("cq"),
@@ -15,6 +16,7 @@ public enum ServerOpcodes
     _fpi("fpi"),
     GuildInfo("gi"),
     GuildLessonInfo("ginf"),
+    GuildLessonsInfo("gni"), // Appeared in 2.0.0.0 after new guild system.
     GetCorpse("gtr"),
     _hoi("hoi"),
     Health("hp"),
@@ -30,6 +32,7 @@ public enum ServerOpcodes
     PlayersListDelete("ld"),
     OnlineList("lf"),
     _lh0("lh0"),
+    LearnGuildInfo("lni"), // Appeared in 2.0.0.0 after new guild system.
     Location("loc"),
     LoginResult("login_result"),
     QuestListInfo("lq"),
@@ -43,6 +46,8 @@ public enum ServerOpcodes
     MessageList("msl"),
     NoGo("ng"),
     _omg("omg"),
+    PlayerLocation("pl"), // Appeared in 2.0.0.0
+    PlayersLocation("ppl"), // Appeared in 2.0.0.0
     Professions("prof"),
     _prot1("prot1"),
     _prot2("prot2"),
@@ -51,6 +56,7 @@ public enum ServerOpcodes
     QuestInfo("q"),
     QuestFinalText("qft"),
     NpcQuestList("qli"),
+    RegionLocations("r"),
     RelaxOff("r0"),
     RelaxOn("r1"),
     StarInfo("rcity"),
