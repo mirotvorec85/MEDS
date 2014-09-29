@@ -1,6 +1,8 @@
 package meds;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import meds.Item.Prototype;
@@ -390,6 +392,37 @@ public class Inventory
         return -1;
     }
 
+    public Integer[] findAllItems(int templateId)
+    {
+        List<Integer> slots = new ArrayList<Integer>();
+        for (int i = Slots.Inventory1.getValue(); i <= Slots.Inventory25.getValue(); ++i)
+        {
+            if (this.inventorySlots[i] == null)
+                continue;
+            if (this.inventorySlots[i].Template.getId() != templateId)
+                continue;
+            slots.add(i);
+        }
+
+        return slots.toArray(new Integer[slots.size()]);
+    }
+
+    public Integer[] findAllItems(Prototype proto)
+    {
+        if (proto == null)
+            return new Integer[0];
+
+        List<Integer> slots = new ArrayList<Integer>();
+        for (int i = Slots.Inventory1.getValue(); i <= Slots.Inventory25.getValue(); ++i)
+        {
+            if (!proto.equals(this.inventorySlots[i]))
+                continue;
+            slots.add(i);
+        }
+
+        return slots.toArray(new Integer[slots.size()]);
+    }
+
     public boolean tryStoreItem(Item item)
     {
         return this.tryStoreItem(item, item.getCount());
@@ -489,29 +522,35 @@ public class Inventory
 
     public Item takeItem(Prototype proto, int count)
     {
-        Item item = null;
         if (proto == null || proto.getTemplateId() == 0)
-            return item;
+            return null;
 
-        int countRemain = count;
+        // Try to find all the slots contain the specified prototype
+        Integer[] itemSlots = this.findAllItems(proto);
 
-        for (int i = Slots.Inventory25.getValue(); i >= Slots.Inventory1.getValue(); --i)
+        if (itemSlots.length == 0)
+            return null;
+
+        int i = itemSlots.length - 1;
+        Item item = new Item(proto, 0);
+        do
         {
-            if (!proto.equals(this.inventorySlots[i]))
+            if (!item.transer(this.inventorySlots[itemSlots[i]], count - item.getCount()))
+            {
+                --i;
                 continue;
-            if (item == null)
-                item = this.inventorySlots[i].unstackItem(countRemain);
-            else
-                item.tryStackItem(this.inventorySlots[i].unstackItem(countRemain));
+            }
 
-            if (this.inventorySlots[i].getCount() == 0)
-                this.inventorySlots[i] = null;
-            countRemain -= item.getCount();
-            if (countRemain == 0)
+            if (this.inventorySlots[itemSlots[i]].getCount() == 0)
+                this.inventorySlots[itemSlots[i]] = null;
+
+            if (item.getCount() == count)
                 break;
-        }
 
-        if (item != null)
+            --i;
+        } while (i >= 0);
+
+        if (item.getCount() != 0)
             onInventoryChanged();
         return item;
     }

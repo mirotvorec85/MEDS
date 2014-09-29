@@ -354,6 +354,32 @@ public class Item
     }
 
     /**
+     * Moves the whole stack of the specified source Item into this Item
+     */
+    public boolean transer(Item source)
+    {
+        if (source == null)
+            return false;
+        return this.transer(source, source.count);
+    }
+
+    /**
+     * Moves the specified count of the specified source Item into this Item
+     */
+    public boolean transer(Item source, int count)
+    {
+        if (!isStackableWith(source))
+            return false;
+
+        if (count > source.count)
+            count = source.count;
+
+        this.count += count;
+        source.count -= count;
+        return true;
+    }
+
+    /**
      * Separates the item into two parts, returns the one that has the specified count
      * and applies the other part to this Item object.
      * @param count How much items to extract from this item stack.
@@ -376,6 +402,8 @@ public class Item
      */
     public boolean tryStackItem(Item item)
     {
+        if (item == null)
+            return false;
         return this.tryStackItem(item, item.count);
     }
 
@@ -462,6 +490,8 @@ public class Item
 
     public boolean equals(Item item)
     {
+        if (item == null)
+            return false;
         return equals(item.getPrototype());
     }
 
