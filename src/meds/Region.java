@@ -18,6 +18,8 @@ public class Region
     private List<Location> locations = new ArrayList<Location>();;
     private List<Location> ordinaryLocations = new ArrayList<Location>();
 
+    private ServerPacket locationListData;
+
     public int getId()
     {
         return id;
@@ -98,5 +100,18 @@ public class Region
             return this.locations.get(Random.nextInt(0, this.locations.size()));
 
         return this.ordinaryLocations.get(Random.nextInt(0, this.ordinaryLocations.size()));
+    }
+
+    public ServerPacket getLocationListData()
+    {
+        if (this.locationListData == null)
+        {
+            this.locationListData = new ServerPacket(ServerOpcodes.RegionLocations)
+                .add(this.id);
+            for (Location location : this.locations)
+                this.locationListData.add(location.getId());
+        }
+
+        return this.locationListData;
     }
 }
