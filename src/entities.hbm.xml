@@ -142,17 +142,17 @@
         <property name="statuses" type="int">
             <column name="`statuses`" />
         </property>
-        <map name="currencies" fetch="select" lazy="true" cascade="all">
+        <map name="currencies" fetch="select" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="`character_id`" />
             <map-key column="`currency_id`" type="int" />
             <one-to-many class="CharacterCurrency" />
         </map>
-        <map name="guilds" fetch="select" lazy="true" cascade="all">
+        <map name="guilds" fetch="select" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="`character_id`" />
             <map-key column="`guild_id`" type="int" />
             <one-to-many class="CharacterGuild" />
         </map>
-        <map name="innItems" fetch="select" lazy="true" cascade="all">
+        <map name="innItems" fetch="select" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="`character_id`" />
             <composite-map-key class="meds.Item$Prototype">
                 <key-property name="templateId" column="item_template_id" />
@@ -161,22 +161,22 @@
             </composite-map-key>
             <one-to-many class="CharacterInnItem" />
         </map>
-        <map name="inventoryItems" fetch="select" lazy="true" cascade="all">
+        <map name="inventoryItems" fetch="select" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="`character_id`" />
             <map-key column="`slot`" type="int" />
             <one-to-many class="CharacterInventoryItem" />
         </map>
-        <map name="quests" fetch="select" lazy="true" cascade="all">
+        <map name="quests" fetch="select" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="`character_id`" />
             <map-key column="`quest_template_id`" type="int" />
             <one-to-many class="CharacterQuest" />
         </map>
-        <map name="skills" fetch="select" lazy="true" cascade="all">
+        <map name="skills" fetch="select" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="`character_id`" />
             <map-key column="`skill_id`" type="int" />
             <one-to-many class="CharacterSkill" />
         </map>
-        <map name="spells" fetch="select" lazy="true" cascade="all">
+        <map name="spells" fetch="select" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="`character_id`" />
             <map-key column="`spell_id`" type="int" />
             <one-to-many class="CharacterSpell" />

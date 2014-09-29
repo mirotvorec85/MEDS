@@ -15,17 +15,18 @@ public class CharacterInnItem implements Serializable
     private int count;
 
     // TODO: Check primary key assignment
-    public CharacterInnItem(Prototype proto, int count)
+    public CharacterInnItem(int characterId, Prototype proto, int count)
     {
+        this.characterId = characterId;
         this.itemTemplateId = proto.getTemplateId();
         this.modification = proto.getModification();
         this.durability = proto.getDurability();
         this.count = count;
     }
 
-    public CharacterInnItem(Prototype proto)
+    public CharacterInnItem(int characterId, Prototype proto)
     {
-        this(proto, 0);
+        this(characterId, proto, 0);
     }
 
     @Override

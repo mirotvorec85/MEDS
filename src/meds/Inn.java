@@ -61,7 +61,8 @@ public class Inn
         CharacterInnItem innItem = this.items.get(proto);
         if (innItem == null)
         {
-            innItem = new CharacterInnItem(proto);
+            innItem = new CharacterInnItem(this.owner.getGuid(), proto);
+            this.items.put(proto, innItem);
         }
         innItem.setCount(innItem.getCount() + item.getCount());
 

@@ -13,6 +13,17 @@ public class CharacterInventoryItem implements Serializable
     private int durability;
     private int count;
 
+    public CharacterInventoryItem()
+    {
+
+    }
+
+    public CharacterInventoryItem(int characterId, int slot)
+    {
+        this.characterId = characterId;
+        this.slot = slot;
+    }
+
     public int getCharacterId()
     {
         return characterId;

@@ -218,10 +218,8 @@ public class Inventory
 
                 if (charItem == null)
                 {
-                    charItem = new CharacterInventoryItem();
+                    charItem = new CharacterInventoryItem(this.owner.getGuid(), i);
                     this.characterItems.put(i, charItem);
-                    charItem.setCharacterId(this.owner.getGuid());
-                    charItem.setSlot(i);
                 }
 
                 charItem.setItemTemplateId(item.Template.getId());
