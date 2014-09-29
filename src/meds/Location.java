@@ -40,6 +40,10 @@ public class Location
     private java.util.Map<Prototype, Item> items;
     private Region region;
 
+    private ServerPacket locationData;
+    private ServerPacket locationInfoData;
+    private ServerPacket neighborsInfoData;
+
     /**
      * Indicating whether the location will be updated at the next tick. Use a Setter for setting a value for this field!
      */
@@ -332,35 +336,88 @@ public class Location
         return Map.getInstance().getLocation(neighbourId);
     }
 
+
+    /**
+     * Gets the shorter location info with ServerOpcodes.LocationInfo
+     */
+    public ServerPacket getInfoData()
+    {
+        if (this.locationInfoData == null)
+        {
+            this.locationInfoData =  new ServerPacket(ServerOpcodes.LocationInfo)
+                .add(this.id)
+                .add(this.title)
+                .add(this.topId)
+                .add(this.bottomId)
+                .add(this.northId)
+                .add(this.southId)
+                .add(this.westId)
+                .add(this.eastId)
+                .add(this.xCoord)
+                .add(this.yCoord)
+                .add(this.zCoord)
+                .add(this.specialLocationType)
+                .add(this.square ? "1" : "0")
+                .add(this.region.getName())
+                .add(this.region.getKingdom().getName())
+                .add("Continent")
+                .add(this.regionId)
+                .add("0"); // TODO: Determine the source of this value.
+        }
+        return this.locationInfoData;
+    }
+
+    public ServerPacket getNeighborsInfoData()
+    {
+        if (this.neighborsInfoData == null)
+        {
+            this.neighborsInfoData = new ServerPacket();
+            Location neighbor;
+
+            for (MovementDirections direction : MovementDirections.values())
+            {
+                if ((neighbor = getNeighbourLocation(direction)) != null)
+                {
+                    this.neighborsInfoData.add(neighbor.getInfoData());
+                }
+            }
+        }
+        return this.neighborsInfoData;
+    }
+
     public ServerPacket getData()
     {
-        return new ServerPacket(ServerOpcodes.Location)
-            .add(this.id)
-            .add(this.title)
-            .add(this.topId)
-            .add(this.bottomId)
-            .add(this.northId)
-            .add(this.southId)
-            .add(this.westId)
-            .add(this.eastId)
-            .add(this.xCoord)
-            .add(this.yCoord)
-            .add(this.zCoord)
-            .add("Continent")
-            .add(this.region.getKingdom().getName())
-            .add(this.region.getName())
-            .add(this.specialLocationType)
-            .add(this.safeZone ? "true" : "false")
-            .add(this.keeperType)
-            .add(this.keeperName)
-            .add(this.specialLocationId)
-            .add(this.pictureId)
-            .add(this.square ? "1" : "0")
-            .add(this.safeRegion ? "1" : "0")
-            .add(this.pictureTime)
-            .add(this.keeperTime)
-            .add(this.regionId)
-            .add("0"); // TODO: Determine the source of this value.
+        if (this.locationData == null)
+        {
+            this.locationData = new ServerPacket(ServerOpcodes.Location)
+                .add(this.id)
+                .add(this.title)
+                .add(this.topId)
+                .add(this.bottomId)
+                .add(this.northId)
+                .add(this.southId)
+                .add(this.westId)
+                .add(this.eastId)
+                .add(this.xCoord)
+                .add(this.yCoord)
+                .add(this.zCoord)
+                .add("Continent")
+                .add(this.region.getKingdom().getName())
+                .add(this.region.getName())
+                .add(this.specialLocationType)
+                .add(this.safeZone ? "true" : "false")
+                .add(this.keeperType)
+                .add(this.keeperName)
+                .add(this.specialLocationId)
+                .add(this.pictureId)
+                .add(this.square ? "1" : "0")
+                .add(this.safeRegion ? "1" : "0")
+                .add(this.pictureTime)
+                .add(this.keeperTime)
+                .add(this.regionId)
+                .add("0"); // TODO: Determine the source of this value.
+        }
+        return this.locationData;
     }
 
     public void addCorpse(Corpse corpse)
@@ -417,6 +474,7 @@ public class Location
             if (player.getSession() != null)
             {
                 player.getSession().addData(getData());
+                player.getSession().addData(getNeighborsInfoData());
                 player.getSession().addData(getCorpseData());
             }
         }

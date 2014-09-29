@@ -86,6 +86,7 @@ public class Session implements Runnable
         this.opcodeHandlers.put(ClientOpcodes.SetAutoSpell, new SetAutoSpellOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.EnterStar, new EnterStarOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.SetHome, new SetHomeOpcodeHandler());
+        this.opcodeHandlers.put(ClientOpcodes.GetLocationInfo, new LocationInfoOpcodeHandler());
 
         this.packets = new HashMap<Long, ServerPacket>();
 
@@ -1150,6 +1151,29 @@ public class Session implements Runnable
         public void handle(String[] data)
         {
             Session.this.player.setHome();
+        }
+    }
+
+    private class LocationInfoOpcodeHandler extends OpcodeHandler
+    {
+        @Override
+        public boolean isAuthenticatedOnly()
+        {
+            return false;
+        }
+
+        @Override
+        public int getMinDataLength()
+        {
+            return 1;
+        }
+
+        @Override
+        public void handle(String[] data)
+        {
+            Location location = Map.getInstance().getLocation(SafeConvert.toInt32(data[0]));
+            if (location != null)
+                Session.this.addData(location.getInfoData());
         }
     }
 }

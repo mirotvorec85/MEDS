@@ -31,6 +31,7 @@ public enum ServerOpcodes
     PlayersListAdd("la"),
     PlayersListDelete("ld"),
     OnlineList("lf"),
+    LocationInfo("li"),
     _lh0("lh0"),
     LearnGuildInfo("lni"), // Appeared in 2.0.0.0 after new guild system.
     Location("loc"),
