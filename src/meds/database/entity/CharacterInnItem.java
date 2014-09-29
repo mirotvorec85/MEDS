@@ -14,6 +14,11 @@ public class CharacterInnItem implements Serializable
     private int durability;
     private int count;
 
+    public CharacterInnItem()
+    {
+
+    }
+
     // TODO: Check primary key assignment
     public CharacterInnItem(int characterId, Prototype proto, int count)
     {
