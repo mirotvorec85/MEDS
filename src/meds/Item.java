@@ -70,13 +70,30 @@ public class Item
         {
             if (obj == null)
                 return false;
-            if (!(obj instanceof Prototype))
-                return false;
-            Prototype cObj = (Prototype)obj;
+            if (obj instanceof Prototype)
+                return this.equals((Prototype)obj);
+            if (obj instanceof Item)
+                return this.equals((Item)obj);
 
-            return this.templateId == cObj.templateId &&
-                    this.modification == cObj.modification &&
-                    this.durability == cObj.durability;
+            return false;
+        }
+
+        public boolean equals(Prototype proto)
+        {
+            if (proto == null)
+                return false;
+
+            return this.templateId == proto.templateId &&
+                    this.modification == proto.modification &&
+                    this.durability == proto.durability;
+        }
+
+        public boolean equals(Item item)
+        {
+            if (item == null)
+                return false;
+
+            return item.equals(this);
         }
     }
 
@@ -88,6 +105,14 @@ public class Item
         private ItemEssenceLevels essenceLevel;
         private ItemEssenceTypes essenceType;
         private ItemReinforcementTypes reinforcement;
+
+        /**
+         * Private constructor that is only used for clonning.
+         */
+        private Modification()
+        {
+
+        }
 
         public Modification(int value)
         {
@@ -153,6 +178,18 @@ public class Item
         public String toString()
         {
             return Integer.toString(this.value);
+        }
+
+        @Override
+        public Modification clone()
+        {
+            Modification newModification = new Modification();
+            newModification.value = this.value;
+            newModification.essenceLevel = this.essenceLevel;
+            newModification.essenceType = this.essenceType;
+            newModification.reinforcement = this.reinforcement;
+            newModification.totem = this.totem;
+            return newModification;
         }
     }
 
@@ -457,11 +494,10 @@ public class Item
     {
         // TODO: Clone item by initialize default item and assign all the field.
         // not doing recalculating these fields values (too efficient)
-        Item newItem = new Item(this.Template);
-        newItem.count = this.count;
-        newItem.bonusParameters = this.bonusParameters;
+        Item newItem = new Item(this.Template, count);
+        newItem.bonusParameters = new HashMap<ItemBonusParameters, Integer>(this.bonusParameters);
         newItem.durability = this.durability;
-        newItem.modification = this.modification;
+        newItem.modification = this.modification.clone();
         return newItem;
     }
 
