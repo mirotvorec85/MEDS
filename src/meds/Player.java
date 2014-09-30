@@ -15,12 +15,10 @@ import meds.database.entity.CharacterSpell;
 import meds.database.entity.Currency;
 import meds.database.entity.Guild;
 import meds.database.entity.GuildLesson;
-import meds.database.entity.LevelCost;
 import meds.database.entity.Skill;
 import meds.database.entity.Spell;
 import meds.enums.ClanMemberStatuses;
 import meds.enums.Currencies;
-import meds.enums.GuildLessonStatuses;
 import meds.enums.Parameters;
 import meds.enums.PlayerSettings;
 import meds.enums.PlayerStatuses;
@@ -201,6 +199,11 @@ public class Player extends Unit
     public int getStatuses()
     {
         return this.statuses.getFlags();
+    }
+
+    public int getGuildLevel()
+    {
+        return this.guildLevel;
     }
 
     public int getCurrencyAmount(Currency currency)
@@ -533,102 +536,52 @@ public class Player extends Unit
         return packet;
     }
 
-    public ServerPacket getGuildLessonsData(int guildId)
+    public void learnGuildLesson(Guild guild)
     {
-        int learnedCount = 0;
-        int nextGuildId = guildId;
-        Guild guild;
-        /*
-         *  Find an appropriate guild in this guilds chain:
-         *  - Guild
-         *   - Middle Guild
-         *    - Higher Guild
-         *     - Academy
-         */
-        do
-        {
-            guild = DBStorage.GuildStore.get(nextGuildId);
-            nextGuildId = guild.getNextId();
-            CharacterGuild charGuild = this.info.getGuilds().get(guild.getId());
-            if (charGuild != null)
-                learnedCount = charGuild.getLevel();
-            else
-                learnedCount = 0;
+        if (guild == null)
+            return;
 
-        } while (learnedCount == 15 && nextGuildId != 0);
+        int guildId = guild.getId();
 
-        Map<Integer, GuildLesson> guildLessons = DBStorage.GuildLessonStore.get(guild.getId());
-
-        // Check previous Guild
-        boolean isGuildAvailable = true;
-        if (guild.getPrevId() != 0)
-        {
-            CharacterGuild charPrevGuild = this.info.getGuilds().get(guild.getPrevId());
-            if (charPrevGuild == null || charPrevGuild.getLevel() != 15)
-                isGuildAvailable = false;
-        }
-
-        ServerPacket packet = new ServerPacket(ServerOpcodes.GuildLessonInfo);
-        int goldSumm = 0;
-        for (int i = 1; i <= 15; ++i)
-        {
-            LevelCost cost = DBStorage.LevelCostStore.get(this.level.getGuildLevel() + i - learnedCount);
-            if (i - learnedCount > 0)
-                goldSumm += cost.getGold();
-            GuildLessonStatuses status = GuildLessonStatuses.Available;
-            // This guild is unavailable
-            if (!isGuildAvailable)
-                status = GuildLessonStatuses.Unavailable;
-            // This guild level is learned
-            else if (learnedCount >= i)
-                status = GuildLessonStatuses.Learned;
-            // Not enough gold or levels
-            else if (goldSumm > this.getCurrencyAmount(Currencies.Gold) ||
-                    (this.level.getGuildLevel() + i - learnedCount) > this.level.getLevel())
-                status = GuildLessonStatuses.RequirementsFailed;
-
-            packet.add(status);
-            packet.add(guildLessons.get(i).getDescription());
-            packet.add(status == GuildLessonStatuses.Learned ? -1 : (i - learnedCount + this.level.getGuildLevel() > this.level.getLevel()) ? cost.getExperience() : 0);
-            packet.add(status == GuildLessonStatuses.Learned ? -1 : cost.getGold());
-        }
-
-        packet.add(guild.getName());
-        packet.add("0");
-        packet.add(guild.getName());
-        packet.add(guild.getId());
-        packet.add("free");
-        packet.add("+100500 gold");
-
-        return packet;
-    }
-
-    public void learnGuildLesson(int guildId)
-    {
         CharacterGuild charGuild = this.info.getGuilds().get(guildId);
         if (charGuild == null)
         {
+            // This is the first lesson in this guild
+            // Check the previous(required) guild to be learned;
+            if (guild.getPrevId() != 0)
+            {
+                CharacterGuild prevCharGuild = this.info.getGuilds().get(guild.getPrevId());
+                if (prevCharGuild == null || prevCharGuild.getLevel() != 15)
+                    return;
+            }
+
             charGuild = new CharacterGuild(this.guid, guildId, 0);
             this.info.getGuilds().put(guildId, charGuild);
         }
 
-        GuildLesson lesson = DBStorage.GuildLessonStore.get(guildId).get(charGuild.getLevel());
-        if (!this.changeCurrency(Currencies.Gold.getValue(), -DBStorage.LevelCostStore.get(this.level.getGuildLevel()).getGold()))
+        // This guild is already learned
+        if (charGuild.getLevel() == 15)
+            return;
+
+        GuildLesson lesson = DBStorage.GuildLessonStore.get(guildId).get(charGuild.getLevel() + 1);
+        if (!this.changeCurrency(Currencies.Gold.getValue(), -DBStorage.LevelCostStore.get(this.guildLevel + 1).getGold()))
             return;
 
         this.applyGuildImprovement(lesson.getImprovementType1(), lesson.getId1(), lesson.getCount1());
         this.applyGuildImprovement(lesson.getImprovementType2(), lesson.getId2(), lesson.getCount2());
 
         charGuild.setLevel(charGuild.getLevel() + 1);
+        ++this.guildLevel;
 
         if (this.session != null)
         {
-            session.sendServerMessage(498);
-            session.send(new ServerPacket()
+
+            session.addServerMessage(498);
+            // TODO: Implement sound sending (Sound 31 here)
+            session.addData(new ServerPacket()
                     .add(this.getMagicData())
                     .add(this.getParametersData())
-                    .add(this.getGuildLevelData())
-                    .add(this.getGuildLessonsData(guildId)));
+                    .add(this.getGuildLevelData()));
         }
 
     }
@@ -657,6 +610,8 @@ public class Player extends Unit
                     this.info.getSpells().put(id, characterSpell);
                 }
                 characterSpell.setLevel(characterSpell.getLevel() + count);
+                // TODO: Message about new level with spell
+                // TODO: Set AutoSpell if not set
                 break;
             default: break;
         }

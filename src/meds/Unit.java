@@ -36,8 +36,6 @@ public abstract class Unit
         private int unk4;
         private int religLevel;
 
-        private int guildLevel;
-
         public LevelInfo(int level, int exp, int religLevel, int religExp)
         {
             this.level = level;
@@ -93,10 +91,6 @@ public abstract class Unit
         public int getReligLevel()
         {
             return this.religLevel;
-        }
-        public int getGuildLevel()
-        {
-            return this.guildLevel;
         }
 
         public ServerPacket getPacketData()

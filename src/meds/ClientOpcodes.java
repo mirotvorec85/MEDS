@@ -13,7 +13,8 @@ public enum ClientOpcodes
     BankExchange("chp"),
     DestroyItem("di"),
     GetLocationInfo("gei"), // Appeared in 2.0.0.0
-    EnterGuild("gg"),
+    @Deprecated
+    EnterGuild("gg"), // Deprecated after 2.0.0.0
     GetItemInfo("gii"),
     GetInn("ginn"),
     GuildLearn("gl"),

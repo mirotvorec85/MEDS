@@ -10,6 +10,8 @@ import java.util.HashMap;
 import meds.Item.Prototype;
 import meds.database.DBStorage;
 import meds.database.entity.Character;
+import meds.database.entity.Guild;
+import meds.database.entity.LevelCost;
 import meds.database.entity.NewMessage;
 import meds.database.entity.QuestTemplate;
 import meds.enums.BattleStates;
@@ -62,7 +64,6 @@ public class Session implements Runnable
         this.opcodeHandlers.put(ClientOpcodes.Attack, new AttackOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.UseMagic, new UseMagicOpcodeHander());
         this.opcodeHandlers.put(ClientOpcodes.Relax, new RelaxOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.EnterGuild, new EnterGuildOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.GuildLearn, new GuildLearnOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.GetGuildLevels, new GetGuildLevelsOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.Say, new SayOpcodeHandler());
@@ -88,6 +89,8 @@ public class Session implements Runnable
         this.opcodeHandlers.put(ClientOpcodes.SetHome, new SetHomeOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.GetLocationInfo, new LocationInfoOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.RegionLocations, new RegionLocationsOpcodeHandler());
+        this.opcodeHandlers.put(ClientOpcodes.GuildLessonsInfo, new GuildLessonsInfoOpcodeHandler());
+        this.opcodeHandlers.put(ClientOpcodes.LearnGuildInfo, new LearnGuildInfoOpcodeHandler());
 
         this.packets = new HashMap<Long, ServerPacket>();
 
@@ -695,25 +698,6 @@ public class Session implements Runnable
         }
     }
 
-    private class EnterGuildOpcodeHandler extends OpcodeHandler
-    {
-        @Override
-        public void handle(String[] data)
-        {
-            Location position = Session.this.player.getPosition();
-            if ((position.getSpecialLocationType() != SpecialLocationTypes.MagicSchool &&
-                    position.getSpecialLocationType() != SpecialLocationTypes.MilitarySchool) ||
-                    position.getSpecialLocationId() == 0)
-                    return;
-                int guildId = position.getSpecialLocationId();
-
-                if (!DBStorage.GuildStore.containsKey(guildId))
-                    return;
-
-                send(Session.this.player.getGuildLessonsData(guildId));
-        }
-    }
-
     private class GuildLearnOpcodeHandler extends OpcodeHandler
     {
         @Override
@@ -725,14 +709,11 @@ public class Session implements Runnable
         @Override
         public void handle(String[] data)
         {
-            int guildId = SafeConvert.toInt32(data[0]);
-            // TODO: Add checking for the guild chains
-            //if (guildId != this.player.Position.SpecialLocationId)
-            //    return;
-            if (!DBStorage.GuildStore.containsKey(guildId))
+            // Inside a Guild location only
+            if (Session.this.player.getPosition().getSpecialLocationType() != SpecialLocationTypes.MagicSchool)
                 return;
 
-            Session.this.player.learnGuildLesson(guildId);
+            Session.this.player.learnGuildLesson(DBStorage.GuildStore.get(SafeConvert.toInt32(data[0])));
         }
     }
 
@@ -1198,6 +1179,59 @@ public class Session implements Runnable
             Region region = Map.getInstance().getRegion(SafeConvert.toInt32(data[0]));
             if (region != null)
                 Session.this.addData(region.getLocationListData());
+        }
+    }
+
+    private class GuildLessonsInfoOpcodeHandler extends OpcodeHandler
+    {
+        @Override
+        public int getMinDataLength()
+        {
+            return 1;
+        }
+
+        @Override
+        public void handle(String[] data)
+        {
+            Guild guild = DBStorage.GuildStore.get(SafeConvert.toInt32(data[0]));
+            if (guild != null)
+                Session.this.addData(guild.getLessonsData());
+        }
+    }
+
+    private class LearnGuildInfoOpcodeHandler extends OpcodeHandler
+    {
+        @Override
+        public void handle(String[] data)
+        {
+            ServerPacket packet = new ServerPacket(ServerOpcodes.LearnGuildInfo);
+            packet.add("0");  // Always 0
+            int availableCount = Session.this.player.getLevel().getLevel() - Session.this.player.getGuildLevel();
+            packet.add(availableCount); // Available levels
+
+            // Positive - free available lessons count
+            // Negative - total learned lessons
+            packet.add(-Session.this.player.getGuildLevel());
+            packet.add(availableCount);
+            // Next lesson gold
+            LevelCost nextLevel = DBStorage.LevelCostStore.get(Session.this.player.getGuildLevel() + 1);
+            packet.add(nextLevel.getGold());
+            // Gold for all available lessons
+            int cost = 0;
+            do
+            {
+                cost += nextLevel.getGold();
+                nextLevel = nextLevel.getNextLevelCost();
+            } while (nextLevel == null || nextLevel.getLevel() <= Session.this.player.getGuildLevel());
+            packet.add(cost);
+
+            // Lessons reset cost
+            packet.add("free");
+
+            // ??? Maybe next reset cost?
+            packet.add("+100500 gold");
+
+            Session.this.addData(packet);
         }
     }
 }

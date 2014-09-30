@@ -41,7 +41,7 @@ public class CharacterGuild implements Serializable
     public void setGuildId(int guildId)
     {
         this.guildId = guildId;
-        this.guild = DBStorage.GuildStore.get(guild);
+        this.guild = DBStorage.GuildStore.get(guildId);
     }
 
     public Guild getGuild()

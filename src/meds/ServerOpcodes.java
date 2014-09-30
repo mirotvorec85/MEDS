@@ -15,7 +15,8 @@ public enum ServerOpcodes
     _fex("fex"),
     _fpi("fpi"),
     GuildInfo("gi"),
-    GuildLessonInfo("ginf"),
+    @Deprecated
+    GuildLessonInfo("ginf"), // Deprecated after 2.0.0.0
     GuildLessonsInfo("gni"), // Appeared in 2.0.0.0 after new guild system.
     GetCorpse("gtr"),
     _hoi("hoi"),
