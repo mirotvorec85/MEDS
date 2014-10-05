@@ -5,7 +5,15 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
+import meds.database.Hibernate;
+import meds.database.entity.CharacterInfo;
+import meds.database.entity.CharacterSpell;
+import meds.enums.Races;
 import meds.logging.Logging;
+import meds.util.MD5Hasher;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 public class ServerCommandHandler implements Runnable
 {
@@ -111,7 +119,60 @@ public class ServerCommandHandler implements Runnable
         @Override
         public void handle(String[] args)
         {
-            Logging.Debug.log("Character command args: " + args.toString());
+            if (String.valueOf("create").equals(args[0]))
+                this.create(Arrays.copyOfRange(args, 1, args.length));
+        }
+
+        private void create(String[] args)
+        {
+            if (args.length < 1)
+            {
+                System.out.println("Character create error: Missing character name.");
+                return;
+            }
+            if (args.length < 2)
+            {
+                System.out.println("Character create error: Missing character password.");
+                return;
+            }
+
+            String login = args[0].toLowerCase();
+            String charName = Character.toUpperCase(login.charAt(0)) + login.substring(1);
+
+            meds.database.entity.Character character = new meds.database.entity.Character();
+            character.setLogin(login);
+            character.setPasswordHash(MD5Hasher.ComputeHash(MD5Hasher.ComputeHash(args[1]) + "dsdarkswords"));
+
+            Session session = Hibernate.getSessionFactory().openSession();
+            Transaction tx = session.beginTransaction();
+            session.save(character);
+            tx.commit();
+            session.close();
+            int characterId = character.getId();
+
+            CharacterInfo characterInfo = new CharacterInfo();
+            characterInfo.setCharacterId(characterId);
+            characterInfo.setName(charName);
+            characterInfo.setAvatarId(22); // Elf
+            characterInfo.setRace(Races.Elf.getValue());
+            // Every base stat is 10
+            characterInfo.setBaseCon(10);
+            characterInfo.setBaseStr(10);
+            characterInfo.setBaseDex(10);
+            characterInfo.setBaseInt(10);
+            // Location - Seastone Star
+            characterInfo.setLocationId(3);
+            characterInfo.setHomeId(3);
+
+            characterInfo.getSpells().put(38, new CharacterSpell(characterId, 38, 1)); // Examine
+            characterInfo.getSpells().put(54, new CharacterSpell(characterId, 54, 1)); // First Aid
+            characterInfo.getSpells().put(60, new CharacterSpell(characterId, 60, 1)); // Relax
+
+            session = Hibernate.getSessionFactory().openSession();
+            tx = session.beginTransaction();
+            session.save(characterInfo);
+            tx.commit();
+            session.close();
         }
     }
 

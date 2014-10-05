@@ -6,7 +6,7 @@
 
     <class name="Character" table="`character`">
         <id name="id" type="int" column="`id`">
-            <generator class="assigned" />
+            <generator class="increment" />
         </id>
         <property name="login" type="string">
             <column name="`login`" />

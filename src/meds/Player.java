@@ -606,7 +606,7 @@ public class Player extends Unit
                 CharacterSpell characterSpell = this.info.getSpells().get(id);
                 if (characterSpell == null)
                 {
-                    characterSpell = new CharacterSpell(id, 0);
+                    characterSpell = new CharacterSpell(this.guid, id, 0);
                     this.info.getSpells().put(id, characterSpell);
                 }
                 characterSpell.setLevel(characterSpell.getLevel() + count);

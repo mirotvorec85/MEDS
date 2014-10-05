@@ -12,8 +12,9 @@ public class CharacterSpell implements Serializable
 
     public CharacterSpell() { }
 
-    public CharacterSpell(int spellId, int level)
+    public CharacterSpell(int characterId, int spellId, int level)
     {
+        this.characterId = characterId;
         this.spellId = spellId;
         this.level = level;
     }
