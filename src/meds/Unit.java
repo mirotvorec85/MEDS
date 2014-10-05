@@ -497,17 +497,15 @@ public abstract class Unit
                 Player player = (Player)this;
 
                 // Reward exp
-                int minExp = this.getLevel().getLevel() > 50 ? 0 : 1;
-                int exp = victim.getLevel().getLevel() * 2 - getLevel().getLevel();
-                if (exp < 0)
-                    exp = minExp;
-                if (victim.getLevel().getLevel() > getLevel().getLevel())
-                    exp *= 8;
+                int victimLevel = victim.getLevel().getLevel();
+                int killerLevel = this.getLevel().getLevel();
+                int exp = (victimLevel * victimLevel * victimLevel + 1) / (killerLevel * killerLevel + 1) + 1;
 
-                // Cannot get exp more than need per level + 1
-                int nextLevelEpx = DBStorage.LevelCostStore.get(getLevel().getLevel() + 1).getExperience();
-                if (exp > nextLevelEpx + 1)
-                    exp = nextLevelEpx + 1;
+                // HACK: the limit (or even its existence) is unknown
+                // Cannot get exp more than a half of the next level requirement
+                int nextLevelEpx = DBStorage.LevelCostStore.get(killerLevel + 1).getExperience();
+                if (exp > nextLevelEpx / 2)
+                    exp = nextLevelEpx / 2;
 
                 if (exp > 0)
                 {
