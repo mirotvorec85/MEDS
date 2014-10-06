@@ -42,6 +42,9 @@ public class Session implements Runnable
 
     private Player player;
 
+    /**
+     * Indicating whether the player passed login verification successful and loaded from DB.
+     */
     private boolean isAuthenticated;
 
     /**
@@ -527,6 +530,8 @@ public class Session implements Runnable
 
             // Send the custom welcome message
             packet.addData(ServerOpcodes.ServerMessage, "5001");
+
+            Session.this.isAuthenticated = true;
             send(packet);
         }
     }
@@ -534,15 +539,8 @@ public class Session implements Runnable
     private class ReadyOpcodeHandler extends OpcodeHandler
     {
         @Override
-        public boolean isAuthenticatedOnly()
-        {
-            return false;
-        }
-
-        @Override
         public void handle(String[] data)
         {
-            Session.this.isAuthenticated = true;
             Session.this.player.logIn(Session.this);
             World.getInstance().playerLoggedIn(Session.this.player);
         }
@@ -1138,12 +1136,6 @@ public class Session implements Runnable
     private class LocationInfoOpcodeHandler extends OpcodeHandler
     {
         @Override
-        public boolean isAuthenticatedOnly()
-        {
-            return false;
-        }
-
-        @Override
         public int getMinDataLength()
         {
             return 1;
@@ -1160,12 +1152,6 @@ public class Session implements Runnable
 
     private class RegionLocationsOpcodeHandler extends OpcodeHandler
     {
-        @Override
-        public boolean isAuthenticatedOnly()
-        {
-            return false;
-        }
-
         @Override
         public int getMinDataLength()
         {
