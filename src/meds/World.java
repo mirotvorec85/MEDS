@@ -189,7 +189,7 @@ public class World implements Runnable
     public ServerPacket getDayTimeData()
     {
         String day = this.dayTime < 360000 ? "0" : "1";
-        String time = this.dayTime < 360000 ? Integer.toString(this.dayTime / 1000) : Integer.toHexString(this.dayTime / 1000 - 360);
+        String time = this.dayTime < 360000 ? Integer.toString(this.dayTime / 1000) : Integer.toString(this.dayTime / 1000 - 360);
 
         return new ServerPacket(ServerOpcodes.DayTime)
             .add(day)
@@ -268,7 +268,7 @@ public class World implements Runnable
         // Set new Day Time
         this.dayTime += time;
         // Night begins
-        if (this.dayTime >= 360000)
+        if (this.dayTime - time < 360000 && this.dayTime >= 360000)
         {
             addDataToAll(getDayTimeData());
         }
