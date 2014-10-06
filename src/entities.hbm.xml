@@ -125,6 +125,9 @@
             <column name="`relig_exp`" />
         </property>
         <property name="level" type="int">
+            <column name="`level`" />
+        </property>
+        <property name="religLevel" type="int">
             <column name="`relig_level`" />
         </property>
         <property name="locationId" type="int">
