@@ -1,6 +1,6 @@
 package meds.util;
 
-public class EnumFlags<T extends Enum<T> & Valued>
+public class EnumFlags<T extends Enum<T> & Valued> implements Valued
 {
     private int flags;
 
@@ -63,7 +63,8 @@ public class EnumFlags<T extends Enum<T> & Valued>
         return this.has(flag.getValue());
     }
 
-    public int getFlags()
+    @Override
+    public int getValue()
     {
         return this.flags;
     }

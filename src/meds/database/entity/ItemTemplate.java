@@ -96,7 +96,7 @@ public class ItemTemplate
     }
     public int getFlags()
     {
-        return flags.getFlags();
+        return flags.getValue();
     }
     public void setFlags(int flags)
     {

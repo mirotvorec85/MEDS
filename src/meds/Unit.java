@@ -514,7 +514,7 @@ public abstract class Unit
                 }
 
                 // AutoLoot
-                if (corpse != null && player.hasSettings(PlayerSettings.AutoLoot))
+                if (corpse != null && player.getSettings().has(PlayerSettings.AutoLoot))
                     player.lootCorpse(corpse);
             }
         }

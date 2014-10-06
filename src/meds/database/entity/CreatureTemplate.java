@@ -54,7 +54,7 @@ public class CreatureTemplate
     }
     public int getCreatureFlags()
     {
-        return creatureFlags.getFlags();
+        return creatureFlags.getValue();
     }
     public void setCreatureFlags(int creatureFlags)
     {

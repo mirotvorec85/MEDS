@@ -902,9 +902,9 @@ public class Session implements Runnable
         {
             int status = SafeConvert.toInt32(data[0]);
             if (status == 1)
-                Session.this.player.setSettings(PlayerSettings.AutoLoot);
+                Session.this.player.getSettings().set(PlayerSettings.AutoLoot);
             else
-                Session.this.player.unsetSettings(PlayerSettings.AutoLoot);
+                Session.this.player.getSettings().unset(PlayerSettings.AutoLoot);
         }
     }
 

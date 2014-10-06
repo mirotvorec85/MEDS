@@ -171,34 +171,14 @@ public class Player extends Unit
         return this.inn;
     }
 
-    public boolean hasSettings(PlayerSettings settings)
+    public EnumFlags<PlayerSettings> getSettings()
     {
-        return this.settings.has(settings);
+        return this.settings;
     }
 
-    public void setSettings(PlayerSettings settings)
+    public EnumFlags<PlayerStatuses> getStatuses()
     {
-        this.settings.set(settings);
-    }
-
-    public void unsetSettings(PlayerSettings settings)
-    {
-        this.unsetSettings(settings);
-    }
-
-    public boolean hasStatus(PlayerStatuses status)
-    {
-        return this.statuses.has(status);
-    }
-
-    public void setStatus(PlayerStatuses status)
-    {
-        this.statuses.set(status);
-    }
-
-    public int getStatuses()
-    {
-        return this.statuses.getFlags();
+        return this.statuses;
     }
 
     public int getGuildLevel()
@@ -411,8 +391,8 @@ public class Player extends Unit
         this.info.setLocationId(this.position.getId());
         // Home is set
         // AutoSpell is set
-        this.info.setSettings(this.settings.getFlags());
-        this.info.setStatuses(this.statuses.getFlags());
+        this.info.setSettings(this.settings.getValue());
+        this.info.setStatuses(this.statuses.getValue());
 
         this.inventory.save();
         this.inn.save();
