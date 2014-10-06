@@ -17,8 +17,8 @@ public class Corpse
     {
         Logging.Debug.log("Create corpse for " + owner.getName());
         this.owner = owner;
-        this.position = this.owner.getPosition();
         this.guid = Map.getInstance().getNextCorpseGuid();
+        setPosition(owner.getPosition());
         this.loot = new HashSet<Item>();
     }
 
@@ -36,6 +36,15 @@ public class Corpse
     public Location getPosition()
     {
         return this.position;
+    }
+
+    private void setPosition(Location location)
+    {
+        if (location == null && this.position != null)
+            this.position.removeCorpse(this);
+        else if (location != null)
+            location.addCorpse(this);
+        this.position = location;
     }
 
     public int getGold()
