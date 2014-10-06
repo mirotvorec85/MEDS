@@ -42,6 +42,8 @@ public enum ItemBonusParameters implements Valued
 
     public static ItemBonusParameters parse(int value)
     {
+        if (value < 0 || value >= values.length)
+            return null;
         return ItemBonusParameters.values[value];
     }
 

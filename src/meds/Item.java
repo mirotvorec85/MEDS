@@ -250,6 +250,37 @@ public class Item
         }
     }
 
+    public static ServerPacket getItemInfo(int templateId, int modification, ServerPacket packet)
+    {
+        ItemTemplate template = DBStorage.ItemTemplateStore.get(templateId);
+        if (template == null)
+            return packet;
+
+        packet.add(ServerOpcodes.ItemInfo);
+        packet.add(template.getId())
+            // TODO: additional bonuses of the modification value
+            .add(modification);
+
+        if (template.getDescription().isEmpty())
+            packet.add(template.getTitle());
+        else
+            packet.add(template.getTitle() + "\r\n" + template.getDescription());
+
+        packet.add(template.getImageId())
+            .add(template.getItemClass())
+            .add(template.getLevel())
+            .add(template.getCost())
+            .add(template.getCurrencyId())
+            .add("1187244746") // Image (or even Item itself) date
+            .add(getMaxDurability(template))
+            .add(getWeight(template));
+
+        for (Map.Entry<ItemBonusParameters, Integer> entry : template.getBonusParameters().entrySet())
+            packet.add(entry.getKey()).add(entry.getValue());
+
+        return packet;
+    }
+
     public final ItemTemplate Template;
 
     public final int MaxDurability;
@@ -446,35 +477,6 @@ public class Item
         if (value == null)
             value = 0;
         return value;
-    }
-
-    public ServerPacket getPacketData()
-    {
-        if (this.Template == null)
-            return null;
-
-        ServerPacket packet = new ServerPacket(ServerOpcodes.ItemInfo);
-        packet.add(this.Template.getId())
-            .add(this.modification.getValue());
-
-        if (this.Template.getDescription().isEmpty())
-            packet.add(this.Template.getTitle());
-        else
-            packet.add(this.Template.getTitle() + "\r\n" + this.Template.getDescription());
-
-        packet.add(this.Template.getImageId())
-            .add(this.Template.getItemClass())
-            .add(this.Template.getLevel())
-            .add(this.Template.getCost())
-            .add(this.Template.getCurrencyId())
-            .add("1187244746") // Image (or even Item itself) date
-            .add(this.durability)
-            .add(this.Weight);
-
-        for (Map.Entry<ItemBonusParameters, Integer> entry : this.bonusParameters.entrySet())
-            packet.add(entry.getKey()).add(entry.getValue());
-
-        return packet;
     }
 
     @Override

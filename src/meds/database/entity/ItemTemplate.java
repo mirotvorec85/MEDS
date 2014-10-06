@@ -1,9 +1,16 @@
 package meds.database.entity;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import meds.enums.ItemBonusParameters;
 import meds.enums.ItemClasses;
 import meds.enums.ItemFlags;
+import meds.logging.Logging;
 import meds.util.EnumFlags;
+import meds.util.SafeConvert;
 
+@SuppressWarnings("unused")
 public class ItemTemplate
 {
     private int id;
@@ -17,12 +24,13 @@ public class ItemTemplate
     private int subClass;
     private EnumFlags<ItemFlags> flags;
     private String itemBonuses;
+    private Map<ItemBonusParameters, Integer> bonusParameters = new HashMap<ItemBonusParameters, Integer>();
 
     public int getId()
     {
         return id;
     }
-    public void setId(int id)
+    private void setId(int id)
     {
         this.id = id;
     }
@@ -30,7 +38,7 @@ public class ItemTemplate
     {
         return title;
     }
-    public void setTitle(String title)
+    private void setTitle(String title)
     {
         this.title = title;
     }
@@ -38,7 +46,7 @@ public class ItemTemplate
     {
         return description;
     }
-    public void setDescription(String description)
+    private void setDescription(String description)
     {
         this.description = description;
     }
@@ -46,7 +54,7 @@ public class ItemTemplate
     {
         return imageId;
     }
-    public void setImageId(int imageId)
+    private void setImageId(int imageId)
     {
         this.imageId = imageId;
     }
@@ -54,7 +62,7 @@ public class ItemTemplate
     {
         return itemClass.getValue();
     }
-    public void setItemClassInteger(int itemClass)
+    private void setItemClassInteger(int itemClass)
     {
         this.itemClass = ItemClasses.parse(itemClass);
     }
@@ -66,7 +74,7 @@ public class ItemTemplate
     {
         return level;
     }
-    public void setLevel(int level)
+    private void setLevel(int level)
     {
         this.level = level;
     }
@@ -74,7 +82,7 @@ public class ItemTemplate
     {
         return cost;
     }
-    public void setCost(int cost)
+    private void setCost(int cost)
     {
         this.cost = cost;
     }
@@ -82,7 +90,7 @@ public class ItemTemplate
     {
         return currencyId;
     }
-    public void setCurrencyId(int currencyId)
+    private void setCurrencyId(int currencyId)
     {
         this.currencyId = currencyId;
     }
@@ -90,7 +98,7 @@ public class ItemTemplate
     {
         return subClass;
     }
-    public void setSubClass(int subClass)
+    private void setSubClass(int subClass)
     {
         this.subClass = subClass;
     }
@@ -98,7 +106,7 @@ public class ItemTemplate
     {
         return flags.getValue();
     }
-    public void setFlags(int flags)
+    private void setFlags(int flags)
     {
         this.flags = new EnumFlags<ItemFlags>(flags);
     }
@@ -110,9 +118,43 @@ public class ItemTemplate
     {
         return itemBonuses;
     }
-    public void setItemBonuses(String itemBonuses)
+    private void setItemBonuses(String itemBonuses)
     {
         this.itemBonuses = itemBonuses;
+        this.bonusParameters = new HashMap<ItemBonusParameters, Integer>();
+        String[] keyValues = itemBonuses.split(";");
+        for (int i = 0; i < keyValues.length; ++i)
+        {
+            // Ignore empty strings
+            // It may happen when the itemBonus string ends with ";"
+            if (keyValues[i].length() == 0)
+                continue;
+
+            String[] keyValue = keyValues[i].split(":");
+            if (keyValue.length != 2)
+            {
+                Logging.Warn.log("Item template " + this.id + " has a wrong bonus key-value pair \"" + keyValues[i] + "\". Skipped.");
+                continue;
+            }
+            ItemBonusParameters parameter = ItemBonusParameters.parse(SafeConvert.toInt32(keyValue[0]));
+            int value = SafeConvert.toInt32(keyValue[1]);
+            if (parameter == null)
+            {
+                Logging.Warn.log("Item template " + this.id + " has a wrong ItemBonusParameter type:  \"" + keyValue[0] + "\". Skipped.");
+                continue;
+            }
+            if (value <= 0)
+            {
+                Logging.Warn.log("Item template " + this.id + " has a wrong ItemBonusParameter value:  \"" + keyValue[1] + "\". Skipped.");
+                continue;
+            }
+            this.bonusParameters.put(parameter, value);
+        }
+        this.bonusParameters = java.util.Collections.unmodifiableMap(this.bonusParameters);
+    }
+    public Map<ItemBonusParameters, Integer> getBonusParameters()
+    {
+        return this.bonusParameters;
     }
 
     @Override

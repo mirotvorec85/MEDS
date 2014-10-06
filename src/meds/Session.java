@@ -748,13 +748,12 @@ public class Session implements Runnable
         {
             ServerPacket packet = new ServerPacket();
             int templateId;
+            int modification;
             for (int i = 1; i < data.length; i += 2)
             {
                 templateId = SafeConvert.toInt32(data[i - 1]);
-                //modification = SafeConvert.toInt32(data[i]);
-                // TODO: modification
-                Item item = new Item(templateId);
-                packet.add(item.getPacketData());
+                modification = SafeConvert.toInt32(data[i]);
+                Item.getItemInfo(templateId, modification, packet);
             }
             send(packet);
         }
