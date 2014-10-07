@@ -11,6 +11,8 @@ import meds.enums.ItemEssenceLevels;
 import meds.enums.ItemEssenceTypes;
 import meds.enums.ItemReinforcementTypes;
 import meds.enums.ItemTotemicTypes;
+import meds.enums.Parameters;
+import meds.spell.Spell;
 import meds.util.Valued;
 
 public class Item
@@ -535,6 +537,44 @@ public class Item
 
     public void use(Player user)
     {
-        // TODO: implement
+        Spell spell = null;
+        switch (this.Template.getId())
+        {
+            case 64: // Small Health Potion
+                int amount = user.parameters.value(Parameters.Health) - user.getHealth();
+                // HP is full
+                if (amount < 1)
+                    return;
+                // TODO: level checking
+                user.setHealth(user.parameters.value(Parameters.Health));
+                if (user.getSession() != null)
+                    user.getSession().addServerMessage(500, this.Template.getTitle(), Integer.toString(amount));
+                break;
+            case 3581: // Small Mana Potion
+                // TODO: Implement
+                break;
+            case 35196: // Steel Body
+                spell = new Spell(16, user, 3, null, this);
+                break;
+            case 35197: // Bears Blood
+                // Level from Item level???
+                spell = new Spell(17, user, 3, null, this);
+                break;
+            case 35198: // Tigers Strength
+                spell = new Spell(14, user, 3, null, this);
+                break;
+            case 35199: // Feline Grace
+                spell = new Spell(18, user, 3, null, this);
+                break;
+            case 35200: // Wisdom of the Owl
+                spell = new Spell(37, user, 3, null, this);
+                break;
+        }
+
+        if (spell != null)
+        {
+            if (spell.cast())
+                --this.count;
+        }
     }
 }
