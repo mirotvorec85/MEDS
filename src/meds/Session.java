@@ -463,7 +463,7 @@ public class Session implements Runnable
             packet.addData(ServerOpcodes.AutoSpell, Integer.toString(Session.this.player.getAutoSpell())); // Default magic
             packet.addData(ServerOpcodes._s0, "");
 
-            if (Session.this.player.getRelax())
+            if (Session.this.player.isRelax())
                 packet.add(ServerOpcodes.RelaxOn);
             else
                 packet.add(ServerOpcodes.RelaxOff);
@@ -692,7 +692,7 @@ public class Session implements Runnable
             /*
              * data[0] - "0".
              */
-            Session.this.player.setRelax(!Session.this.player.getRelax());
+            Session.this.player.castSpell(60); // Cast Relax spell
         }
     }
 

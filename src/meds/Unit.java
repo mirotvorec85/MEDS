@@ -340,6 +340,8 @@ public abstract class Unit
         }
         if (battle != null)
         {
+            // Remove Relax Aura
+            this.removeAura(1000);
             battle.enterBattle(this);
         }
 
@@ -432,16 +434,11 @@ public abstract class Unit
         /* Magic */
         if (this.getAutoSpell() != 0)
         {
-            int level;
-            if ((level = this.getSpellLevel(this.getAutoSpell())) != 0)
+            // This spell killed a target
+            if (this.castSpell(this.getAutoSpell(), this.target) &&
+                    (this.target == null || !this.target.isAlive()))
             {
-                new meds.spell.Spell(this.getAutoSpell(), this, level, this.target).cast();
-
-                // This spell killed a target
-                if (this.target == null || !this.target.isAlive())
-                {
-                    return;
-                }
+                return;
             }
         }
 
@@ -602,6 +599,19 @@ public abstract class Unit
         return this.auras.containsKey(spellId);
     }
 
+    public boolean castSpell(int spellId)
+    {
+        return this.castSpell(spellId, null);
+    }
+
+    public boolean castSpell(int spellId, Unit target)
+    {
+        int level = this.getSpellLevel(spellId);
+        if (level == 0)
+            return false;
+        meds.spell.Spell spell = new meds.spell.Spell(spellId, this, level, target);
+        return spell.cast();
+    }
 
     protected void onVisualChanged()
     {
@@ -639,11 +649,7 @@ public abstract class Unit
 
         if (this.effectSpell != null && this.effectSpell.getKey() != null)
         {
-            Integer spellLevel = this.getSpellLevel(this.effectSpell.getKey().getId());
-            if (spellLevel != null)
-            {
-                new meds.spell.Spell(this.effectSpell.getKey(), this, spellLevel).cast();
-            }
+            this.castSpell(this.effectSpell.getKey().getId(), this.effectSpell.getValue());
 
             this.effectSpell = new KeyValuePair<Spell, Unit>(null, null);
         }
@@ -660,12 +666,6 @@ public abstract class Unit
                 {
                     healthRegen *= 3;
                     manaRegen *= 3;
-                }
-                // Relaxing doubles the regeneration
-                if (isPlayer() && ((Player)this).getRelax())
-                {
-                    healthRegen *= 2;
-                    manaRegen *= 2;
                 }
 
                 int newHealth = this.getHealth() + healthRegen;

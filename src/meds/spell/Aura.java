@@ -40,6 +40,7 @@ public class Aura
         customAuraClasses.put(17, AuraBuff.class); // Feline Grace
         customAuraClasses.put(18, AuraBuff.class); // Bears Blood
         customAuraClasses.put(37, AuraBuff.class); // Wisdom of the Owl
+        customAuraClasses.put(1000, AuraRelax.class); // Relax
     }
 
     protected int level;
@@ -56,10 +57,10 @@ public class Aura
      * @param entry Entry of the related spell.
      * @param owner A unit who is target of the aura
      * @param level Level of the aura.
-     * @param duration Duration in milliseconds. If aura is permanent, duration = -1.
+     * @param duration Duration in milliseconds. If duration is negative the the aura is permanent.
      * @return A new Aura instance for this Spell
      */
-    public static Aura CreateAura(meds.database.entity.Spell entry, Unit owner, int level, int duration)
+    public static Aura createAura(meds.database.entity.Spell entry, Unit owner, int level, int duration)
     {
         Aura aura = null;
         Class<? extends Aura> auraClass = Aura.customAuraClasses.get(entry.getId());
@@ -88,7 +89,7 @@ public class Aura
             aura.ownerPlayer = (Player)owner;
         aura.level = level;
         aura.remainingTime = duration;
-        aura.isPermanent = duration == -1;
+        aura.isPermanent = duration < 0;
         aura.state = States.Created;
         aura.minuteLeft = false;
 
@@ -176,7 +177,7 @@ public class Aura
         return new ServerPacket(ServerOpcodes.Aura)
             .add(this.spellEntry.getId())
             .add(this.level)
-            .add(this.remainingTime / 1000);
+            .add(this.isPermanent ? "-1" : this.remainingTime / 1000);
     }
 
     public void forceRemove()

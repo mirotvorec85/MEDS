@@ -84,6 +84,17 @@ public class Spell
              case 54:
                  handleSpellFirstAid();
                  break;
+             // Relax
+             case 60:
+                 if (this.caster.hasAura(1000))
+                 {
+                     this.caster.removeAura(1000);
+                 }
+                 else
+                 {
+                     this.caster.addAura(Aura.createAura(DBStorage.SpellStore.get(1000), this.caster, -1, -10));
+                 }
+                 break;
              default:
                  return false;
          }
@@ -190,7 +201,7 @@ public class Spell
              duration = 1200000;
 
          // TODO: mana cost
-         Aura aura = Aura.CreateAura(entry, this.target, level, duration);
+         Aura aura = Aura.createAura(entry, this.target, level, duration);
          if (!this.target.addAura(aura))
              return;
 

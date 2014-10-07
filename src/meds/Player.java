@@ -113,14 +113,9 @@ public class Player extends Unit
             this.session.addData(new ServerPacket(ServerOpcodes.AutoSpell).add(spellId));
     }
 
-    public boolean getRelax()
+    public boolean isRelax()
     {
-        return false;
-    }
-
-    public void setRelax(boolean relax)
-    {
-        // TODO: implement relax statement
+        return this.hasAura(1000);
     }
 
     public Location getHome()
