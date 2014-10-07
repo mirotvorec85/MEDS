@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import meds.database.DBStorage;
+import meds.database.entity.LevelCost;
 import meds.database.entity.Spell;
 import meds.enums.ClanMemberStatuses;
 import meds.enums.Parameters;
@@ -50,7 +51,7 @@ public abstract class Unit
             if (Unit.this.unitType != UnitTypes.Player)
                 return;
             Player player = (Player)Unit.this;
-            int nextLvlExp = DBStorage.LevelCostStore.get(this.level + 1).getExperience();
+            int nextLvlExp = LevelCost.getExp(this.level + 1);
 
             // Is Level Up
             if (nextLvlExp <= this.exp)
@@ -518,7 +519,7 @@ public abstract class Unit
 
                 // HACK: the limit (or even its existence) is unknown
                 // Cannot get exp more than a half of the next level requirement
-                int nextLevelEpx = DBStorage.LevelCostStore.get(killerLevel + 1).getExperience();
+                int nextLevelEpx = LevelCost.getExp(killerLevel + 1);
                 if (exp > nextLevelEpx / 2)
                     exp = nextLevelEpx / 2;
 

@@ -1199,16 +1199,9 @@ public class Session implements Runnable
             packet.add(-Session.this.player.getGuildLevel());
             packet.add(availableCount);
             // Next lesson gold
-            LevelCost nextLevel = DBStorage.LevelCostStore.get(Session.this.player.getGuildLevel() + 1);
-            packet.add(nextLevel.getGold());
+            packet.add(LevelCost.getGold(Session.this.player.getGuildLevel() + 1));
             // Gold for all available lessons
-            int cost = 0;
-            do
-            {
-                cost += nextLevel.getGold();
-                nextLevel = nextLevel.getNextLevelCost();
-            } while (nextLevel == null || nextLevel.getLevel() <= Session.this.player.getGuildLevel());
-            packet.add(cost);
+            packet.add(LevelCost.getTotalGold(Session.this.player.getGuildLevel() + 1, Session.this.player.getLevel().getLevel()));
 
             // Lessons reset cost
             packet.add("free");

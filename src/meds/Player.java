@@ -15,6 +15,7 @@ import meds.database.entity.CharacterSpell;
 import meds.database.entity.Currency;
 import meds.database.entity.Guild;
 import meds.database.entity.GuildLesson;
+import meds.database.entity.LevelCost;
 import meds.database.entity.Skill;
 import meds.database.entity.Spell;
 import meds.enums.ClanMemberStatuses;
@@ -544,7 +545,7 @@ public class Player extends Unit
             return;
 
         GuildLesson lesson = DBStorage.GuildLessonStore.get(guildId).get(charGuild.getLevel() + 1);
-        if (!this.changeCurrency(Currencies.Gold.getValue(), -DBStorage.LevelCostStore.get(this.guildLevel + 1).getGold()))
+        if (!this.changeCurrency(Currencies.Gold.getValue(), -LevelCost.getGold(this.guildLevel + 1)))
             return;
 
         this.applyGuildImprovement(lesson.getImprovementType1(), lesson.getId1(), lesson.getCount1());
