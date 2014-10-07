@@ -3,7 +3,9 @@ package meds.enums;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum Parameters
+import meds.util.Valued;
+
+public enum Parameters implements Valued
 {
     None(0),
     /* Base Parameters */
@@ -64,8 +66,15 @@ public enum Parameters
         this.value = value;
     }
 
+    @Override
     public int getValue()
     {
         return this.value;
+    }
+
+    @Override
+    public String toString()
+    {
+        return Integer.toString(this.value);
     }
 }

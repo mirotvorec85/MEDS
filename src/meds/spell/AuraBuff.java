@@ -165,10 +165,10 @@ public class AuraBuff extends Aura
         }
 
         // Apply Bonus parameters
-        if (this.bonusParameter1.getKey() != Parameters.None)
+        if (this.bonusParameter1 != null)
         {
             this.owner.getParameters().magic().change(this.bonusParameter1.getKey(), this.bonusParameter1.getValue());
-            if (this.bonusParameter2.getKey() != Parameters.None)
+            if (this.bonusParameter2 != null)
                 this.owner.getParameters().magic().change(this.bonusParameter2.getKey(), this.bonusParameter2.getValue());
         }
     }
@@ -181,17 +181,20 @@ public class AuraBuff extends Aura
     protected void removeBonus(boolean isSendToPlayer)
     {
         // Remove bonus parameters
-        if (this.bonusParameter1.getKey() != Parameters.None)
+        if (this.bonusParameter1 != null)
         {
             this.owner.getParameters().magic().change(this.bonusParameter1.getKey(), -this.bonusParameter1.getValue());
             if (isSendToPlayer && this.ownerPlayer != null && this.ownerPlayer.getSession() != null)
                 this.ownerPlayer.getSession().addData( new ServerPacket(ServerOpcodes.BonusMagicParameter).add(this.bonusParameter1.getKey()).add("0"));
-            if (this.bonusParameter2.getKey() != Parameters.None)
+
+            if (this.bonusParameter2 != null)
             {
                 this.owner.getParameters().magic().change(this.bonusParameter2.getKey(), -this.bonusParameter2.getValue());
                  if (isSendToPlayer && this.ownerPlayer != null && this.ownerPlayer.getSession() != null)
                      this.ownerPlayer.getSession().addData( new ServerPacket(ServerOpcodes.BonusMagicParameter).add(this.bonusParameter2.getKey()).add("0"));
             }
+            this.bonusParameter1 = null;
+            this.bonusParameter2 = null;
         }
     }
 
@@ -206,10 +209,10 @@ public class AuraBuff extends Aura
     {
         ServerPacket packet = super.getPacketData();
 
-        if (this.bonusParameter1.getKey() != Parameters.None)
+        if (this.bonusParameter1 != null)
         {
             packet.add(ServerOpcodes.BonusMagicParameter).add(this.bonusParameter1.getKey()).add(this.bonusParameter1.getValue());
-            if (this.bonusParameter2.getKey() != Parameters.None)
+            if (this.bonusParameter2 != null)
                 packet.add(ServerOpcodes.BonusMagicParameter).add(this.bonusParameter2.getKey()).add(this.bonusParameter2.getValue());
         }
 
