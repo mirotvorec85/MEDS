@@ -157,7 +157,6 @@ public class Location
     {
         this.regionId = regionId;
         this.region = Map.getInstance().getRegion(regionId);
-        this.region.addLocation(this);
     }
     public Region getRegion()
     {

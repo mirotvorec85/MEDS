@@ -84,6 +84,7 @@ public class Map
         for (Region region : regions)
         {
             this.regions.put(region.getId(), region);
+            region.getKingdom().addRegion(region);
         }
         Logging.Info.log("Loaded " + this.regions.size() + " regions");
 
@@ -91,6 +92,7 @@ public class Map
         for (Location location : locations)
         {
             this.locations.put(location.getId(), location);
+            location.getRegion().addLocation(location);
         }
         Logging.Info.log("Loaded " + this.locations.size() + " locations");
 

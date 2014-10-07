@@ -15,7 +15,13 @@ public class Region
     private int maxLevel;
 
     private Kingdom kingdom;
-    private List<Location> locations = new ArrayList<Location>();;
+    /**
+     * List of all the location the belong to this region.
+     */
+    private List<Location> locations = new ArrayList<Location>();
+    /**
+     * List of only non-special locations (i.e exclude shops, guilds, stars etc.; locations where creature are allowed to be)
+     */
     private List<Location> ordinaryLocations = new ArrayList<Location>();
 
     private ServerPacket locationListData;
