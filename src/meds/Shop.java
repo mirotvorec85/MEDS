@@ -118,21 +118,6 @@ public class Shop
         // Cost is 20% less than the item cost
         seller.changeCurrency(this.currencyId, (int)(item.Template.getCost() * 0.8) * item.getCount());
 
-        Integer shopItemCount = this.items.get(item.Template);
-        // The shop has not had this item
-        if (shopItemCount == null)
-        {
-            this.items.put(item.Template, item.getCount());
-            return true;
-        }
-        // Do not do anything when this item is infinite item of the shop
-        if (shopItemCount == -1)
-        {
-            return true;
-        }
-
-        // Add item to the shop stock
-        this.items.put(item.Template, shopItemCount + item.getCount());
         return true;
     }
 
@@ -155,7 +140,7 @@ public class Shop
             return false;
 
         // Correct count by source count
-        if (count > shopItemCount)
+        if (count > shopItemCount && shopItemCount != Integer.valueOf(-1))
             count = shopItemCount;
 
         // Correct count by payable ability
@@ -171,13 +156,15 @@ public class Shop
         buyer.changeCurrency(this.currencyId, - template.getCost() * count);
 
         // Subtract the bought count if not an infinite item stack
-        if (shopItemCount != 1)
+        if (shopItemCount != Integer.valueOf(-1))
         {
             shopItemCount -= count;
             // The last items
             if (shopItemCount == 0)
                 // Remove from the shop
                 this.items.remove(template);
+            else
+                this.items.put(template, shopItemCount);
         }
 
         return true;
@@ -205,18 +192,14 @@ public class Shop
             case AlchemicalShop:
                 return itemClass == ItemClasses.Usable || itemClass == ItemClasses.Gemm;
             case ArmourShop:
-                return itemClass == ItemClasses.Head || itemClass == ItemClasses.Body ||
-                    itemClass == ItemClasses.Shield;
-            case Dump:
-                return itemClass == ItemClasses.Component;
-            case JewelerShop:
-                return itemClass == ItemClasses.Ring || itemClass == ItemClasses.Neck;
-            case DepartmentStore:
                 return itemClass == ItemClasses.Hands || itemClass == ItemClasses.Back ||
                     itemClass == ItemClasses.Waist || itemClass == ItemClasses.Legs ||
-                    itemClass == ItemClasses.Foot;
-            case WeaponShop:
-                return itemClass == ItemClasses.Weapon;
+                    itemClass == ItemClasses.Head || itemClass == ItemClasses.Body ||
+                    itemClass == ItemClasses.Shield || itemClass == ItemClasses.Foot ||
+                    itemClass == ItemClasses.Ring || itemClass == ItemClasses.Neck ||
+                    itemClass == ItemClasses.Weapon;
+            case Dump:
+                return itemClass == ItemClasses.Component;
             default:
                 return false;
         }

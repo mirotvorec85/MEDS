@@ -862,7 +862,18 @@ public class Session implements Runnable
             // int unk5 = SafeConvert.ToInt32(data[4]); // Always 0
             if (proto.getTemplateId() == 0 || count == -1)
                 return;
-            Session.this.player.sellItem(proto, count);
+
+            // Player must be at shop
+            if (player.getPosition().getSpecialLocationType() == SpecialLocationTypes.Generic)
+                return;
+
+            Shop shop = meds.Map.getInstance().getShop(player.getPosition().getSpecialLocationId());
+            // There is no shop with this id
+            if (shop == null)
+                return;
+
+            if (shop.buyItem(player, proto, count) && player.getSession() != null)
+                player.getSession().addData(shop.getData());
         }
     }
 
@@ -882,7 +893,18 @@ public class Session implements Runnable
             // int unk5 = SafeConvert.ToInt32(data[4]); // Always 0
             if (proto.getTemplateId() == 0 || count == -1)
                 return;
-            Session.this.player.buyItem(proto, count);
+
+            // Player must be at shop
+            if (player.getPosition().getSpecialLocationType() == SpecialLocationTypes.Generic)
+                return;
+
+            Shop shop = meds.Map.getInstance().getShop(player.getPosition().getSpecialLocationId());
+            // There is no shop with this id
+            if (shop == null)
+                return;
+
+            if (shop.sellItem(player, proto, count) && player.getSession() != null)
+                player.getSession().addData(shop.getData());
         }
     }
 

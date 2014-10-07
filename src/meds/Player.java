@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import meds.Item.Prototype;
 import meds.database.DBStorage;
 import meds.database.Hibernate;
 import meds.database.entity.CharacterCurrency;
@@ -674,36 +673,6 @@ public class Player extends Unit
         }
 
         this.position.removeCorpse(corpse);
-    }
-
-    public void sellItem(Prototype proto, int count)
-    {
-        // Player must be at shop
-        if (this.position.getSpecialLocationType() == SpecialLocationTypes.Generic)
-            return;
-
-        Shop shop = meds.Map.getInstance().getShop(this.position.getSpecialLocationId());
-        // There is no shop with this id
-        if (shop == null)
-            return;
-
-        if (shop.buyItem(this, proto, count) && this.session != null)
-            this.session.addData(shop.getData());
-    }
-
-    public void buyItem(Prototype proto, int count)
-    {
-        // Player must be at shop
-        if (this.position.getSpecialLocationType() == SpecialLocationTypes.Generic)
-            return;
-
-        Shop shop = meds.Map.getInstance().getShop(this.position.getSpecialLocationId());
-        // There is no shop with this id
-        if (shop == null)
-            return;
-
-        if (shop.sellItem(this, proto, count) && this.session != null)
-            this.session.addData(shop.getData());
     }
 
     public void interact(Unit unit)
