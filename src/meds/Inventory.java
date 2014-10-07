@@ -532,14 +532,13 @@ public class Inventory
             return null;
 
         int i = itemSlots.length - 1;
-        Item item = new Item(proto, 0);
+        Item item = null;
         do
         {
-            if (!item.transer(this.inventorySlots[itemSlots[i]], count - item.getCount()))
-            {
-                --i;
-                continue;
-            }
+            if (item == null)
+                item = this.inventorySlots[itemSlots[i]].unstackItem(count);
+            else
+                item.transer(this.inventorySlots[itemSlots[i]], count - item.getCount());
 
             if (this.inventorySlots[itemSlots[i]].getCount() == 0)
                 this.inventorySlots[itemSlots[i]] = null;
@@ -550,7 +549,7 @@ public class Inventory
             --i;
         } while (i >= 0);
 
-        if (item.getCount() != 0)
+        if (item != null && item.getCount() != 0)
             onInventoryChanged();
         return item;
     }
