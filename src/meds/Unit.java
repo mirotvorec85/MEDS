@@ -62,7 +62,7 @@ public abstract class Unit
                 player.onDisplayChanged();
                 if (player.getSession() != null)
                     player.getSession().addServerMessage(497). // You gain a new level
-                        addServerMessage(492). // You can learn new lesson in guilds
+                        addServerMessage(492). // You can learn new lesson in a guild
                         addData(this.getPacketData()).addData(player.getParametersData());
             }
             else
@@ -87,6 +87,21 @@ public abstract class Unit
         public int getLevel()
         {
             return this.level;
+        }
+        public void setLevel(int level)
+        {
+            if (this.level == level)
+                return;
+            this.level = level;
+            if (!Unit.this.isPlayer())
+                return;
+            Player player = (Player)Unit.this;
+
+            player.onVisualChanged();
+            player.onDisplayChanged();
+
+            if (player.getSession() != null)
+                player.getSession().addData(this.getPacketData());
         }
         public int getReligLevel()
         {

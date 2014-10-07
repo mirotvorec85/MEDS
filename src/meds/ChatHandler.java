@@ -8,7 +8,7 @@ import meds.util.SafeConvert;
 
 public final class ChatHandler
 {
-public final static String MessageSeparator = "\u0030";
+    public final static String MessageSeparator = "\u0030";
     public final static String PlayerSeparator = "\u0002";
     public final static String SayChar = "\u0031";
 
@@ -16,22 +16,10 @@ public final static String MessageSeparator = "\u0030";
 
     static
     {
-    chatCommands.put("teleport", new TeleportChatCommand());
+        chatCommands.put("teleport", new TeleportChatCommand());
+        chatCommands.put("set_level", new SetLevelChatCommand());
     }
 
-    // TODO: Implement ChatCommands
-    /*
-    private delegate void chatCommandDelegate(Player player, string[] data);
-    private static Dictionary<string, chatCommandDelegate> chatCommands;
-
-    static ChatHandler()
-    {
-        ChatHandler.chatCommands = new Dictionary<string, chatCommandDelegate>()
-        {
-            {"teleport", ChatHandler.CommandTeleport},
-        };
-    }
-*/
     public static void handleSay(Player player, String message)
     {
         // Ignore empty messages
@@ -40,12 +28,12 @@ public final static String MessageSeparator = "\u0030";
 
         // Message contains only whitespace
         for (int i = 0; i < message.length(); ++i)
-    {
-        if (message.charAt(i) != ' ')
-        break;
-        if (i == message.length() - 1)
-        return;
-    }
+        {
+            if (message.charAt(i) != ' ')
+            break;
+            if (i == message.length() - 1)
+            return;
+        }
 
         // Is a command
         if (message.charAt(0) == '\\' && message.length() > 1)
@@ -68,7 +56,7 @@ public final static String MessageSeparator = "\u0030";
 
     public static void handleWhisper(Player player, String message)
     {
-    // TODO: Implement whispering
+        // TODO: Implement whispering
     }
 
     public static void handleCommand(Player player, String command, String[] commandArgs)
@@ -84,29 +72,47 @@ public final static String MessageSeparator = "\u0030";
 
     private static abstract class ChatCommand
     {
-    public int getMinArgsCount()
-    {
-    return -1;
-    }
+        public int getMinArgsCount()
+        {
+            return -1;
+        }
 
-    public abstract void handle(Player player, String[] args);
+        public abstract void handle(Player player, String[] args);
     }
 
     private static class TeleportChatCommand extends ChatCommand
     {
-    @Override
-    public int getMinArgsCount()
-    {
-    return 1;
-    }
+        @Override
+        public int getMinArgsCount()
+        {
+            return 1;
+        }
 
-    @Override
-    public void handle(Player player, String[] args)
-    {
+        @Override
+        public void handle(Player player, String[] args)
+        {
             int locationId = SafeConvert.toInt32(args[0]);
             Location location = Map.getInstance().getLocation(locationId);
             if (location != null)
                 player.setPosition(location);
+        }
     }
+
+    private static class SetLevelChatCommand extends ChatCommand
+    {
+        @Override
+        public int getMinArgsCount()
+        {
+            return 1;
+        }
+
+        @Override
+        public void handle(Player player, String[] args)
+        {
+            int level = SafeConvert.toInt32(args[0], -1);
+            if (level < 0 || level > 360)
+                return;
+            player.getLevel().setLevel(level);
+        }
     }
 }
