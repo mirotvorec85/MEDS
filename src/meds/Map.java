@@ -172,7 +172,7 @@ public class Map
                 }
                 packet.add(mover.getName());
 
-                //mover.getPosition().addData(mover, packet);
+                mover.getPosition().addData(mover, packet);
 
                 mover.setPosition(location);
             }
