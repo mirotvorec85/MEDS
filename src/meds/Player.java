@@ -33,6 +33,16 @@ import org.hibernate.Transaction;
 
 public class Player extends Unit
 {
+    private class SessionDisconnect implements meds.Session.DisconnectListener
+    {
+        @Override
+        public void disconnect(meds.Session session)
+        {
+            // TODO; Implement timer to logout the hanging player
+            Player.this.session = null;
+        }
+    }
+
     protected static final int SaveTime = 60000;
     protected static final int SyncTime = 20000;
 
@@ -54,6 +64,8 @@ public class Player extends Unit
 
     private int guildLevel;
 
+    private SessionDisconnect disconnector;
+
     public Player(int guid)
     {
         super();
@@ -70,6 +82,8 @@ public class Player extends Unit
 
         this.saverTimer = SaveTime;
         this.syncTimer = SyncTime;
+
+        this.disconnector = new SessionDisconnect();
     }
 
     @Override
@@ -270,14 +284,15 @@ public class Player extends Unit
 
     public void logIn(meds.Session session)
     {
+        if (this.session != null)
+        {
+            Logging.Warn.log ("Player %d assigns a new session with existing one.");
+            this.session.removeDisconnectListener(this.disconnector);
+        }
         this.session = session;
+        this.session.addDisconnectListener(this.disconnector);
         // Reappear to the current location
         this.setPosition(this.position);
-    }
-
-    public void logOut()
-    {
-        this.session = null;
     }
 
     private boolean load()

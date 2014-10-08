@@ -5,7 +5,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.EventListener;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import meds.Item.Prototype;
 import meds.database.DBStorage;
@@ -27,6 +30,11 @@ import meds.util.SafeConvert;
 
 public class Session implements Runnable
 {
+    public interface DisconnectListener extends EventListener
+    {
+        public void disconnect(Session session);
+    }
+
     /**
      * Related Socket for this session.
      */
@@ -52,9 +60,13 @@ public class Session implements Runnable
      */
     private int key;
 
+    private Set<DisconnectListener> listeners;
+
     public Session(Socket socket)
     {
         this.socket = socket;
+
+        this.listeners = new HashSet<Session.DisconnectListener>();
 
         this.opcodeHandlers = new HashMap<ClientOpcodes, Session.OpcodeHandler>();
         this.opcodeHandlers.put(ClientOpcodes.Verification, new VerificationOpcodeHandler());
@@ -98,6 +110,16 @@ public class Session implements Runnable
         this.packets = new HashMap<Long, ServerPacket>();
 
         this.key = Random.nextInt();
+    }
+
+    public void addDisconnectListener(DisconnectListener listener)
+    {
+        this.listeners.add(listener);
+    }
+
+    public void removeDisconnectListener(DisconnectListener listener)
+    {
+        this.listeners.remove(listener);
     }
 
     @Override
@@ -161,7 +183,16 @@ public class Session implements Runnable
                         continue;
                     }
 
-                    handler.handle(data);
+                    try
+                    {
+                        handler.handle(data);
+                    }
+                    catch(Exception ex)
+                    {
+                        Logging.Error.log("An exception has occured while handling the opcode " + clientOpcode.toString(), ex);
+                        continue;
+                    }
+
                     // Send a packet buffer
                     if (handler.isPositionSend() && this.player != null && this.player.getPosition() != null)
                         this.player.getPosition().send();
@@ -172,27 +203,27 @@ public class Session implements Runnable
         }
         catch (IOException e)
         {
-            Logging.Error.log("Exception while reading a socket: " + e.getMessage());
+            // Then the Server is stopping this exception is the expected
+            if (!Server.isStopping())
+                Logging.Error.log("An exception while reading a socket.", e);
         }
     }
 
     private void disconnect()
     {
-        if (this.player != null)
-        {
-            this.player.logOut();
-            World.getInstance().playerLoggedOut(this.player);
-        }
-
         try
         {
             this.socket.close();
         }
         catch (IOException ex)
         {
-            Logging.Error.log("IOException on socket.close(): " + ex.getMessage());
+            Logging.Error.log("IOException while trying to close the Session socket", ex);
         }
-        Server.disconnect(this);
+
+        for (DisconnectListener listener : this.listeners)
+            listener.disconnect(this);
+
+        this.listeners.clear();
     }
 
     public void send(ServerPacket packet)

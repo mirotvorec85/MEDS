@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
+import meds.Server.StopListener;
 import meds.database.Hibernate;
 import meds.database.entity.CharacterInfo;
 import meds.database.entity.CharacterSpell;
@@ -19,65 +20,91 @@ public class ServerCommandHandler implements Runnable
 {
     private HashMap<String, CommandHandler> commands;
 
+    private Scanner scanner;
+
     public ServerCommandHandler()
     {
         this.commands = new HashMap<String, ServerCommandHandler.CommandHandler>();
         this.commands.put("character", new CharacterCommandHandler());
         this.commands.put("help", new HelpCommandHandler());
         this.commands.put("shutdown", new ShutdownCommandHandler());
+
+        Server.addStopListener(new StopListener()
+        {
+
+            @Override
+            public void stop()
+            {
+                // Set isStopping value and the World.stop() method
+                // will be called just before the next update.
+                ServerCommandHandler.this.scanner.close();
+            }
+        });
     }
 
     @Override
     public void run()
     {
         Logging.Debug.log("ServerCommandHandler started");
-        Scanner scanner = new Scanner(System.in);
+        this.scanner = new Scanner(System.in);
         String line;
-        while(scanner.hasNext())
+        try
         {
-            line = scanner.nextLine();
-            if (line.isEmpty())
-                continue;
-            line = line.toLowerCase();
-            Logging.Debug.log("Command entered: " + line);
-            String[] commandArgs = line.split(" ");
-
-            CommandHandler handler = this.commands.get(commandArgs[0]);
-            if (handler == null)
+            while(this.scanner.hasNext())
             {
-                System.out.println("Command \"" + commandArgs[0] + "\" not found. To see the list of all available commands type \"help\"");
-                continue;
-            }
-
-            // Check subcommands
-            String[] subCommands = handler.getSubCommands();
-            if (subCommands != null)
-            {
-                if (commandArgs.length == 1)
-                {
-                    this.notifySubCommands(commandArgs[0], subCommands);
+                line = this.scanner.nextLine();
+                if (line.isEmpty())
                     continue;
-                }
-                boolean subCommandFound = false;
-                for (int i = 0; i < subCommands.length; ++i)
-                {
-                    if (subCommands[i].equals(commandArgs[1]))
-                    {
-                        subCommandFound = true;
-                        break;
-                    }
-                }
-                if (!subCommandFound)
-                {
-                    System.out.println("Unknown subcommand \"" + commandArgs[1] + "\".");
-                    this.notifySubCommands(commandArgs[0], subCommands);
-                    continue;
-                }
+                line = line.toLowerCase();
+                this.handleLine(line);
             }
-            handler.handle(Arrays.copyOfRange(commandArgs, 1, commandArgs.length));
         }
-        scanner.close();
-        Logging.Debug.log("ServerCommandHandler does not have next");
+        catch(Exception ex)
+        {
+            // While stopping the Server any Exception is expected here
+            if (!Server.isStopping())
+                Logging.Error.log("An exception had occurred while reading the Server Command.", ex);
+        }
+    }
+
+    private void handleLine(String line)
+    {
+        Logging.Debug.log("Command entered: " + line);
+        String[] commandArgs = line.split(" ");
+
+        CommandHandler handler = this.commands.get(commandArgs[0]);
+        if (handler == null)
+        {
+            System.out.println("Command \"" + commandArgs[0] + "\" not found. To see the list of all available commands type \"help\"");
+            return;
+        }
+
+        // Check subcommands
+        String[] subCommands = handler.getSubCommands();
+        if (subCommands != null)
+        {
+            if (commandArgs.length == 1)
+            {
+                this.notifySubCommands(commandArgs[0], subCommands);
+                return;
+            }
+            boolean subCommandFound = false;
+            for (int i = 0; i < subCommands.length; ++i)
+            {
+                if (subCommands[i].equals(commandArgs[1]))
+                {
+                    subCommandFound = true;
+                    break;
+                }
+            }
+            if (!subCommandFound)
+            {
+                System.out.println("Unknown subcommand \"" + commandArgs[1] + "\".");
+                this.notifySubCommands(commandArgs[0], subCommands);
+                return;
+            }
+        }
+        handler.handle(Arrays.copyOfRange(commandArgs, 1, commandArgs.length));
     }
 
     private void notifySubCommands(String command, String[] subCommands)
@@ -104,7 +131,7 @@ public class ServerCommandHandler implements Runnable
         public void handle(String[] args)
         {
             Logging.Info.log("Shutting down...");
-            Program.Exit();
+            Server.exit();
         }
     }
 
@@ -194,5 +221,4 @@ public class ServerCommandHandler implements Runnable
             }
         }
     }
-
 }

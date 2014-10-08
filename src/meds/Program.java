@@ -1,7 +1,5 @@
 package meds;
 
-import java.io.IOException;
-
 import meds.database.DBStorage;
 import meds.database.Hibernate;
 import meds.logging.Logging;
@@ -16,40 +14,32 @@ public class Program
      */
     public static void main(String[] args)
     {
-        Random.initialize(); new Item.Prototype();
-
-        if (!Configuration.load())
-        {
-            Logging.Info.log("Server is stopped.");
-        }
-
-        Hibernate.configure();
-
-        DBStorage.load();
-        Logging.Info.log("Database is loaded.");
-
-        // Initialize Map instance and load its data
-        Map.getInstance().load();
-        Logging.Info.log("Map is loaded");
-
-        new Player(6);
-
         try
         {
+            Random.initialize();
+
+            if (!Configuration.load())
+            {
+                Logging.Info.log("Server is stopped.");
+            }
+
+            Hibernate.configure();
+
+            DBStorage.load();
+            Logging.Info.log("Database is loaded.");
+
+            // Initialize Map instance and load its data
+            Map.getInstance().load();
+            Logging.Info.log("Map is loaded");
+
             Server server = new Server();
+            World.getInstance().createCreatures();
+
             server.Start();
         }
-        catch (IOException ex)
+        catch (Exception ex)
         {
-            Logging.Fatal.log("IOException while starting a server: " + ex.getMessage());
+            Logging.Fatal.log("An exception has occured while starting the Server", ex);
         }
-
-        System.out.println("Server stopped.");
-    }
-
-    public static void Exit()
-    {
-        // TODO: a graceful server exit
-        System.exit(0);
     }
 }

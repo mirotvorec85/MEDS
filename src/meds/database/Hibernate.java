@@ -1,6 +1,5 @@
 package meds.database;
 
-import meds.Program;
 import meds.logging.Logging;
 
 import org.hibernate.SessionFactory;
@@ -26,11 +25,10 @@ public class Hibernate
 
             Hibernate.sessionFactory = configuration.buildSessionFactory(serviceRegistry);
         }
-        catch(Exception e)
+        catch(Exception ex)
         {
-            Logging.Fatal.log("Hibernate Exception: " + e.getMessage());
-            e.printStackTrace();
-            Program.Exit();
+            Logging.Fatal.log("An exception occurred while confuguring Hibernate", ex);
+            return;
         }
         Logging.Info.log("Hibernate has been configured.");
     }

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import meds.Server.StopListener;
 import meds.database.Hibernate;
 import meds.logging.Logging;
 
@@ -39,6 +40,11 @@ public class World implements Runnable
     private LinkedList<Battle> newBattles;
     private LinkedList<Battle> expiredBattles;
 
+    /**
+     * Indicating whether the world is in stopping process
+     */
+    private boolean isStopping;
+
     private World()
     {
         this.players = new HashMap<Integer, Player>();
@@ -52,10 +58,26 @@ public class World implements Runnable
         this.expiredBattles = new LinkedList<Battle>();
 
         this.dayTime = 0;
+
+        Server.addStopListener(new StopListener()
+        {
+
+            @Override
+            public void stop()
+            {
+                // Set isStopping value and the World.stop() method
+                // will be called just before the next update.
+                World.this.isStopping = true;
+            }
+        });
     }
 
     public void playerLoggedIn(Player player)
     {
+        // Due to possible delay this may happen
+        if (this.isStopping)
+            return;
+
         // Already in game
         if (this.players.containsKey(player.getGuid()))
             return;
@@ -219,22 +241,30 @@ public class World implements Runnable
     @Override
     public void run()
     {
-        try
+
+        long lastTickDuration = 0;
+        long sleepTime = 0;
+
+        do
         {
-            long lastTickDuration = 0;
-            long sleepTime = 0;
+            // Stop the thread for (2000 - world update time)
+            // As a result the whole update-sleep cycle takes exactly 2 seconds
+            sleepTime = 2000 - lastTickDuration;
+            // Minimal sleep time is 50 ms
+            if (sleepTime < 50)
+                sleepTime = 50;
 
-            do
+            Logging.Debug.log("World sleeping time: " + sleepTime);
+
+            try
             {
-                // Stop the thread for (2000 - world update time)
-                // As a result the whole update-sleep cycle takes exactly 2 seconds
-                sleepTime = 2000 - lastTickDuration;
-                // Minimal sleep time is 50 ms
-                if (sleepTime < 50)
-                    sleepTime = 50;
-
-                Logging.Debug.log("World sleeping time: " + sleepTime);
                 Thread.sleep(sleepTime);
+
+                if (this.isStopping)
+                {
+                    stop();
+                    return;
+                }
 
                 this.tickTime = (int)sleepTime;
 
@@ -242,23 +272,27 @@ public class World implements Runnable
                 lastTickDuration = Server.getServerTimeMillis();
 
                 this.update(this.tickTime);
+            }
+            catch(InterruptedException ex)
+            {
+                Logging.Error.log("A Thread error in World run ", ex);
+            }
+            catch(Exception ex)
+            {
+                Logging.Error.log("An error while updating server Tact " + this.tickTime, ex);
+            }
 
-                // How much time takes the world update
-                lastTickDuration = Server.getServerTimeMillis() - lastTickDuration;
+            // How much time takes the world update
+            lastTickDuration = Server.getServerTimeMillis() - lastTickDuration;
+        } while(true);
+    }
 
-            } while(true);
-        }
-        catch(Exception ex)
-        {/*
-            StackTraceElement[] ste = ex.getStackTrace();
-            String stackTrace = "";
-            for (int i = 0; i < ste.length; ++i)
-                stackTrace += ste[i].toString() + "\n";
-
-            Logging.Fatal.log("Fatal error while updating server Tact (%d). \nError Type: %s.\nMessage: %s\nStack Trace:\n%s", this.tickTime, ex.getClass().toString(), ex.getMessage(), stackTrace);
-            Program.Exit();*/
-            ex.printStackTrace();
-        }
+    private void stop()
+    {
+        Logging.Info.log("Stopping the World");
+        // Save of the players to DB
+        for (Player player : this.players.values())
+            player.save();
     }
 
     public void update(int time)
@@ -331,14 +365,7 @@ public class World implements Runnable
             if (!this.addPlayersPacket.isEmpty())
             {
                 this.addDataToAll(this.addPlayersPacket);
-                Logging.Debug.log("addPlayersPacket added to all players: " + this.addPlayersPacket.toString());
                 this.addPlayersPacket.clear();
-                Logging.Debug.log("addPlayersPacket cleared. Current content: " + this.addPlayersPacket.toString());
-
-            }
-            else
-            {
-                Logging.Debug.log("addPlayersPacket is empty");
             }
         }
 
