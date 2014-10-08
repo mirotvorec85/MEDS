@@ -14,6 +14,30 @@ public class Logger
         return this.logger;
     }
 
+    public void log(String message, Throwable thr)
+    {
+        switch (this.logger.getName())
+        {
+            case "Debug":
+                this.logger.debug(message, thr);
+                break;
+            case "Info":
+                this.logger.info(message, thr);
+                break;
+            case "Warn":
+                this.logger.warn(message, thr);
+                break;
+            case "Error":
+                this.logger.error(message, thr);
+                break;
+            case "Fatal":
+                this.logger.fatal(message, thr);
+                break;
+            default:
+                break;
+        }
+    }
+
     public void log(String message)
     {
         switch (this.logger.getName())
