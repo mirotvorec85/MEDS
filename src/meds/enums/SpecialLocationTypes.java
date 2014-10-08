@@ -10,7 +10,7 @@ public enum SpecialLocationTypes implements Valued
     MagicSchool(3),
     WeaponShop(4),
     ArmourShop(5),
-    DepartmentStor(6),
+    DepartmentStore(6),
     JewelerShop(7),
     ScribeShop(8),
     MagicShop(9),
@@ -20,6 +20,7 @@ public enum SpecialLocationTypes implements Valued
     Bank(13),
     Bar(14),
     Inn(15),
+    Dock(16),
 
     ArtefactWeaponShop(22),
     ArtefactArmourShop(23),
