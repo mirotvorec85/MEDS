@@ -78,6 +78,9 @@ public class ServerPacket implements Cloneable
 
     public ServerPacket add(Object object)
     {
+        // NULL should be replaced with empty value
+        if (object == null)
+            return add("");
         return add(object.toString());
     }
 
