@@ -229,6 +229,8 @@ public abstract class Unit
 
     public void setPosition(Location location)
     {
+        // Remove Relax statement
+        removeAura(1000);
         Location prevLocation = this.position;
         this.position = location;
 
