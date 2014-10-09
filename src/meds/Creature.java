@@ -90,6 +90,18 @@ public class Creature extends Unit
     }
 
     @Override
+    public int getLevel()
+    {
+        return this.template.getLevel();
+    }
+
+    @Override
+    public int getReligLevel()
+    {
+        return 0;
+    }
+
+    @Override
     public int getAvatar()
     {
         return this.template.getAvatarId();
@@ -131,8 +143,6 @@ public class Creature extends Unit
 
         if (this.template == null)
             return 0;
-
-        this.level = new LevelInfo(this.template.getLevel(), 0, 0, 0);
 
         /*
          * CREATURE STATS:
@@ -192,7 +202,7 @@ public class Creature extends Unit
          *
          * */
 
-        int level = this.level.getLevel();
+        int level = getLevel();
 
         this.parameters.base().value(Parameters.Constitution, 8 + level / 6);
         this.parameters.base().value(Parameters.Strength, 8 + level / 6);
@@ -268,7 +278,7 @@ public class Creature extends Unit
 
         // Money
         if (!this.template.hasFlag(CreatureFlags.Beast))
-            this.gold = Random.nextInt(this.level.getLevel() / 2, this.level.getLevel() + 1);
+            this.gold = Random.nextInt(this.getLevel() / 2, this.getLevel() + 1) * 10;
     }
 
     @Override

@@ -461,7 +461,7 @@ public class Inventory
         if (isEquipmentSlot(slot))
         {
             // Check min level
-            if (item.Template.getLevel() > this.owner.getLevel().getLevel())
+            if (item.Template.getLevel() > this.owner.getLevel())
                 return false;
 
             switch (Slots.parse(slot))

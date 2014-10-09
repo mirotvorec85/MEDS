@@ -29,114 +29,10 @@ public abstract class Unit
         public void unitTargetDied(Unit unit);
     }
 
-    public class LevelInfo
-    {
-        private int exp;
-        private int religExp;
-        private int level;
-        private int unk4;
-        private int religLevel;
-
-        public LevelInfo(int level, int exp, int religLevel, int religExp)
-        {
-            this.level = level;
-            this.exp = exp;
-            this.religExp = religExp;
-            this.religLevel = religLevel;
-        }
-
-        private void setExp(int value)
-        {
-            this.exp = value;
-            if (Unit.this.unitType != UnitTypes.Player)
-                return;
-            Player player = (Player)Unit.this;
-            int nextLvlExp = LevelCost.getExp(this.level + 1);
-
-            // Is Level Up
-            if (nextLvlExp <= this.exp)
-            {
-                this.exp -= nextLvlExp;
-                ++this.level;
-                // Send messages
-                player.onVisualChanged();
-                player.onDisplayChanged();
-                if (player.getSession() != null)
-                    player.getSession().addServerMessage(497). // You gain a new level
-                        addServerMessage(492). // You can learn new lesson in a guild
-                        addData(this.getPacketData()).addData(player.getParametersData());
-            }
-            else
-            {
-                if (player.getSession() != null)
-                    player.getSession().addData(this.getPacketData(true));
-            }
-
-        }
-        public void addExp(int value)
-        {
-            this.setExp(this.exp + value);
-        }
-        public int getExp()
-        {
-            return this.exp;
-        }
-        public int getReligExp()
-        {
-            return this.religExp;
-        }
-        public int getLevel()
-        {
-            return this.level;
-        }
-        public void setLevel(int level)
-        {
-            if (this.level == level)
-                return;
-            this.level = level;
-            if (!Unit.this.isPlayer())
-                return;
-            Player player = (Player)Unit.this;
-
-            player.onVisualChanged();
-            player.onDisplayChanged();
-
-            if (player.getSession() != null)
-                player.getSession().addData(this.getPacketData());
-        }
-        public int getReligLevel()
-        {
-            return this.religLevel;
-        }
-
-        public ServerPacket getPacketData()
-        {
-            return this.getPacketData(false);
-        }
-
-        public ServerPacket getPacketData(boolean experienceOnly)
-        {
-            ServerPacket packet = new ServerPacket(ServerOpcodes.Experience);
-            packet.add(this.exp);
-            packet.add(this.religExp );
-
-            if(!experienceOnly)
-            {
-                packet.add(this.level);
-                packet.add(this.unk4);
-                packet.add(this.religLevel);
-            }
-
-            return packet;
-        }
-    }
-
     protected int guid;
     protected Races race;
 
     protected UnitTypes unitType;
-
-    protected LevelInfo level;
 
     protected int clanId;
     protected ClanMemberStatuses clanMemberStatus;
@@ -182,7 +78,6 @@ public abstract class Unit
         this.auras = new HashMap<Integer, Aura>();
         this.skills = new HashMap<Integer, Integer>();
         this.spells = new HashMap<Integer, Integer>();
-        this.level = new LevelInfo(0, 0, 0, 0);
         this.targetDiedListeners = new HashSet<Unit.TargetDiedListener>();
     }
 
@@ -365,10 +260,9 @@ public abstract class Unit
         return this.guid;
     }
 
-    public LevelInfo getLevel()
-    {
-        return this.level;
-    }
+    public abstract int getLevel();
+
+    public abstract int getReligLevel();
 
     public boolean isPlayer()
     {
@@ -512,8 +406,8 @@ public abstract class Unit
                 Player player = (Player)this;
 
                 // Reward exp
-                int victimLevel = victim.getLevel().getLevel();
-                int killerLevel = this.getLevel().getLevel();
+                int victimLevel = victim.getLevel();
+                int killerLevel = this.getLevel();
                 int exp = (victimLevel * victimLevel * victimLevel + 1) / (killerLevel * killerLevel + 1) + 1;
 
                 // HACK: the limit (or even its existence) is unknown
@@ -524,7 +418,7 @@ public abstract class Unit
 
                 if (exp > 0)
                 {
-                    getLevel().addExp(exp);
+                    player.addExp(exp);
                     player.getSession().addServerMessage(1038, Integer.toString(exp)); // You gain experience
                 }
 

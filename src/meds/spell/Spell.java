@@ -157,8 +157,8 @@ public class Spell
          }
          else
          {
-             if (recoveredHealth > 12 * this.caster.getLevel().getLevel())
-                 recoveredHealth = 12 * this.caster.getLevel().getLevel();
+             if (recoveredHealth > 12 * this.caster.getLevel())
+                 recoveredHealth = 12 * this.caster.getLevel();
 
              if (recoveredHealth + this.caster.getHealth() > this.caster.getParameters().value(Parameters.Health))
                  recoveredHealth = this.caster.getParameters().value(Parameters.Health) - this.caster.getHealth();

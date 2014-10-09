@@ -309,7 +309,7 @@ public class UnitParameters
         {
             case Damage:
                 if (this.unit.getRace() == Races.Orc)
-                    bonus = this.unit.getLevel().getLevel() * 6;
+                    bonus = this.unit.getLevel() * 6;
                 base().value(Parameters.Damage, bonus + this.value(Parameters.Dexterity) + this.value(Parameters.Strength));
                 break;
             case Protection:
@@ -317,17 +317,17 @@ public class UnitParameters
                 break;
             case ChanceToHit:
                 if (this.unit.getRace() == Races.Elf)
-                    bonus = this.unit.getLevel().getLevel() / 2;
+                    bonus = this.unit.getLevel() / 2;
                 base().value(Parameters.ChanceToHit, bonus + this.value(Parameters.Dexterity));
                 break;
             case Armour:
                 if (this.unit.getRace() == Races.Dwarf || this.unit.getRace() == Races.Elf)
-                    bonus = this.unit.getLevel().getLevel() * 3 / 2; // or * 1.5
+                    bonus = this.unit.getLevel() * 3 / 2; // or * 1.5
                 base().value(Parameters.Armour, bonus + this.value(Parameters.Dexterity) + this.value(Parameters.Constitution) / 3);
                 break;
             case ChanceToCast:
                 if (this.unit.getRace() == Races.Human || this.unit.getRace() == Races.Drow)
-                    bonus = this.unit.getLevel().getLevel() / 2;
+                    bonus = this.unit.getLevel() / 2;
                 base().value(Parameters.ChanceToCast, bonus + this.value(Parameters.Intelligence) / 2);
                 break;
             case MagicDamage:
@@ -350,7 +350,7 @@ public class UnitParameters
             case FrostResistance:
             case LightningResistance:
                 if (this.unit.getRace() == Races.Dwarf || this.unit.getRace() == Races.Orc)
-                    bonus = this.unit.getLevel().getLevel() * 3 / 2; // or * 1.5
+                    bonus = this.unit.getLevel() * 3 / 2; // or * 1.5
                 int value = this.value(Parameters.Strength) * 3 / 10 + this.value(Parameters.Intelligence) / 10;
                 base().value(Parameters.FireResistance, value);
                 base().value(Parameters.FrostResistance, value);

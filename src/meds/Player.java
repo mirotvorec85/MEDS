@@ -195,6 +195,94 @@ public class Player extends Unit
         return this.guildLevel;
     }
 
+    @Override
+    public int getLevel()
+    {
+        return this.info.getLevel();
+    }
+
+    @Override
+    public int getReligLevel()
+    {
+        return this.info.getReligLevel();
+    }
+
+    public int getReligExp()
+    {
+        return this.info.getReligExp();
+    }
+
+    public int getExp()
+    {
+        return this.info.getExp();
+    }
+
+    private void setExp(int value)
+    {
+        this.info.setExp(value);
+
+        int nextLvlExp = LevelCost.getExp(this.getLevel() + 1);
+
+        // Is Level Up
+        if (nextLvlExp <= this.getExp())
+        {
+            this.info.setExp(this.info.getExp() - nextLvlExp);
+            this.info.setLevel(this.info.getLevel() + 1);
+            // Send messages
+            onVisualChanged();
+            onDisplayChanged();
+            if (this.session != null)
+                this.session.addServerMessage(497). // You gain a new level
+                    addServerMessage(492). // You can learn new lesson in a guild
+                    addData(this.getLevelData()).addData(getParametersData());
+        }
+        else
+        {
+            if (this.session != null)
+                this.session.addData(this.getLevelData(true));
+        }
+
+    }
+
+    public void setLevel(int level)
+    {
+        if (this.info.getLevel() == level)
+            return;
+        this.info.setLevel(level);
+
+        onVisualChanged();
+        onDisplayChanged();
+
+        if (this.session != null)
+            this.session.addData(this.getLevelData());
+    }
+
+    public ServerPacket getLevelData()
+    {
+        return this.getLevelData(false);
+    }
+
+    public ServerPacket getLevelData(boolean experienceOnly)
+    {
+        ServerPacket packet = new ServerPacket(ServerOpcodes.Experience);
+        packet.add(this.getExp());
+        packet.add(this.getReligExp());
+
+        if(!experienceOnly)
+        {
+            packet.add(this.getLevel());
+            packet.add("0");
+            packet.add(this.getReligLevel());
+        }
+
+        return packet;
+    }
+
+    protected void addExp(int value)
+    {
+        this.setExp(this.getExp() + value);
+    }
+
     public int getCurrencyAmount(Currency currency)
     {
         return this.getCurrencyAmount(currency.getId());
@@ -321,9 +409,6 @@ public class Player extends Unit
         this.clanId = this.info.getClanId();
         this.clanMemberStatus = ClanMemberStatuses.parse(this.info.getClanStatus());
 
-        // Experience
-        this.level = new LevelInfo(this.info.getLevel(), this.info.getExp(), this.info.getReligLevel(), this.info.getReligExp());
-
         // Parameters
         this.parameters.base().value(Parameters.Constitution, this.info.getBaseCon());
         this.parameters.base().value(Parameters.Strength, this.info.getBaseStr());
@@ -394,11 +479,8 @@ public class Player extends Unit
         this.info.setGuildFireResist(this.parameters.guild().value(Parameters.FireResistance));
         this.info.setGuildFrostResist(this.parameters.guild().value(Parameters.FrostResistance));
         this.info.setGuildShockResist(this.parameters.guild().value(Parameters.LightningResistance));
-        this.info.setExp(this.level.getExp());
-        this.info.setReligExp(this.level.getReligExp());
-        this.info.setLevel(this.level.getLevel());
-        this.info.setReligLevel(this.level.getReligLevel());
         this.info.setLocationId(this.position.getId());
+        // Experience and Levels are set
         // Home is set
         // AutoSpell is set
         this.info.setSettings(this.settings.getValue());

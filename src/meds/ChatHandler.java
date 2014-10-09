@@ -112,7 +112,7 @@ public final class ChatHandler
             int level = SafeConvert.toInt32(args[0], -1);
             if (level < 0 || level > 360)
                 return;
-            player.getLevel().setLevel(level);
+            player.setLevel(level);
         }
     }
 }

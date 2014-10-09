@@ -446,13 +446,13 @@ public class Session implements Runnable
                 .add(Session.this.player.getSkillData())
                 .add(Session.this.player.getGuildData());
 
-            // NOTE: Sometimes the data above is sended as a separate packet
+            // NOTE: Sometimes the data above is sent as a separate packet
 
             packet.add(Session.this.player.getCurrencyData())
                 .add(Session.this.player.getParametersData())
                 .addData(ServerOpcodes.BattleState, BattleStates.NoBattle.toString())
                 .add(Session.this.player.getHealthManaData())
-                .add(Session.this.player.getLevel().getPacketData());
+                .add(Session.this.player.getLevelData());
 
             send(packet);
             packet.clear();
@@ -1244,7 +1244,7 @@ public class Session implements Runnable
         {
             ServerPacket packet = new ServerPacket(ServerOpcodes.LearnGuildInfo);
             packet.add("0");  // Always 0
-            int availableCount = Session.this.player.getLevel().getLevel() - Session.this.player.getGuildLevel();
+            int availableCount = Session.this.player.getLevel() - Session.this.player.getGuildLevel();
             packet.add(availableCount); // Available levels
 
             // Positive - free available lessons count
@@ -1254,7 +1254,7 @@ public class Session implements Runnable
             // Next lesson gold
             packet.add(LevelCost.getGold(Session.this.player.getGuildLevel() + 1));
             // Gold for all available lessons
-            packet.add(LevelCost.getTotalGold(Session.this.player.getGuildLevel() + 1, Session.this.player.getLevel().getLevel()));
+            packet.add(LevelCost.getTotalGold(Session.this.player.getGuildLevel() + 1, Session.this.player.getLevel()));
 
             // Lessons reset cost
             packet.add("free");

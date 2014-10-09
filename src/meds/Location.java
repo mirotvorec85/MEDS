@@ -648,7 +648,7 @@ public class Location
                 pss.add(_unit.getGuid());
                 pss.add(_unit.getAvatar());
                 pss.add((int)(73d *_unit.getHealth() / _unit.getParameters().value(Parameters.Health)));
-                pss.add(_unit.getLevel().getLevel());
+                pss.add(_unit.getLevel());
                 // TODO: next values is not magic numbers
                 pss.add("0").add("0").add("0").add("0");
                 pss.add(_unit.getTarget() == null ? 0 : _unit.getTarget().getGuid());

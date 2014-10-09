@@ -160,7 +160,7 @@ public class AuraBuff extends Aura
                         break;
                 }
                 this.bonusParameter1 = new KeyValuePair<Parameters, Integer>(Parameters.Health,
-                    (int)(this.owner.getParameters().value(Parameters.Health) * effectPercent + this.owner.getLevel().getLevel() * this.level * (1 + effectPercent)));
+                    (int)(this.owner.getParameters().value(Parameters.Health) * effectPercent + this.owner.getLevel() * this.level * (1 + effectPercent)));
                 break;
         }
 

@@ -88,9 +88,9 @@ public class World implements Runnable
         this.addPlayersPacket.add(ServerOpcodes.PlayersListAdd)
             .add(player.getGuid())
             .add(player.getName())
-            .add(player.getLevel().getLevel())
+            .add(player.getLevel())
             .add("0") // Religion Id
-            .add(player.getLevel().getReligLevel())
+            .add(player.getReligLevel())
             .add("0") // "1" is the group leader
             .add(player.getStatuses())
             .add(player.getClanId())
@@ -111,9 +111,9 @@ public class World implements Runnable
     {
         this.updatePlayersPacket.add(ServerOpcodes.PlayersListUpdate)
             .add(player.getGuid())
-            .add(player.getLevel().getLevel())
+            .add(player.getLevel())
             .add("0") // Religion Id
-            .add(player.getLevel().getReligLevel())
+            .add(player.getReligLevel())
             .add("0") // "1" is the group leader
             /* statuses here? */
             .add(player.getClanId())
@@ -131,9 +131,9 @@ public class World implements Runnable
             {
                 packet.add(player.getGuid())
                     .add(player.getName())
-                    .add(player.getLevel().getLevel())
+                    .add(player.getLevel())
                     .add("0") // Religion ID
-                    .add(player.getLevel().getReligLevel())
+                    .add(player.getReligLevel())
                     .add("0") // 1 WHen a player is a group leader
                     .add(player.getStatuses())
                     .add(player.getClanId())
