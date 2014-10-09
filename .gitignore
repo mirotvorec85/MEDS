@@ -1,6 +1,10 @@
 # Eclipse settings folder
 .settings/*
 
+# IntelliJ IDEA settings and moduule files
+.idea/*
+MEDS.iml
+
 # Meta Information (MANIFEST)
 META-INF/*
 
