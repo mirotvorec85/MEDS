@@ -36,6 +36,8 @@ public class CharacterInfo
     private int guildFireResist;
     private int guildFrostResist;
     private int guildShockResist;
+    private int health;
+    private int mana;
     private int exp;
     private int religExp;
     private int level;
@@ -275,6 +277,22 @@ public class CharacterInfo
     public void setGuildShockResist(int guildShockResist)
     {
         this.guildShockResist = guildShockResist;
+    }
+    public int getHealth()
+    {
+        return health;
+    }
+    public void setHealth(int health)
+    {
+        this.health = health;
+    }
+    public int getMana()
+    {
+        return mana;
+    }
+    public void setMana(int mana)
+    {
+        this.mana = mana;
     }
     public int getExp()
     {

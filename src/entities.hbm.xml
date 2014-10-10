@@ -118,6 +118,12 @@
         <property name="guildShockResist" type="int">
             <column name="`guild_shockresist`" />
         </property>
+        <property name="health" type="int">
+            <column name="`health`" />
+        </property>
+        <property name="mana" type="int">
+            <column name="`mana`" />
+        </property>
         <property name="exp" type="int">
             <column name="`exp`" />
         </property>

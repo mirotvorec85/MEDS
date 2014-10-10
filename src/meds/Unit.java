@@ -150,8 +150,6 @@ public abstract class Unit
     public void setHealth(int health)
     {
         this.health = health;
-        if (this.isPlayer() && ((Player)this).getSession() != null)
-            ((Player)this).getSession().addData(this.getHealthManaData());
         onVisualChanged();
     }
 
@@ -168,8 +166,6 @@ public abstract class Unit
     public void setMana(int mana)
     {
         this.mana = mana;
-        if (this.isPlayer() && ((Player)this).getSession() != null)
-            ((Player)this).getSession().addData(this.getHealthManaData());
         onVisualChanged();
     }
 
@@ -182,8 +178,6 @@ public abstract class Unit
     {
         this.health = health;
         this.mana = mana;
-        if (this.isPlayer() && ((Player)this).getSession() != null)
-            ((Player)this).getSession().addData(this.getHealthManaData());
         onVisualChanged();
     }
 

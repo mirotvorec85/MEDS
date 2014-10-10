@@ -196,6 +196,46 @@ public class Player extends Unit
     }
 
     @Override
+    public int getHealth()
+    {
+        return this.info.getHealth();
+    }
+
+    @Override
+    public int getMana()
+    {
+        return this.info.getMana();
+    }
+
+    @Override
+    public void setHealth(int health)
+    {
+        super.setHealth(health);
+        this.info.setHealth(health);
+        if (this.session != null)
+            this.session.addData(this.getHealthManaData());
+    }
+
+    @Override
+    public void setMana(int mana)
+    {
+        super.setMana(mana);
+        this.info.setMana(mana);
+        if (this.session != null)
+            this.session.addData(this.getHealthManaData());
+    }
+
+    @Override
+    public void setHealthMana(int health, int mana)
+    {
+        super.setHealthMana(health, mana);
+        this.info.setHealth(health);
+        this.info.setMana(mana);
+        if (this.session != null)
+            this.session.addData(this.getHealthManaData());
+    }
+
+    @Override
     public int getLevel()
     {
         return this.info.getLevel();
