@@ -1,16 +1,21 @@
 package meds;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import meds.logging.Logging;
 import meds.util.SafeConvert;
 
 public final class ChatHandler
 {
+    public final static String Separator = "\u0002";
     public final static String MessageSeparator = "\u0030";
-    public final static String PlayerSeparator = "\u0002";
     public final static String SayChar = "\u0031";
+    public final static String SystemChar = "\u0034";
 
     private static HashMap<String, ChatCommand> chatCommands = new HashMap<String, ChatHandler.ChatCommand>();
 
@@ -18,6 +23,18 @@ public final class ChatHandler
     {
         chatCommands.put("teleport", new TeleportChatCommand());
         chatCommands.put("set_level", new SetLevelChatCommand());
+    }
+
+    public static void sendSystemMessage(String message)
+    {
+        if (message == null || message.length() == 0)
+            return;
+
+        ServerPacket packet = new ServerPacket(ServerOpcodes.ChatMessage);
+        StringBuilder text = new StringBuilder();
+        text.append(Separator).append(SystemChar).append(message);
+        packet.add(text);
+        World.getInstance().sendToAll(packet);
     }
 
     public static void handleSay(Player player, String message)
@@ -40,7 +57,7 @@ public final class ChatHandler
         {
             String text = message.substring(1);
             String[] commandData = text.split(" ");
-            handleCommand(player, commandData[0], Arrays.copyOfRange(commandData, 1, commandData.length));
+            handleCommand(player, commandData[0], message.substring(commandData[0].length() + 2));
             return;
         }
 
@@ -48,8 +65,8 @@ public final class ChatHandler
         // TODO: Say to the region after Region implementation
         ServerPacket packet = new ServerPacket(ServerOpcodes.ChatMessage);
         StringBuilder response = new StringBuilder();
-        response.append(PlayerSeparator).append(SayChar).append("[").append(player.getName()).append("]: ")
-        .append(PlayerSeparator).append(MessageSeparator).append(message);
+        response.append(Separator).append(SayChar).append("[").append(player.getName()).append("]: ")
+        .append(Separator).append(MessageSeparator).append(message);
         packet.add(response);
         World.getInstance().sendToAll(packet);
     }
@@ -59,14 +76,23 @@ public final class ChatHandler
         // TODO: Implement whispering
     }
 
-    public static void handleCommand(Player player, String command, String[] commandArgs)
+    public static void handleCommand(Player player, String command, String commandArgs)
     {
+        // Parsing commands
+        // Each word except surrounding with quotes
+
+        List<String> list = new ArrayList<String>();
+        Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(commandArgs);
+        while(m.find())
+            list.add(m.group(1).replace("\"", ""));
+
+        String[] args = list.toArray(new String[list.size()]);
         ChatCommand chatCommand = chatCommands.get(command);
         if (chatCommand == null)
         return;
-        if (chatCommand.getMinArgsCount() != -1 && chatCommand.getMinArgsCount() > commandArgs.length)
+        if (chatCommand.getMinArgsCount() != -1 && chatCommand.getMinArgsCount() > args.length)
         return;
-        chatCommand.handle(player, commandArgs);
+        chatCommand.handle(player, args);
         Logging.Info.log("Executing command \"%s\" for Player \"%s\"", command, player.getName());
     }
 
