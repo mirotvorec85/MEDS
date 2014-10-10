@@ -23,6 +23,7 @@ public final class ChatHandler
     {
         chatCommands.put("teleport", new TeleportChatCommand());
         chatCommands.put("set_level", new SetLevelChatCommand());
+        chatCommands.put("announce", new AnnounceChatCommand());
     }
 
     public static void sendSystemMessage(String message)
@@ -139,6 +140,21 @@ public final class ChatHandler
             if (level < 0 || level > 360)
                 return;
             player.setLevel(level);
+        }
+    }
+
+    private static class AnnounceChatCommand extends ChatCommand
+    {
+        @Override
+        public int getMinArgsCount()
+        {
+            return 1;
+        }
+
+        @Override
+        public void handle(Player player, String[] args)
+        {
+            sendSystemMessage(args[0]);
         }
     }
 }
