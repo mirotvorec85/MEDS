@@ -116,6 +116,10 @@ public abstract class Unit
         return this.race;
     }
 
+    public DeathStates getDeathState()
+    {
+        return this.deathState;
+    }
 
     public Location getPosition()
     {

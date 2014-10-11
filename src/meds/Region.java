@@ -1,6 +1,7 @@
 package meds;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import meds.util.Random;
@@ -19,6 +20,7 @@ public class Region
      * List of all the location the belong to this region.
      */
     private List<Location> locations = new ArrayList<Location>();
+    private List<Location> locationsView = Collections.unmodifiableList(locations);
     /**
      * List of only non-special locations (i.e exclude shops, guilds, stars etc.; locations where creature are allowed to be)
      */
@@ -93,6 +95,11 @@ public class Region
         this.locations.add(location);
         if (!location.isSafeZone())
             this.ordinaryLocations.add(location);
+    }
+
+    public List<Location> getLocations()
+    {
+        return this.locationsView;
     }
 
     public Location getRandomLocation()

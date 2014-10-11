@@ -1,8 +1,6 @@
 package meds;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import meds.Item.Prototype;
 import meds.enums.MovementDirections;
@@ -36,6 +34,7 @@ public class Location
     private int keeperTime;
 
     private Set<Unit> units;
+    private Set<Unit> unitsView;
     private java.util.Map<Integer, Corpse> corpses;
     private java.util.Map<Prototype, Item> items;
     private Region region;
@@ -57,6 +56,7 @@ public class Location
     public Location()
     {
         this.units = new HashSet<Unit>();
+        this.unitsView = Collections.unmodifiableSet(this.units);
         this.corpses = new HashMap<Integer, Corpse>();
         this.items = new HashMap<Prototype, Item>();
     }
@@ -419,6 +419,19 @@ public class Location
         return this.locationData;
     }
 
+    /**
+     * Gets a value indicating whether this location doesn't contain any units.
+     */
+    public boolean isEmpty()
+    {
+        return this.units.isEmpty();
+    }
+
+    public Set<Unit> getUnits()
+    {
+        return this.unitsView;
+    }
+
     public void addCorpse(Corpse corpse)
     {
         this.corpses.put(corpse.getGuid(), corpse);
@@ -618,8 +631,13 @@ public class Location
 
     public void update(int time)
     {
+        this.updatable = false;
+
         if (this.units.size() == 0)
+        {
+            this.updatedUnit = null;
             return;
+        }
 
         for (Unit unit : this.units)
         {
@@ -632,7 +650,7 @@ public class Location
             // Send new Units list
             // At least 1 unit should be changed
             // and this unit should not be an updatable unit
-            if (!this.updatable || (this.updatedUnit != null && this.updatedUnit == player))
+            if (this.updatedUnit == player)
                 continue;
             if (player.getSession() == null)
                 continue;
@@ -661,7 +679,7 @@ public class Location
             player.getSession().addData(pss);
         }
 
-        this.updatable = false;
+
         this.updatedUnit = null;
     }
 }
