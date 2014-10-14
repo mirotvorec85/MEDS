@@ -64,6 +64,8 @@ public abstract class Unit
 
     private Set<TargetDiedListener> targetDiedListeners;
 
+    private Map<Damage.ReductionTypes, Set<Damage.AffectionHandler>> damageReductions = new HashMap<>(Damage.ReductionTypes.values().length);
+
     public Unit()
     {
         this.guid = 0;
@@ -89,6 +91,27 @@ public abstract class Unit
     public void removeTargetDiedListener(TargetDiedListener listener)
     {
         this.targetDiedListeners.remove(listener);
+    }
+
+    public void addDamageReduction(Damage.ReductionTypes type, Damage.AffectionHandler handler)
+    {
+        Set<Damage.AffectionHandler> handlers = this.damageReductions.get(type);
+        if (handlers == null)
+        {
+            handlers = new HashSet<>();
+            this.damageReductions.put(type, handlers);
+        }
+        handlers.add(handler);
+    }
+
+    public void removeDamageReduction(Damage.ReductionTypes type, Damage.AffectionHandler handler)
+    {
+        Set<Damage.AffectionHandler> handlers = this.damageReductions.get(type);
+        if (handlers == null)
+        {
+            return;
+        }
+        handlers.remove(handler);
     }
 
     public int getGuid()
@@ -291,17 +314,6 @@ public abstract class Unit
         .add("0");
     }
 
-    /**
-     * Applies Protection parameter for reducing incoming damage.
-     * @param cleanDamage An initial damage before protection affection.
-     * @return The result Damage.
-     */
-    public int calculateDamageReduction(int cleanDamage)
-    {
-        int actualDamage = cleanDamage - this.parameters.value(Parameters.Protection);
-        return actualDamage < 0 ? 0 : actualDamage;
-    }
-
     public void runAway()
     {
         if (this.battle == null)
@@ -340,19 +352,50 @@ public abstract class Unit
         Logging.Debug.log("Unit \"%s\" random damage from %d up to %d", this.getName(), this.parameters.value(Parameters.Damage), this.parameters.value(Parameters.MaxDamage));
         int initialDamage = Random.nextInt(this.parameters.value(Parameters.Damage), this.parameters.value(Parameters.MaxDamage));
 
-        Damage damage = new Damage();
-        damage.setInitialDamage(initialDamage);
+        Damage damage = new Damage(initialDamage, this.target);
         damage.IsAutoAttack = true;
-        this.dealDamage(this.target, damage);
+        this.dealDamage(damage);
     }
 
-    public void dealDamage(Unit victim, Damage damage)
+    public void calculateFinalDamage(Damage damage)
     {
+        Unit target = damage.getTarget();
+        if (target == null)
+            return;
+
+        /*
+            Apply damage reduction sources
+         */
+        // Protection
+        damage.FinalDamage -= target.parameters.value(Parameters.Protection);
+        if (damage.FinalDamage <= 0)
+            return;
+
+        // Handle all the reductions with the specified order in Enum
+        Set<Damage.AffectionHandler> affections;
+        for (Damage.ReductionTypes affectionType : Damage.ReductionTypes.values())
+        {
+            affections = target.damageReductions.get(affectionType);
+            if (affections != null)
+                for (Damage.AffectionHandler affection : affections)
+                    if (affection.handle(damage))
+                        return;
+        }
+
+    }
+
+    public void dealDamage(Damage damage)
+    {
+        // No target - no damage
+        if (damage.getTarget() == null)
+            return;
+
+        Unit victim = damage.getTarget();
+
         // Auto-attack
+        // Is hit or miss
         if (damage.IsAutoAttack)
         {
-            damage.FinalDamage = victim.calculateDamageReduction(damage.FinalDamage);
-
             // Chance to Hit
             double hitChance = this.parameters.value(Parameters.ChanceToHit) * 3d / (this.parameters.value(Parameters.ChanceToHit) * 3 + this.target.parameters.value(Parameters.Armour));
             boolean isHit = Random.nextDouble() <= hitChance;
@@ -368,6 +411,8 @@ public abstract class Unit
             }
         }
 
+        this.calculateFinalDamage(damage);
+
         Logging.Debug.log("\"%s\"(%d) deals %d to \"%s\"(%d). Victim's health: %d", this.getName(), this.getGuid(), damage.FinalDamage, victim.getName(), victim.getGuid(), victim.getHealth());
 
         // No damage
@@ -382,7 +427,7 @@ public abstract class Unit
         }
 
         // Killing blow
-        if (victim.getHealth() <= damage.getInitialDamage())
+        if (victim.getHealth() <= damage.getRealDamage())
         {
             damage.IsFatal = true;
             addServerMessage(damage.MessageDealerKillingBlow, Integer.toString(damage.FinalDamage), victim.getName());
@@ -428,7 +473,7 @@ public abstract class Unit
         // Ordinary hit.
         else
         {
-            victim.changeHealth( -damage.FinalDamage);
+            victim.changeHealth( -damage.getRealDamage());
 
             addServerMessage(damage.MessageDealerDamage, victim.getName(), Integer.toString(damage.FinalDamage));
             victim.addServerMessage(damage.MessageVictimDamage, getName(), Integer.toString(damage.FinalDamage));

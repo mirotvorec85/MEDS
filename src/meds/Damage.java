@@ -2,16 +2,32 @@ package meds;
 
 public class Damage
 {
+    public enum ReductionTypes
+    {
+        Absorption,
+    }
+
+    public interface AffectionHandler
+    {
+        boolean handle(Damage damage);
+    }
+
+
     /**
      * Calculated(clean) damage
      */
     private int initialDamage;
 
+    private Unit target;
+
     public int FinalDamage;
+    public int Absorbed;
     public boolean IsAutoAttack;
     public boolean IsFatal;
+    /**
+     * A reference to the Spell object that causes this damage.
+     */
     public meds.spell.Spell Spell;
-
 
     public int MessageDealerMiss = 33;
     public int MessageDealerNoDamage = 45;
@@ -28,14 +44,24 @@ public class Damage
     public int MessagePositionDamage = 23;
     public int MessagePositionKillingBlow = 26;
 
+    public Damage(int initialDamage, Unit target)
+    {
+        this.initialDamage = this.FinalDamage = initialDamage;
+        this.target = target;
+    }
+
     public int getInitialDamage()
     {
         return this.initialDamage;
     }
 
-    public void setInitialDamage(int initialDamage)
+    public int getRealDamage()
     {
-        this.initialDamage = initialDamage;
-        this.FinalDamage = initialDamage;
+        return FinalDamage - Absorbed;
+    }
+
+    public Unit getTarget()
+    {
+        return target;
     }
 }

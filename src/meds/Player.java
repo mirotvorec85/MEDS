@@ -851,9 +851,9 @@ public class Player extends Unit
         // TODO: also recalculate aura bonus parameters
         if (this.syncTimer < 0)
         {
-            // Heroic Shield effect update
-            // 120 + Level * 12 (Low level)
-            // 96 + Level * 12 (High Level)
+            // Update Heroic Shield effect
+            if (!this.isInCombat())
+                new meds.spell.Spell(1141, this, 1).cast();
 
             if (this.session != null && this.auras.size() != 0)
             {

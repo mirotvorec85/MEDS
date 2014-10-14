@@ -39,8 +39,10 @@ public class Aura
         customAuraClasses.put(16, AuraBuff.class); // Steel Body
         customAuraClasses.put(17, AuraBuff.class); // Feline Grace
         customAuraClasses.put(18, AuraBuff.class); // Bears Blood
+        customAuraClasses.put(36, AuraShield.class); // Layered Defense
         customAuraClasses.put(37, AuraBuff.class); // Wisdom of the Owl
         customAuraClasses.put(1000, AuraRelax.class); // Relax
+        customAuraClasses.put(1141, AuraShield.class); // Heroic Shield
     }
 
     protected int level;
@@ -109,6 +111,13 @@ public class Aura
     public int getLevel()
     {
         return this.level;
+    }
+
+    protected void setLevel(int level)
+    {
+        this.level = level;
+        if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null)
+            this.ownerPlayer.getSession().addData(getPacketData());
     }
 
     public int getRemainingTime()
