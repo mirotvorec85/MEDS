@@ -2,8 +2,8 @@ package org.meds.database.entity;
 
 import java.util.Map;
 
-import org.meds.ServerOpcodes;
-import org.meds.ServerPacket;
+import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerPacket;
 import org.meds.database.DBStorage;
 
 public class Guild

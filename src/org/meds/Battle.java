@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.meds.enums.BattleStates;
 import org.meds.logging.Logging;
+import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerPacket;
 import org.meds.util.Random;
 
 public class Battle

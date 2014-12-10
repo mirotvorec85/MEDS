@@ -5,11 +5,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.meds.Server.StopListener;
+import org.meds.net.Server;
+import org.meds.net.Server.StopListener;
 import org.meds.database.Hibernate;
 import org.meds.logging.Logging;
 
 import org.hibernate.Session;
+import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerPacket;
 
 public class World implements Runnable
 {

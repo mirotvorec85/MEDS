@@ -6,6 +6,8 @@ import org.meds.Item.Prototype;
 import org.meds.enums.MovementDirections;
 import org.meds.enums.Parameters;
 import org.meds.enums.SpecialLocationTypes;
+import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerPacket;
 import org.meds.util.Random;
 
 public class Location

@@ -25,6 +25,8 @@ import org.meds.enums.PlayerStatuses;
 import org.meds.enums.Races;
 import org.meds.enums.SpecialLocationTypes;
 import org.meds.logging.Logging;
+import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerPacket;
 import org.meds.spell.Aura;
 import org.meds.util.EnumFlags;
 
@@ -33,10 +35,10 @@ import org.hibernate.Transaction;
 
 public class Player extends Unit
 {
-    private class SessionDisconnect implements org.meds.Session.DisconnectListener
+    private class SessionDisconnect implements org.meds.net.Session.DisconnectListener
     {
         @Override
-        public void disconnect(org.meds.Session session)
+        public void disconnect(org.meds.net.Session session)
         {
             // TODO; Implement timer to logout the hanging player
             Player.this.session = null;
@@ -46,7 +48,7 @@ public class Player extends Unit
     protected static final int SaveTime = 60000;
     protected static final int SyncTime = 20000;
 
-    protected org.meds.Session session;
+    protected org.meds.net.Session session;
 
     private EnumFlags<PlayerSettings> settings;
 
@@ -153,7 +155,7 @@ public class Player extends Unit
             this.session.addServerMessage(17, home.getRegion().getName());
     }
 
-    public org.meds.Session getSession()
+    public org.meds.net.Session getSession()
     {
         return this.session;
     }
@@ -410,7 +412,7 @@ public class Player extends Unit
         return super.create();
     }
 
-    public void logIn(org.meds.Session session)
+    public void logIn(org.meds.net.Session session)
     {
         if (this.session != null)
         {

@@ -1,4 +1,4 @@
-package org.meds;
+package org.meds.net;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;

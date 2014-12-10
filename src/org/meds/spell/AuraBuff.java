@@ -1,7 +1,7 @@
 package org.meds.spell;
 
-import org.meds.ServerOpcodes;
-import org.meds.ServerPacket;
+import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerPacket;
 import org.meds.enums.Parameters;
 import org.meds.util.KeyValuePair;
 

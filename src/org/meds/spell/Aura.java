@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.meds.Player;
-import org.meds.ServerOpcodes;
-import org.meds.ServerPacket;
+import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerPacket;
 import org.meds.Unit;
 import org.meds.logging.Logging;
 

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerPacket;
 import org.meds.util.Random;
 
 public class Region

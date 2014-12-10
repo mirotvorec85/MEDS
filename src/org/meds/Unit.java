@@ -17,6 +17,9 @@ import org.meds.enums.Races;
 import org.meds.enums.SpecialLocationTypes;
 import org.meds.enums.SpellTypes;
 import org.meds.logging.Logging;
+import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerPacket;
+import org.meds.net.Session;
 import org.meds.spell.Aura;
 import org.meds.spell.Aura.States;
 import org.meds.util.KeyValuePair;
@@ -320,7 +323,7 @@ public abstract class Unit
             return;
 
         // Send message "You panic and try to run away"
-        org.meds.Session session;
+        Session session;
         if (this.isPlayer() && (session = ((Player)this).getSession()) != null)
         {
             session.addServerMessage(254);

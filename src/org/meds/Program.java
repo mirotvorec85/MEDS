@@ -3,6 +3,7 @@ package org.meds;
 import org.meds.database.DBStorage;
 import org.meds.database.Hibernate;
 import org.meds.logging.Logging;
+import org.meds.net.Server;
 import org.meds.util.Random;
 
 

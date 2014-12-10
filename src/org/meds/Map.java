@@ -10,6 +10,8 @@ import org.meds.enums.MovementDirections;
 import org.meds.logging.Logging;
 
 import org.hibernate.Session;
+import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerPacket;
 
 public class Map
 {

@@ -6,6 +6,8 @@ import java.util.Map;
 import org.meds.Item.Prototype;
 import org.meds.database.entity.CharacterInnItem;
 import org.meds.enums.InnFilters;
+import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerPacket;
 
 public class Inn
 {

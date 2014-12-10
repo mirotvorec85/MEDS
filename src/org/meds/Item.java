@@ -13,6 +13,8 @@ import org.meds.enums.ItemEssenceTypes;
 import org.meds.enums.ItemReinforcementTypes;
 import org.meds.enums.ItemTotemicTypes;
 import org.meds.enums.Parameters;
+import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerPacket;
 import org.meds.spell.Spell;
 import org.meds.util.Valued;
 

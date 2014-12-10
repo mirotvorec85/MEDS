@@ -10,6 +10,8 @@ import org.meds.database.entity.ShopItem;
 import org.meds.enums.ItemClasses;
 import org.meds.enums.ShopTypes;
 import org.meds.logging.Logging;
+import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerPacket;
 
 public class Shop
 {

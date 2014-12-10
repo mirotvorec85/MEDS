@@ -1,4 +1,4 @@
-package org.meds;
+package org.meds.net;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.meds.Configuration;
+import org.meds.World;
 import org.meds.logging.Logging;
 
 public class Server

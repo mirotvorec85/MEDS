@@ -9,6 +9,8 @@ import org.meds.Item.Prototype;
 import org.meds.database.entity.CharacterInventoryItem;
 import org.meds.enums.ItemBonusParameters;
 import org.meds.enums.ItemClasses;
+import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerPacket;
 import org.meds.util.Valued;
 
 public class Inventory

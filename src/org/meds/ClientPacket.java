@@ -1,5 +1,7 @@
 package org.meds;
 
+import org.meds.net.PacketOpcode;
+
 public class ClientPacket
 {
     private PacketOpcode[] packetOpcodes;

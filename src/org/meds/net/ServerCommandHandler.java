@@ -1,11 +1,11 @@
-package org.meds;
+package org.meds.net;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
-import org.meds.Server.StopListener;
+import org.meds.net.Server.StopListener;
 import org.meds.database.Hibernate;
 import org.meds.database.entity.CharacterInfo;
 import org.meds.database.entity.CharacterSpell;

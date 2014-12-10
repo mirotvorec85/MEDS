@@ -1,7 +1,7 @@
 package org.meds.database.entity;
 
-import org.meds.ServerOpcodes;
-import org.meds.ServerPacket;
+import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerPacket;
 import org.meds.database.DBStorage;
 import org.meds.enums.QuestTypes;
 import org.meds.logging.Logging;

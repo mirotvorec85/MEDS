@@ -1,4 +1,4 @@
-package org.meds;
+package org.meds.net;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.meds.*;
 import org.meds.Item.Prototype;
 import org.meds.database.DBStorage;
 import org.meds.database.entity.Character;
