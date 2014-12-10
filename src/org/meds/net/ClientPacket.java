@@ -1,4 +1,4 @@
-package org.meds;
+package org.meds.net;
 
 import org.meds.net.PacketOpcode;
 
