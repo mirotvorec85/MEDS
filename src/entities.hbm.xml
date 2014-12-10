@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC
 "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<hibernate-mapping package="meds.database.entity">
+<hibernate-mapping package="org.meds.database.entity">
 
     <class name="Character" table="`character`">
         <id name="id" type="int" column="`id`">
@@ -163,7 +163,7 @@
         </map>
         <map name="innItems" fetch="select" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="`character_id`" />
-            <composite-map-key class="meds.Item$Prototype">
+            <composite-map-key class="org.meds.Item$Prototype">
                 <key-property name="templateId" column="item_template_id" />
                 <key-property name="modification" column="modification" />
                 <key-property name="durability" column="durability" />
@@ -268,7 +268,7 @@
         </property>
     </class>
 
-    <class name="meds.Creature" table="`creature`">
+    <class name="org.meds.Creature" table="`creature`">
         <id name="guid" type="int" column="`guid`">
             <generator class="increment" />
         </id>
@@ -424,7 +424,7 @@
         </property>
     </class>
 
-    <class name="meds.Kingdom" table="kingdom">
+    <class name="org.meds.Kingdom" table="kingdom">
         <id name="id" type="int" column="id" >
             <generator class="assigned"/>
         </id>
@@ -448,7 +448,7 @@
         </property>
     </class>
 
-    <class name="meds.Location" table="`location`">
+    <class name="org.meds.Location" table="`location`">
         <id name="id" type="int" column="id" >
             <generator class="assigned"/>
         </id>
@@ -529,7 +529,7 @@
         </property>
     </class>
 
-    <class name="meds.Region" table="`region`">
+    <class name="org.meds.Region" table="`region`">
         <id name="id" type="int" column="id" >
             <generator class="assigned"/>
         </id>
@@ -619,7 +619,7 @@
         </property>
     </class>
 
-    <class name="meds.Shop" table="`shop`" >
+    <class name="org.meds.Shop" table="`shop`" >
         <id name="id" type="int" column="id">
             <generator class="increment"/>
         </id>
