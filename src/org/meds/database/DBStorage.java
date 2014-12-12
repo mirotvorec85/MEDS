@@ -2,28 +2,18 @@ package org.meds.database;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.meds.database.entity.*;
 import org.meds.database.entity.Character;
-import org.meds.database.entity.CharacterInfo;
-import org.meds.database.entity.CreatureLoot;
-import org.meds.database.entity.CreatureQuestRelation;
-import org.meds.database.entity.CreatureTemplate;
-import org.meds.database.entity.Currency;
-import org.meds.database.entity.Guild;
-import org.meds.database.entity.GuildLesson;
-import org.meds.database.entity.ItemTemplate;
-import org.meds.database.entity.LevelCost;
-import org.meds.database.entity.NewMessage;
-import org.meds.database.entity.QuestTemplate;
-import org.meds.database.entity.Skill;
-import org.meds.database.entity.Spell;
 import org.meds.logging.Logging;
 
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
-public class DBStorage
-{
+public class DBStorage {
+
+    public static Map<Integer, Achievement> AchievementStore;
     public static HashMap<Integer, HashMap<Integer, CreatureLoot>> CreatureLootStore;
     public static HashMap<Integer, HashMap<Integer, CreatureQuestRelation>> CreatureQuestRelationStore;
     public static HashMap<Integer, CreatureTemplate> CreatureTemplateStore;
@@ -41,6 +31,7 @@ public class DBStorage
     public static void load()
     {
         int counter;
+        DBStorage.AchievementStore = new HashMap<Integer, Achievement>();
         DBStorage.CreatureLootStore = new HashMap<Integer, HashMap<Integer,CreatureLoot>>();
         DBStorage.CreatureQuestRelationStore = new HashMap<Integer, HashMap<Integer,CreatureQuestRelation>>();
         DBStorage.CreatureTemplateStore = new HashMap<Integer, CreatureTemplate>();
@@ -53,6 +44,20 @@ public class DBStorage
         DBStorage.QuestTemplateStore = new HashMap<Integer, QuestTemplate>();
 
         Session session = Hibernate.getSessionFactory().openSession();
+
+        // Achievement
+        List<Achievement> achievements = session.createCriteria(Achievement.class).list();
+        for(Achievement achievement : achievements)
+        {
+            DBStorage.AchievementStore.put(achievement.getId(), achievement);
+        }
+        Logging.Info.log("Loaded " + DBStorage.AchievementStore.size() + " achievements");
+
+        // Achievement Criteria
+        List<AchievementCriteria> criterias = session.createCriteria(AchievementCriteria.class).list();
+        // Adding to Achievement criteria list implemented
+        // inside AchievementCriteria.setAchievementId method
+        Logging.Info.log("Loaded " + criterias.size() + " achievement criterias");
 
         // Currency
         List<Currency> currencies = session.createCriteria(Currency.class).list();

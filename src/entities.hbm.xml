@@ -4,6 +4,40 @@
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="org.meds.database.entity">
 
+    <class name="Achievement" table="`achievement`">
+        <id name="id" type="int" column="`id`">
+            <generator class="increment" />
+        </id>
+        <property name="title" type="string">
+            <column name="`title`" />
+        </property>
+        <property name="description" type="string">
+            <column name="`description`" />
+        </property>
+        <property name="count" type="int">
+            <column name="`count`" />
+        </property>
+        <property name="points" type="int">
+            <column name="`points`" />
+        </property>
+        <property name="categoryId" type="int">
+            <column name="`category_id`" />
+        </property>
+    </class>
+
+    <class name="AchievementCriteria" table="`achievement_criteria`">
+        <composite-id>
+            <key-property name="achievementId" column="`achievement_id`" type="int" />
+            <key-property name="index" column="`index`" type="int" />
+        </composite-id>
+        <property name="criteriaTypeId" type="int">
+            <column name="`criteria_type_id`" />
+        </property>
+        <property name="requirement" type="int">
+            <column name="`requirement`" />
+        </property>
+    </class>
+
     <class name="Character" table="`character`">
         <id name="id" type="int" column="`id`">
             <generator class="increment" />
@@ -13,6 +47,19 @@
         </property>
         <property name="passwordHash" type="string">
             <column name="`password_hash`" />
+        </property>
+    </class>
+
+    <class name="CharacterAchievement" table="character_achievement">
+        <composite-id>
+            <key-property name="characterId" type="int"><column name="`character_id`" /></key-property>
+            <key-property name="achievementId" type="int"><column name="`achievement_id`" /></key-property>
+        </composite-id>
+        <property name="progress" type="int">
+            <column name="`progress`" />
+        </property>
+        <property name="completeDate" type="int">
+            <column name="`complete_date`" />
         </property>
     </class>
 
@@ -151,6 +198,11 @@
         <property name="statuses" type="int">
             <column name="`statuses`" />
         </property>
+        <map name="achievements" fetch="select" lazy="true" inverse="true" cascade="all-delete-orphan">
+            <key column="`character_id`" />
+            <map-key column="`achievement_id`" type="int" />
+            <one-to-many class="CharacterAchievement" />
+        </map>
         <map name="currencies" fetch="select" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="`character_id`" />
             <map-key column="`currency_id`" type="int" />

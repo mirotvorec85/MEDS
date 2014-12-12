@@ -6,17 +6,7 @@ import java.util.Set;
 
 import org.meds.database.DBStorage;
 import org.meds.database.Hibernate;
-import org.meds.database.entity.CharacterCurrency;
-import org.meds.database.entity.CharacterGuild;
-import org.meds.database.entity.CharacterInfo;
-import org.meds.database.entity.CharacterSkill;
-import org.meds.database.entity.CharacterSpell;
-import org.meds.database.entity.Currency;
-import org.meds.database.entity.Guild;
-import org.meds.database.entity.GuildLesson;
-import org.meds.database.entity.LevelCost;
-import org.meds.database.entity.Skill;
-import org.meds.database.entity.Spell;
+import org.meds.database.entity.*;
 import org.meds.enums.ClanMemberStatuses;
 import org.meds.enums.Currencies;
 import org.meds.enums.Parameters;
@@ -190,6 +180,18 @@ public class Player extends Unit
     public EnumFlags<PlayerStatuses> getStatuses()
     {
         return this.statuses;
+    }
+
+    public CharacterAchievement getAchievement(int achievementId) {
+        return this.info.getAchievements().get(achievementId);
+    }
+
+    public CharacterAchievement getAchievement(Achievement achievement) {
+        return this.getAchievement(achievement.getId());
+    }
+
+    public void addAchievement(CharacterAchievement achievement) {
+        this.info.getAchievements().put(achievement.getAchievementId(), achievement);
     }
 
     public int getGuildLevel()
@@ -432,6 +434,7 @@ public class Player extends Unit
         this.info = DBStorage.getCharacterInfo(session, this.guid);
 
         // Lazy loading of collections
+        this.info.getAchievements().size();
         this.info.getCurrencies().size();
         this.info.getGuilds().size();
         this.info.getInnItems().size();

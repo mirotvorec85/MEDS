@@ -51,6 +51,7 @@ public class CharacterInfo
     private Spell autoSpell;
     private Location home;
 
+    private Map<Integer, CharacterAchievement> achievements = new HashMap<Integer, CharacterAchievement>();
     private Map<Integer, CharacterGuild> guilds = new HashMap<Integer, CharacterGuild>();
     private Map<Integer, CharacterCurrency> currencies = new HashMap<Integer, CharacterCurrency>();
     private Map<Prototype, CharacterInnItem> innItems = new HashMap<Prototype, CharacterInnItem>();
@@ -385,6 +386,13 @@ public class CharacterInfo
         this.statuses = statuses;
     }
 
+    public Map<Integer, CharacterAchievement> getAchievements() {
+        return achievements;
+    }
+
+    public void setAchievements(Map<Integer, CharacterAchievement> achievements) {
+        this.achievements = achievements;
+    }
     public Map<Integer, CharacterGuild> getGuilds()
     {
         return this.guilds;
