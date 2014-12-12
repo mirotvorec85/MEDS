@@ -114,7 +114,7 @@ public class Server
         }
     }
 
-    public static void min(String[] args) {
+    public static void main(String[] args) {
         try {
             Random.initialize();
 
