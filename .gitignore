@@ -3,16 +3,10 @@
 
 # IntelliJ IDEA settings and moduule files
 .idea/*
-MEDS.iml
-
-# Meta Information (MANIFEST)
-META-INF/*
-
-# Server log files
-logs/*
-
-# Binary files
-bin/*
+*.iml
 
 # Hibernate configuration file
-src/hibernate.cfg.xml
+src/main/resources/hibernate.cfg.xml
+
+# Maven Target directory
+target/*
