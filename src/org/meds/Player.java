@@ -58,6 +58,8 @@ public class Player extends Unit
 
     private SessionDisconnect disconnector;
 
+    private AchievementManager achievementManager;
+
     public Player(int guid)
     {
         super();
@@ -192,6 +194,10 @@ public class Player extends Unit
 
     public void addAchievement(CharacterAchievement achievement) {
         this.info.getAchievements().put(achievement.getAchievementId(), achievement);
+    }
+
+    public AchievementManager getAchievementManager() {
+        return this.achievementManager;
     }
 
     public int getGuildLevel()
@@ -498,6 +504,8 @@ public class Player extends Unit
         this.health = this.parameters.value(Parameters.Health);
         this.mana = this.parameters.value(Parameters.Mana);
 
+        this.achievementManager = new AchievementManager(this);
+
         return true;
     }
 
@@ -732,6 +740,32 @@ public class Player extends Unit
                 break;
             default: break;
         }
+    }
+
+    public ServerPacket getAchievementData() {
+        ServerPacket packet = new ServerPacket(ServerOpcodes.AchievementList);
+        packet.add(0); // List of all achievements
+
+        for (Achievement achievement : DBStorage.AchievementStore.values()) {
+            packet.add(achievement.getId());
+            packet.add(achievement.getTitle());
+            packet.add(achievement.getDescription());
+
+            CharacterAchievement charAchieve;
+            if ((charAchieve = getAchievement(achievement.getId())) != null) {
+                packet.add(charAchieve.getProgress());
+                packet.add(achievement.getCount());
+                packet.add(charAchieve.getCompleteDate());
+            } else {
+                packet.add(0);
+                packet.add(achievement.getCount());
+                packet.add(0);
+            }
+            packet.add(achievement.getCategory());
+            packet.add(achievement.getPoints());
+        }
+
+        return packet;
     }
 
     public ServerPacket getCurrencyData()

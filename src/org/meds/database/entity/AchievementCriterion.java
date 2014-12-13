@@ -1,15 +1,15 @@
 package org.meds.database.entity;
 
 import org.meds.database.DBStorage;
-import org.meds.enums.AchievementCriteriaTypes;
+import org.meds.enums.AchievementCriterionTypes;
 
 import java.io.Serializable;
 
-public class AchievementCriteria implements Serializable {
+public class AchievementCriterion implements Serializable {
 
     private Achievement achievement;
     private int index;
-    private AchievementCriteriaTypes type;
+    private AchievementCriterionTypes type;
     private int requirement;
 
     public Achievement getAchievement() {
@@ -22,7 +22,7 @@ public class AchievementCriteria implements Serializable {
 
     public void setAchievementId(int achievementId) {
         this.achievement = DBStorage.AchievementStore.get(achievementId);
-        this.achievement.getCriterias().add(this);
+        this.achievement.getCriteria().add(this);
     }
 
     public int getIndex() {
@@ -33,7 +33,7 @@ public class AchievementCriteria implements Serializable {
         this.index = index;
     }
 
-    public AchievementCriteriaTypes getType() {
+    public AchievementCriterionTypes getType() {
         return type;
     }
 
@@ -42,7 +42,7 @@ public class AchievementCriteria implements Serializable {
     }
 
     public void setCriteriaTypeId(int criteriaTypeId) {
-        this.type = AchievementCriteriaTypes.parse(criteriaTypeId);
+        this.type = AchievementCriterionTypes.parse(criteriaTypeId);
     }
 
     public int getRequirement() {
@@ -62,7 +62,7 @@ public class AchievementCriteria implements Serializable {
             return false;
         }
 
-        AchievementCriteria that = (AchievementCriteria) o;
+        AchievementCriterion that = (AchievementCriterion) o;
 
         if (this.achievement.getId() != that.achievement.getId() ||
                 this.index != that.index) {

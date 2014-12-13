@@ -10,12 +10,7 @@ import java.util.Set;
 import org.meds.database.DBStorage;
 import org.meds.database.entity.LevelCost;
 import org.meds.database.entity.Spell;
-import org.meds.enums.ClanMemberStatuses;
-import org.meds.enums.Parameters;
-import org.meds.enums.PlayerSettings;
-import org.meds.enums.Races;
-import org.meds.enums.SpecialLocationTypes;
-import org.meds.enums.SpellTypes;
+import org.meds.enums.*;
 import org.meds.logging.Logging;
 import org.meds.net.ServerOpcodes;
 import org.meds.net.ServerPacket;
@@ -471,6 +466,13 @@ public abstract class Unit
                 // AutoLoot
                 if (corpse != null && player.getSettings().has(PlayerSettings.AutoLoot))
                     player.lootCorpse(corpse);
+
+                // Update achievements progress
+                AchievementCategories category = AchievementCategories.PvM;
+                if (victim.isPlayer()) {
+                    category = AchievementCategories.PvP;
+                }
+                player.getAchievementManager().updateProgress(category, victim);
             }
         }
         // Ordinary hit.

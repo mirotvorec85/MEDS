@@ -1,7 +1,5 @@
 package org.meds.database.entity;
 
-import org.meds.Kingdom;
-import org.meds.Region;
 import org.meds.enums.AchievementCategories;
 
 import java.util.HashSet;
@@ -15,10 +13,10 @@ public class Achievement {
     private int count;
     private int points;
     private AchievementCategories category;
-    private Set<AchievementCriteria> criterias;
+    private Set<AchievementCriterion> criteria;
 
     public Achievement() {
-        this.criterias = new HashSet<AchievementCriteria>();
+        this.criteria = new HashSet<AchievementCriterion>();
     }
 
     public int getId() {
@@ -73,12 +71,12 @@ public class Achievement {
         this.category = AchievementCategories.parse(categoryId);
     }
 
-    public Set<AchievementCriteria> getCriterias() {
-        return criterias;
+    public Set<AchievementCriterion> getCriteria() {
+        return criteria;
     }
 
-    public void setCriterias(Set<AchievementCriteria> criterias) {
-        this.criterias = criterias;
+    public void setCriteria(Set<AchievementCriterion> criteria) {
+        this.criteria = criteria;
     }
 
     @Override

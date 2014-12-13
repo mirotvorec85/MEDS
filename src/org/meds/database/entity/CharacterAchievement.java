@@ -1,6 +1,10 @@
 package org.meds.database.entity;
 
-public class CharacterAchievement {
+import java.io.Serializable;
+
+public class CharacterAchievement implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private int characterId;
     private int achievementId;

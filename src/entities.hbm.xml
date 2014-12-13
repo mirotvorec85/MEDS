@@ -25,7 +25,7 @@
         </property>
     </class>
 
-    <class name="AchievementCriteria" table="`achievement_criteria`">
+    <class name="AchievementCriterion" table="`achievement_criteria`">
         <composite-id>
             <key-property name="achievementId" column="`achievement_id`" type="int" />
             <key-property name="index" column="`index`" type="int" />

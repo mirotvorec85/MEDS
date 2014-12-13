@@ -54,7 +54,7 @@ public class DBStorage {
         Logging.Info.log("Loaded " + DBStorage.AchievementStore.size() + " achievements");
 
         // Achievement Criteria
-        List<AchievementCriteria> criterias = session.createCriteria(AchievementCriteria.class).list();
+        List<AchievementCriterion> criterias = session.createCriteria(AchievementCriterion.class).list();
         // Adding to Achievement criteria list implemented
         // inside AchievementCriteria.setAchievementId method
         Logging.Info.log("Loaded " + criterias.size() + " achievement criterias");

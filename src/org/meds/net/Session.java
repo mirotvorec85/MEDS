@@ -507,7 +507,7 @@ public class Session implements Runnable
 
             // NOTE: Sometimes the data above is sended as a separate packet
 
-            // TODO: add achievement list here ("acl" opcode)
+            packet.add(Session.this.player.getAchievementData());
 
             // prot1 and prot2
             packet.addData(ServerOpcodes._prot1, "0").addData(ServerOpcodes._prot2, "0");

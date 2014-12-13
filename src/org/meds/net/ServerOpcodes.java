@@ -3,6 +3,8 @@ package org.meds.net;
 public enum ServerOpcodes
 {
     Aura("a"),
+    AchievementList("acl"),
+    AchievementUpdate("acu"),
     BuyBackList("bbl"), // Appeared in 2.0.0.0
     CultInfo("ci"),
     BonusMagicParameter("cms"),
