@@ -297,6 +297,27 @@ public class Session implements Runnable
         return this;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Session session = (Session) o;
+
+        return this.key == session.key
+                && socket != null ? socket.equals(session.socket) : session.socket != null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return this.socket != null ? socket.hashCode() + this.key : this.key;
+    }
+
     private abstract class OpcodeHandler
     {
         /**

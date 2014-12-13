@@ -50,4 +50,23 @@ public class Kingdom
     {
         this.regions.add(region);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Kingdom kingdom = (Kingdom) o;
+
+        return this.id == kingdom.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.id;
+    }
 }

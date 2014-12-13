@@ -63,4 +63,23 @@ public class Corpse
     {
         return this.guid;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Corpse corpse = (Corpse) o;
+
+        return this.guid == corpse.guid;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.guid;
+    }
 }

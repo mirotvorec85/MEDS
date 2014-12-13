@@ -208,4 +208,23 @@ public class Shop
                 return false;
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Shop shop = (Shop) o;
+
+        return this.id == shop.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.id;
+    }
 }

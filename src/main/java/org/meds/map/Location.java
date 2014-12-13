@@ -627,8 +627,21 @@ public class Location
     }
 
     @Override
-    public int hashCode()
-    {
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Location location = (Location) o;
+
+        return this.id == location.id;
+    }
+
+    @Override
+    public int hashCode() {
         return this.id;
     }
 

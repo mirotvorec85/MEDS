@@ -66,5 +66,22 @@ public class CreatureTemplate
         return this.creatureFlags.has(flag);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
+        CreatureTemplate that = (CreatureTemplate) o;
+
+        return this.templateId == that.templateId;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.templateId;
+    }
 }

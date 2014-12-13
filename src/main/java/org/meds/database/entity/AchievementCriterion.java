@@ -64,12 +64,8 @@ public class AchievementCriterion implements Serializable {
 
         AchievementCriterion that = (AchievementCriterion) o;
 
-        if (this.achievement.getId() != that.achievement.getId() ||
-                this.index != that.index) {
-            return false;
-        }
-
-        return true;
+        return this.achievement.getId() == that.achievement.getId()
+                && this.index == that.index;
     }
 
     @Override

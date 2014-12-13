@@ -631,8 +631,21 @@ public abstract class Unit
     }
 
     @Override
-    public int hashCode()
-    {
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Unit unit = (Unit) o;
+
+        return this.guid == unit.guid;
+    }
+
+    @Override
+    public int hashCode() {
         return this.guid;
     }
 }

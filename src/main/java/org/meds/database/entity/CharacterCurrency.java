@@ -60,18 +60,22 @@ public class CharacterCurrency implements Serializable
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
-        if (!(obj instanceof CharacterCurrency))
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
-        CharacterCurrency cObj = (CharacterCurrency)obj;
+        }
 
-        return this.characterId == cObj.characterId && this.currencyId == cObj.currencyId;
+        CharacterCurrency that = (CharacterCurrency) o;
+
+        return this.characterId == that.characterId
+                && this.currencyId == that.currencyId;
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return this.characterId * 1000 + this.currencyId;
     }
 

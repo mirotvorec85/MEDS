@@ -46,4 +46,24 @@ public class CharacterAchievement implements Serializable {
     public boolean isCompleted() {
         return this.completeDate != 0;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        CharacterAchievement that = (CharacterAchievement) o;
+
+        return this.achievementId == that.achievementId
+                && this.characterId == that.characterId;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.characterId + this.achievementId;
+    }
 }

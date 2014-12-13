@@ -90,11 +90,7 @@ public class Achievement {
 
         Achievement that = (Achievement) o;
 
-        if (this.id != that.id) {
-            return false;
-        }
-
-        return true;
+        return this.id == that.id;
     }
 
     @Override

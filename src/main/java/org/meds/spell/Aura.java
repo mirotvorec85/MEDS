@@ -212,4 +212,24 @@ public class Aura
             this.setState(States.Ending);
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Aura aura = (Aura) o;
+
+        return this.owner.equals(aura.owner)
+                && this.spellEntry.equals(aura.spellEntry);
+    }
+
+    @Override
+    public int hashCode() {
+        return this.owner.hashCode() + this.spellEntry.hashCode();
+    }
 }

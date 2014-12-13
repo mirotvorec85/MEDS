@@ -159,4 +159,23 @@ public class ServerPacket implements Cloneable
     {
         return new ServerPacket(this.data, this.packetEnd);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ServerPacket that = (ServerPacket) o;
+
+        return this.data != null ? this.data.equals(that.data) : that.data != null;
+    }
+
+    @Override
+    public int hashCode() {
+        return data != null ? data.hashCode() : 0;
+    }
 }
