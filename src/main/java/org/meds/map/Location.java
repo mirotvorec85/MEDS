@@ -1,7 +1,8 @@
-package org.meds;
+package org.meds.map;
 
 import java.util.*;
 
+import org.meds.*;
 import org.meds.Item.Prototype;
 import org.meds.enums.MovementDirections;
 import org.meds.enums.Parameters;

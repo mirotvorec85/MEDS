@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.meds.logging.Logging;
+import org.meds.map.Location;
+import org.meds.map.Map;
 
 public class Corpse
 {

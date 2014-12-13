@@ -7,6 +7,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.meds.logging.Logging;
+import org.meds.map.Location;
+import org.meds.map.Map;
+import org.meds.map.Region;
 import org.meds.net.ServerOpcodes;
 import org.meds.net.ServerPacket;
 import org.meds.util.SafeConvert;

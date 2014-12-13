@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.meds.Item.Prototype;
-import org.meds.Location;
+import org.meds.map.Location;
 import org.meds.database.DBStorage;
 
 public class CharacterInfo
@@ -341,7 +341,7 @@ public class CharacterInfo
     }
     public void setHomeId(int homeId)
     {
-        this.home = org.meds.Map.getInstance().getLocation(homeId);
+        this.home = org.meds.map.Map.getInstance().getLocation(homeId);
         this.homeId = homeId;
     }
     public Location getHome()

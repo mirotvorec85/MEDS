@@ -12,6 +12,7 @@ import org.meds.database.entity.LevelCost;
 import org.meds.database.entity.Spell;
 import org.meds.enums.*;
 import org.meds.logging.Logging;
+import org.meds.map.Location;
 import org.meds.net.ServerOpcodes;
 import org.meds.net.ServerPacket;
 import org.meds.net.Session;

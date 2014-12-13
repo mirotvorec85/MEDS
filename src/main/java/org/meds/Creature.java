@@ -12,6 +12,7 @@ import org.meds.enums.CreatureFlags;
 import org.meds.enums.MovementDirections;
 import org.meds.enums.Parameters;
 import org.meds.logging.Logging;
+import org.meds.map.Location;
 import org.meds.util.Random;
 
 public class Creature extends Unit
@@ -79,7 +80,7 @@ public class Creature extends Unit
         else
         {
             this.locationId = locationId;
-            this.spawnLocation = org.meds.Map.getInstance().getLocation(locationId);
+            this.spawnLocation = org.meds.map.Map.getInstance().getLocation(locationId);
         }
     }
 
@@ -253,7 +254,7 @@ public class Creature extends Unit
         else
         {
             // Find random location at creature's region
-            location = org.meds.Map.getInstance().getRegion(this.template.getRegionId()).getRandomLocation(false);
+            location = org.meds.map.Map.getInstance().getRegion(this.template.getRegionId()).getRandomLocation(false);
         }
 
         if (location == null)
@@ -316,7 +317,7 @@ public class Creature extends Unit
                 {
                     MovementDirections direction = this.position.getRandomDirection(false, true);
                     if (direction != MovementDirections.None)
-                        org.meds.Map.getInstance().registerMovement(this, direction);
+                        org.meds.map.Map.getInstance().registerMovement(this, direction);
                 }
                 break;
             case Dead:

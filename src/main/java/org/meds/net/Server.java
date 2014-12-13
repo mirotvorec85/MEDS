@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.meds.Configuration;
-import org.meds.Map;
+import org.meds.map.Map;
 import org.meds.World;
 import org.meds.database.DBStorage;
 import org.meds.database.Hibernate;

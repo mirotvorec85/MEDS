@@ -1,9 +1,11 @@
-package org.meds;
+package org.meds.map;
 
 import java.util.Map;
 import java.util.Set;
 
+import org.meds.Item;
 import org.meds.Item.Prototype;
+import org.meds.Player;
 import org.meds.database.DBStorage;
 import org.meds.database.entity.ItemTemplate;
 import org.meds.database.entity.ShopItem;

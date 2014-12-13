@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.meds.map.Map;
 import org.meds.net.Server;
 import org.meds.net.Server.StopListener;
 import org.meds.database.Hibernate;

@@ -25,6 +25,10 @@ import org.meds.enums.MovementDirections;
 import org.meds.enums.PlayerSettings;
 import org.meds.enums.SpecialLocationTypes;
 import org.meds.logging.Logging;
+import org.meds.map.Location;
+import org.meds.map.Map;
+import org.meds.map.Region;
+import org.meds.map.Shop;
 import org.meds.util.MD5Hasher;
 import org.meds.util.Random;
 import org.meds.util.SafeConvert;
@@ -899,7 +903,7 @@ public class Session implements Runnable
             if (player.getPosition().getSpecialLocationType() == SpecialLocationTypes.Generic)
                 return;
 
-            Shop shop = org.meds.Map.getInstance().getShop(player.getPosition().getSpecialLocationId());
+            Shop shop = Map.getInstance().getShop(player.getPosition().getSpecialLocationId());
             // There is no shop with this id
             if (shop == null)
                 return;
@@ -930,7 +934,7 @@ public class Session implements Runnable
             if (player.getPosition().getSpecialLocationType() == SpecialLocationTypes.Generic)
                 return;
 
-            Shop shop = org.meds.Map.getInstance().getShop(player.getPosition().getSpecialLocationId());
+            Shop shop = Map.getInstance().getShop(player.getPosition().getSpecialLocationId());
             // There is no shop with this id
             if (shop == null)
                 return;

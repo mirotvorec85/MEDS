@@ -15,6 +15,7 @@ import org.meds.enums.PlayerStatuses;
 import org.meds.enums.Races;
 import org.meds.enums.SpecialLocationTypes;
 import org.meds.logging.Logging;
+import org.meds.map.Location;
 import org.meds.net.ServerOpcodes;
 import org.meds.net.ServerPacket;
 import org.meds.spell.Aura;
@@ -485,7 +486,7 @@ public class Player extends Unit
         this.parameters.guild().value(Parameters.LightningResistance, this.info.getGuildShockResist());
 
         // Location
-        this.position = org.meds.Map.getInstance().getLocation(this.info.getLocationId());
+        this.position = org.meds.map.Map.getInstance().getLocation(this.info.getLocationId());
 
         // Home
         // Directly from info

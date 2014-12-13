@@ -476,7 +476,7 @@
         </property>
     </class>
 
-    <class name="org.meds.Kingdom" table="kingdom">
+    <class name="org.meds.map.Kingdom" table="kingdom">
         <id name="id" type="int" column="id" >
             <generator class="assigned"/>
         </id>
@@ -500,7 +500,7 @@
         </property>
     </class>
 
-    <class name="org.meds.Location" table="`location`">
+    <class name="org.meds.map.Location" table="`location`">
         <id name="id" type="int" column="id" >
             <generator class="assigned"/>
         </id>
@@ -581,7 +581,7 @@
         </property>
     </class>
 
-    <class name="org.meds.Region" table="`region`">
+    <class name="org.meds.map.Region" table="`region`">
         <id name="id" type="int" column="id" >
             <generator class="assigned"/>
         </id>
@@ -671,7 +671,7 @@
         </property>
     </class>
 
-    <class name="org.meds.Shop" table="`shop`" >
+    <class name="org.meds.map.Shop" table="`shop`" >
         <id name="id" type="int" column="id">
             <generator class="increment"/>
         </id>

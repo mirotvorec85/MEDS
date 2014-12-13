@@ -1,10 +1,11 @@
-package org.meds;
+package org.meds.map;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.meds.Unit;
 import org.meds.database.Hibernate;
 import org.meds.enums.MovementDirections;
 import org.meds.logging.Logging;
