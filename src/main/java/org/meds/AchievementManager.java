@@ -34,25 +34,22 @@ public class AchievementManager {
             }
             categoryAchievements.add(achievement);
         }
+
+        this.player.addKillingBlowListener(new Unit.KillingBlowListener() {
+            @Override
+            public void handleEvent(Unit.DamageEvent e) {
+
+                if (e.getVictim().isPlayer())
+                    updateProgress(AchievementCategories.PvP, e.getVictim());
+                else
+                    updateProgress(AchievementCategories.PvM, e.getVictim());
+            }
+        });
     }
 
-    public void updateProgress(AchievementCategories category, Unit target) {
+    private void updateProgress(AchievementCategories category, Unit target) {
         if (this.achievements.get(category).size() == 0)
             return;
-
-        switch (category) {
-            case PvM:
-                if (target.getUnitType() != UnitTypes.Creature)
-                    return;
-                break;
-            case PvP:
-                if (!target.isPlayer())
-                    return;
-                break;
-            // Other criteria are not implemented
-            default:
-                return;
-        }
 
         // Check all criteria for all achievements
         Set<AchievementCriterionTypes> completed = new HashSet<AchievementCriterionTypes>(AchievementCriterionTypes.values().length);

@@ -1,18 +1,14 @@
 package org.meds;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.Map;
-import java.util.Set;
 
 import org.meds.database.DBStorage;
 import org.meds.database.entity.LevelCost;
 import org.meds.database.entity.Spell;
 import org.meds.enums.*;
 import org.meds.logging.Logging;
-import org.meds.map.Location;
+import org.meds.map.*;
 import org.meds.net.ServerOpcodes;
 import org.meds.net.ServerPacket;
 import org.meds.net.Session;
@@ -26,6 +22,35 @@ public abstract class Unit
     public interface TargetDiedListener
     {
         public void unitTargetDied(Unit unit);
+    }
+
+    public class DamageEvent extends EventObject {
+
+        private Damage damage;
+        private Unit victim;
+
+        public DamageEvent(Unit source, Damage damage, Unit victim) {
+            super(source);
+            this.damage = damage;
+            this.victim = victim;
+        }
+
+        @Override
+        public Unit getSource() {
+            return (Unit)super.getSource();
+        }
+
+        public Damage getDamage() {
+            return this.damage;
+        }
+
+        public Unit getVictim() {
+            return this.victim;
+        }
+    }
+
+    public interface KillingBlowListener extends EventListener {
+        void handleEvent(DamageEvent e);
     }
 
     protected int guid;
@@ -63,6 +88,8 @@ public abstract class Unit
 
     private Set<TargetDiedListener> targetDiedListeners;
 
+    private Set<KillingBlowListener> killingBlowListeners;
+
     private Map<Damage.ReductionTypes, Set<Damage.AffectionHandler>> damageReductions = new HashMap<>(Damage.ReductionTypes.values().length);
 
     public Unit()
@@ -80,6 +107,7 @@ public abstract class Unit
         this.skills = new HashMap<Integer, Integer>();
         this.spells = new HashMap<Integer, Integer>();
         this.targetDiedListeners = new HashSet<Unit.TargetDiedListener>();
+        this.killingBlowListeners = new HashSet<KillingBlowListener>();
     }
 
     public void addTargetDiedListener(TargetDiedListener listener)
@@ -90,6 +118,14 @@ public abstract class Unit
     public void removeTargetDiedListener(TargetDiedListener listener)
     {
         this.targetDiedListeners.remove(listener);
+    }
+
+    public void addKillingBlowListener(KillingBlowListener listener) {
+        this.killingBlowListeners.add(listener);
+    }
+
+    public void removeKillingBlowListener(KillingBlowListener listener) {
+        this.killingBlowListeners.remove(listener);
     }
 
     public void addDamageReduction(Damage.ReductionTypes type, Damage.AffectionHandler handler)
@@ -442,6 +478,13 @@ public abstract class Unit
                 */
             this.setTarget(null);
 
+            DamageEvent damageEvent = new DamageEvent(this, damage, victim);
+            if (this.killingBlowListeners.size() != 0) {
+                for (KillingBlowListener listener : this.killingBlowListeners) {
+                    listener.handleEvent(damageEvent);
+                }
+            }
+
             // The killer is a Player
             if (this.unitType == UnitTypes.Player)
             {
@@ -467,13 +510,6 @@ public abstract class Unit
                 // AutoLoot
                 if (corpse != null && player.getSettings().has(PlayerSettings.AutoLoot))
                     player.lootCorpse(corpse);
-
-                // Update achievements progress
-                AchievementCategories category = AchievementCategories.PvM;
-                if (victim.isPlayer()) {
-                    category = AchievementCategories.PvP;
-                }
-                player.getAchievementManager().updateProgress(category, victim);
             }
         }
         // Ordinary hit.
