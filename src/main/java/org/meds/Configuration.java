@@ -1,12 +1,6 @@
 package org.meds;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.HashMap;
 
 import org.meds.logging.Logging;
@@ -62,7 +56,8 @@ public class Configuration
         BufferedReader reader = null;
         try
         {
-            reader = new BufferedReader(new FileReader(new File(Configuration.confFile)));
+            reader = new BufferedReader(new InputStreamReader(
+                    Configuration.class.getClassLoader().getResourceAsStream(Configuration.confFile)));
             String textLine = null;
             while ((textLine = reader.readLine()) != null)
             {
@@ -89,13 +84,14 @@ public class Configuration
         }
         catch (FileNotFoundException e)
         {
-            Logging.Error.log("config file not found.");
+            Logging.Error.log("Configuration file not found.");
             Configuration.createConfigFile();
             return false;
         }
         catch (IOException e)
         {
-
+            Logging.Error.log("Unhandled Exception while loading the configuration.", e);
+            return false;
         }
         finally
         {

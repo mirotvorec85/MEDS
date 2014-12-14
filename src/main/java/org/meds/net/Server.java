@@ -119,7 +119,8 @@ public class Server
             Random.initialize();
 
             if (!Configuration.load()) {
-                Logging.Info.log("Server is stopped.");
+                Logging.Info.log("Server startup aborted.");
+                return;
             }
 
             Hibernate.configure();
