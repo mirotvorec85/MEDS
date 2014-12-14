@@ -46,7 +46,7 @@ public enum Parameters implements Valued
     MinDamage(100),
     AllResistance(101);
 
-    private static final Map<Integer, Parameters> values = new HashMap<Integer, Parameters>();
+    private static final Map<Integer, Parameters> values = new HashMap<>();
 
     static
     {

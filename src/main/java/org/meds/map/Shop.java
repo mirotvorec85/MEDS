@@ -22,7 +22,7 @@ public class Shop
     private int currencyId;
     private Set<ShopItem> shopItems;
 
-    private java.util.Map<ItemTemplate, Integer> items = new java.util.HashMap<ItemTemplate, Integer>();
+    private java.util.Map<ItemTemplate, Integer> items = new java.util.HashMap<>();
 
     public int getId()
     {

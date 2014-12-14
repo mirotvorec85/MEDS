@@ -308,12 +308,12 @@ public class Item
         this.Weight = Item.getWeight(template);
         if (this.Template == null)
         {
-            this.bonusParameters = new HashMap<ItemBonusParameters, Integer>();
+            this.bonusParameters = new HashMap<>();
             this.count = 0;
         }
         else
         {
-            this.bonusParameters = new HashMap<ItemBonusParameters, Integer>(this.Template.getBonusParameters());
+            this.bonusParameters = new HashMap<>(this.Template.getBonusParameters());
             this.count = 1;
         }
     }
@@ -542,7 +542,7 @@ public class Item
         // TODO: Clone item by initialize default item and assign all the field.
         // not doing recalculating these fields values (too efficient)
         Item newItem = new Item(this.Template, count);
-        newItem.bonusParameters = new HashMap<ItemBonusParameters, Integer>(this.bonusParameters);
+        newItem.bonusParameters = new HashMap<>(this.bonusParameters);
         newItem.durability = this.durability;
         newItem.modification = this.modification.clone();
         return newItem;

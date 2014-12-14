@@ -46,7 +46,7 @@ public class Server
 
     private static boolean isStopping;
 
-    private static Set<StopListener> stopListeners = new HashSet<Server.StopListener>();
+    private static Set<StopListener> stopListeners = new HashSet<>();
 
     public static boolean isStopping()
     {
@@ -154,7 +154,7 @@ public class Server
 
         this.isLoaded = false;
 
-        this.sessions = new HashMap<Session, Socket>(100);
+        this.sessions = new HashMap<>(100);
 
         this.serverSocket = new ServerSocket(Configuration.getInt(Configuration.Keys.Port));
 

@@ -16,7 +16,7 @@ public enum ItemFlags implements Valued
      */
     IsRare(0x002);
 
-    private static Map<Integer, ItemFlags> values = new HashMap<Integer, ItemFlags>();
+    private static Map<Integer, ItemFlags> values = new HashMap<>();
 
     static
     {

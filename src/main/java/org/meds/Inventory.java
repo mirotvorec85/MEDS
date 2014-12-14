@@ -156,7 +156,7 @@ public class Inventory
     private Item[] inventorySlots;
 
     private Player owner;
-    private Map<Integer, CharacterInventoryItem> characterItems = new HashMap<Integer, CharacterInventoryItem>();
+    private Map<Integer, CharacterInventoryItem> characterItems = new HashMap<>();
 
 
     public Inventory(Player owner)
@@ -397,7 +397,7 @@ public class Inventory
 
     public Integer[] findAllItems(int templateId)
     {
-        List<Integer> slots = new ArrayList<Integer>();
+        List<Integer> slots = new ArrayList<>();
         for (int i = Slots.Inventory1.getValue(); i <= Slots.Inventory25.getValue(); ++i)
         {
             if (this.inventorySlots[i] == null)
@@ -415,7 +415,7 @@ public class Inventory
         if (proto == null)
             return new Integer[0];
 
-        List<Integer> slots = new ArrayList<Integer>();
+        List<Integer> slots = new ArrayList<>();
         for (int i = Slots.Inventory1.getValue(); i <= Slots.Inventory25.getValue(); ++i)
         {
             if (!proto.equals(this.inventorySlots[i]))
@@ -549,7 +549,7 @@ public class Inventory
             --i;
         } while (i >= 0);
 
-        if (item != null && item.getCount() != 0)
+        if (item.getCount() != 0)
             onInventoryChanged();
         return item;
     }

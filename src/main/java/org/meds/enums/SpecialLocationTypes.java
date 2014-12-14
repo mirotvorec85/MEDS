@@ -30,7 +30,7 @@ public enum SpecialLocationTypes implements Valued
 
     PrivateShop(31),
 
-    _GoldemFlask(35);
+    _GoldenFlask(35);
 
     private static SpecialLocationTypes[] values = new SpecialLocationTypes[36];
 

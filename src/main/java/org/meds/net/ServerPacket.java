@@ -10,7 +10,7 @@ public class ServerPacket implements Cloneable
         Value,
         InterValue,
         InterPacket,
-    };
+    }
 
     private PacketEnds packetEnd;
     private StringBuilder data;

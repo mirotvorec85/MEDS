@@ -33,7 +33,7 @@ public class Inn
     {
         this.owner = owner;
         this.count = 0;
-        this.items = new HashMap<Item.Prototype, CharacterInnItem>();
+        this.items = new HashMap<>();
         this.slotCapacity = 100;
         this.countCapacity = 1000;
     }

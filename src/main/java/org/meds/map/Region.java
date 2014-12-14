@@ -21,12 +21,12 @@ public class Region
     /**
      * List of all the location the belong to this region.
      */
-    private List<Location> locations = new ArrayList<Location>();
+    private List<Location> locations = new ArrayList<>();
     private List<Location> locationsView = Collections.unmodifiableList(locations);
     /**
      * List of only non-special locations (i.e exclude shops, guilds, stars etc.; locations where creature are allowed to be)
      */
-    private List<Location> ordinaryLocations = new ArrayList<Location>();
+    private List<Location> ordinaryLocations = new ArrayList<>();
 
     private ServerPacket locationListData;
 

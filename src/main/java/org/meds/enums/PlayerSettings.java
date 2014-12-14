@@ -19,7 +19,7 @@ public enum PlayerSettings implements Valued
     FilterSpells(0x0200),
     Asceticism(0x0400);
 
-    private static Map<Integer, PlayerSettings> values = new HashMap<Integer, PlayerSettings>();
+    private static Map<Integer, PlayerSettings> values = new HashMap<>();
 
     static
     {

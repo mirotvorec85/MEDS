@@ -24,7 +24,7 @@ public class ItemTemplate
     private int subClass;
     private EnumFlags<ItemFlags> flags;
     private String itemBonuses;
-    private Map<ItemBonusParameters, Integer> bonusParameters = new HashMap<ItemBonusParameters, Integer>();
+    private Map<ItemBonusParameters, Integer> bonusParameters = new HashMap<>();
 
     public int getId()
     {
@@ -108,7 +108,7 @@ public class ItemTemplate
     }
     private void setFlags(int flags)
     {
-        this.flags = new EnumFlags<ItemFlags>(flags);
+        this.flags = new EnumFlags<>(flags);
     }
     public boolean hasFlag(ItemFlags flag)
     {
@@ -121,7 +121,7 @@ public class ItemTemplate
     private void setItemBonuses(String itemBonuses)
     {
         this.itemBonuses = itemBonuses;
-        this.bonusParameters = new HashMap<ItemBonusParameters, Integer>();
+        this.bonusParameters = new HashMap<>();
         String[] keyValues = itemBonuses.split(";");
         for (int i = 0; i < keyValues.length; ++i)
         {

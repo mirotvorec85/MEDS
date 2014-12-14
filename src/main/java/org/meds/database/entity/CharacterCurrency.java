@@ -16,11 +16,9 @@ public class CharacterCurrency implements Serializable
 
     public CharacterCurrency() { }
 
-    public CharacterCurrency(int characterId, int currencyId, int amount)
-    {
-        this.characterId = characterId;
+    public CharacterCurrency(int characterId, int currencyId) {
         setCharacterId(characterId);
-        this.amount = amount;
+        setCurrencyId(currencyId);
     }
 
     public int getCharacterId()

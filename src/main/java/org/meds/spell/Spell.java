@@ -379,7 +379,7 @@ public class Spell
         int initialDamage = Random.nextInt(minDamage, maxDamage);
 
         /*
-        * Dispertion
+        * Dispersion
         * */
         // Lightning - 30%
         if (this.entry.getId() == 3)

@@ -31,7 +31,7 @@ public class Aura
         Removed,
     }
 
-    protected static Map<Integer, Class<? extends Aura>> customAuraClasses = new HashMap<Integer, Class<? extends Aura>>();
+    private static final Map<Integer, Class<? extends Aura>> customAuraClasses = new HashMap<>();
 
     static
     {

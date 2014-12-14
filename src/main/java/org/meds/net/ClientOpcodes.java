@@ -48,7 +48,7 @@ public enum ClientOpcodes
     Verification("ver"),
     Whisper("wisp");
 
-    private static Map<String, ClientOpcodes> values = new HashMap<String, ClientOpcodes>();
+    private static final Map<String, ClientOpcodes> values = new HashMap<>();
 
     static
     {

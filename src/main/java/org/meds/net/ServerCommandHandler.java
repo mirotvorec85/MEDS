@@ -24,7 +24,7 @@ public class ServerCommandHandler implements Runnable
 
     public ServerCommandHandler()
     {
-        this.commands = new HashMap<String, ServerCommandHandler.CommandHandler>();
+        this.commands = new HashMap<>();
         this.commands.put("character", new CharacterCommandHandler());
         this.commands.put("help", new HelpCommandHandler());
         this.commands.put("shutdown", new ShutdownCommandHandler());
@@ -62,7 +62,7 @@ public class ServerCommandHandler implements Runnable
         catch(Exception ex)
         {
             // While stopping the Server any Exception is expected here
-            if (!Server.isStopping())
+            if (Server.isStopping())
                 Logging.Error.log("An exception had occurred while reading the Server Command.", ex);
         }
     }

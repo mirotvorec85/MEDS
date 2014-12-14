@@ -42,12 +42,12 @@ public class Map
 
     private Map()
     {
-        this.kingdoms = new HashMap<Integer, Kingdom>();
-        this.regions = new HashMap<Integer, Region>();
-        this.locations = new HashMap<Integer, Location>();
-        this.updatedLocations = new HashSet<Location>();
-        this.shops = new HashMap<Integer, Shop>();
-        this.unitMovement = new HashMap<Unit, MovementDirections>();
+        this.kingdoms = new HashMap<>();
+        this.regions = new HashMap<>();
+        this.locations = new HashMap<>();
+        this.updatedLocations = new HashSet<>();
+        this.shops = new HashMap<>();
+        this.unitMovement = new HashMap<>();
 
         this.corpseGuidCounter = 1;
     }

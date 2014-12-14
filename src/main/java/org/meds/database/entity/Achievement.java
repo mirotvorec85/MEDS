@@ -16,7 +16,7 @@ public class Achievement {
     private Set<AchievementCriterion> criteria;
 
     public Achievement() {
-        this.criteria = new HashSet<AchievementCriterion>();
+        this.criteria = new HashSet<>();
     }
 
     public int getId() {

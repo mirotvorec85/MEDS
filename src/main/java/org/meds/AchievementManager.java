@@ -13,13 +13,13 @@ import java.util.*;
 
 public class AchievementManager {
 
-    private Player player;
+    private final Player player;
 
-    private java.util.Map<AchievementCategories, HashSet<Achievement>> achievements;
+    private final java.util.Map<AchievementCategories, HashSet<Achievement>> achievements;
 
     public AchievementManager(Player player) {
         this.player = player;
-        this.achievements = new HashMap<AchievementCategories, HashSet<Achievement>>(AchievementCategories.values().length);
+        this.achievements = new HashMap<>(AchievementCategories.values().length);
 
         // Create a collection with non-completed achievements
         for (Achievement achievement : DBStorage.AchievementStore.values()) {
@@ -29,7 +29,7 @@ public class AchievementManager {
             }
             HashSet<Achievement> categoryAchievements = this.achievements.get(achievement.getCategory());
             if (categoryAchievements == null) {
-                categoryAchievements = new HashSet<Achievement>(DBStorage.AchievementStore.size());
+                categoryAchievements = new HashSet<>(DBStorage.AchievementStore.size());
                 this.achievements.put(achievement.getCategory(), categoryAchievements);
             }
             categoryAchievements.add(achievement);
@@ -52,8 +52,8 @@ public class AchievementManager {
             return;
 
         // Check all criteria for all achievements
-        Set<AchievementCriterionTypes> completed = new HashSet<AchievementCriterionTypes>(AchievementCriterionTypes.values().length);
-        Set<AchievementCriterionTypes> failed = new HashSet<AchievementCriterionTypes>(AchievementCriterionTypes.values().length);
+        Set<AchievementCriterionTypes> completed = new HashSet<>(AchievementCriterionTypes.values().length);
+        Set<AchievementCriterionTypes> failed = new HashSet<>(AchievementCriterionTypes.values().length);
 
         Iterator<Achievement> iterator = this.achievements.get(category).iterator();
         while (iterator.hasNext()) {

@@ -11,7 +11,7 @@ public enum BattleStates implements Valued
     Battle(4),
     Runaway(5);
 
-    private static BattleStates[] values = new BattleStates[6];
+    private static final BattleStates[] values = new BattleStates[6];
 
     static
     {

@@ -14,34 +14,34 @@ import org.hibernate.criterion.Restrictions;
 public class DBStorage {
 
     public static Map<Integer, Achievement> AchievementStore;
-    public static HashMap<Integer, HashMap<Integer, CreatureLoot>> CreatureLootStore;
-    public static HashMap<Integer, HashMap<Integer, CreatureQuestRelation>> CreatureQuestRelationStore;
-    public static HashMap<Integer, CreatureTemplate> CreatureTemplateStore;
-    public static HashMap<Integer, Currency> CurrencyStore;
-    public static HashMap<Integer, HashMap<Integer, GuildLesson>> GuildLessonStore;
-    public static HashMap<Integer, Guild> GuildStore;
-    public static HashMap<Integer, ItemTemplate> ItemTemplateStore;
-    public static HashMap<Integer, LevelCost> LevelCostStore;
-    public static HashMap<Integer, NewMessage> NewMessageStore;
-    public static HashMap<Integer, QuestTemplate> QuestTemplateStore;
-    public static HashMap<Integer, Skill> SkillStore;
-    public static HashMap<Integer, Spell> SpellStore;
+    public static Map<Integer, Map<Integer, CreatureLoot>> CreatureLootStore;
+    public static Map<Integer, Map<Integer, CreatureQuestRelation>> CreatureQuestRelationStore;
+    public static Map<Integer, CreatureTemplate> CreatureTemplateStore;
+    public static Map<Integer, Currency> CurrencyStore;
+    public static Map<Integer, Map<Integer, GuildLesson>> GuildLessonStore;
+    public static Map<Integer, Guild> GuildStore;
+    public static Map<Integer, ItemTemplate> ItemTemplateStore;
+    public static Map<Integer, LevelCost> LevelCostStore;
+    public static Map<Integer, NewMessage> NewMessageStore;
+    public static Map<Integer, QuestTemplate> QuestTemplateStore;
+    public static Map<Integer, Skill> SkillStore;
+    public static Map<Integer, Spell> SpellStore;
 
     @SuppressWarnings("unchecked")
     public static void load()
     {
         int counter;
-        DBStorage.AchievementStore = new HashMap<Integer, Achievement>();
-        DBStorage.CreatureLootStore = new HashMap<Integer, HashMap<Integer,CreatureLoot>>();
-        DBStorage.CreatureQuestRelationStore = new HashMap<Integer, HashMap<Integer,CreatureQuestRelation>>();
-        DBStorage.CreatureTemplateStore = new HashMap<Integer, CreatureTemplate>();
-        DBStorage.CurrencyStore = new HashMap<Integer, Currency>();
-        DBStorage.GuildLessonStore = new HashMap<Integer, HashMap<Integer,GuildLesson>>();
-        DBStorage.GuildStore = new HashMap<Integer, Guild>();
-        DBStorage.ItemTemplateStore = new HashMap<Integer, ItemTemplate>();
-        DBStorage.LevelCostStore = new HashMap<Integer, LevelCost>();
-        DBStorage.NewMessageStore = new HashMap<Integer, NewMessage>();
-        DBStorage.QuestTemplateStore = new HashMap<Integer, QuestTemplate>();
+        DBStorage.AchievementStore = new HashMap<>();
+        DBStorage.CreatureLootStore = new HashMap<>();
+        DBStorage.CreatureQuestRelationStore = new HashMap<>();
+        DBStorage.CreatureTemplateStore = new HashMap<>();
+        DBStorage.CurrencyStore = new HashMap<>();
+        DBStorage.GuildLessonStore = new HashMap<>();
+        DBStorage.GuildStore = new HashMap<>();
+        DBStorage.ItemTemplateStore = new HashMap<>();
+        DBStorage.LevelCostStore = new HashMap<>();
+        DBStorage.NewMessageStore = new HashMap<>();
+        DBStorage.QuestTemplateStore = new HashMap<>();
 
         Session session = Hibernate.getSessionFactory().openSession();
 
@@ -80,10 +80,10 @@ public class DBStorage {
         counter = 0;
         for(GuildLesson guildLesson : guildLessons)
         {
-            HashMap<Integer, GuildLesson> lessons = DBStorage.GuildLessonStore.get(guildLesson.getGuildId());
+            Map<Integer, GuildLesson> lessons = DBStorage.GuildLessonStore.get(guildLesson.getGuildId());
             if (lessons == null)
             {
-                lessons = new HashMap<Integer, GuildLesson>();
+                lessons = new HashMap<>();
                 DBStorage.GuildLessonStore.put(guildLesson.getGuildId(), lessons);
             }
             ++counter;
@@ -112,7 +112,7 @@ public class DBStorage {
 
         // Skills
         List<Skill> skills = session.createCriteria(Skill.class).list();
-        DBStorage.SkillStore = new HashMap<Integer, Skill>(skills.size());
+        DBStorage.SkillStore = new HashMap<>(skills.size());
         for(Skill skill : skills)
         {
             DBStorage.SkillStore.put(skill.getId(), skill);
@@ -121,7 +121,7 @@ public class DBStorage {
 
         // Spells
         List<Spell> spells = session.createCriteria(Spell.class).list();
-        DBStorage.SpellStore = new HashMap<Integer, Spell>(spells.size());
+        DBStorage.SpellStore = new HashMap<>(spells.size());
         for(Spell spell : spells)
         {
             DBStorage.SpellStore.put(spell.getId(), spell);
@@ -141,10 +141,10 @@ public class DBStorage {
         counter = 0;
         for(CreatureLoot creatureLootItem : creatureLootItems)
         {
-            HashMap<Integer, CreatureLoot> lootItems = DBStorage.CreatureLootStore.get(creatureLootItem.getCreatureTemplateId());
+            Map<Integer, CreatureLoot> lootItems = DBStorage.CreatureLootStore.get(creatureLootItem.getCreatureTemplateId());
             if (lootItems == null)
             {
-                lootItems = new HashMap<Integer, CreatureLoot>();
+                lootItems = new HashMap<>();
                 DBStorage.CreatureLootStore.put(creatureLootItem.getCreatureTemplateId(), lootItems);
             }
             ++counter;
@@ -173,10 +173,10 @@ public class DBStorage {
         counter = 0;
         for(CreatureQuestRelation relation : relations)
         {
-            HashMap<Integer, CreatureQuestRelation> creatureQuests = DBStorage.CreatureQuestRelationStore.get(relation.getCreatureTemplateId());
+            Map<Integer, CreatureQuestRelation> creatureQuests = DBStorage.CreatureQuestRelationStore.get(relation.getCreatureTemplateId());
             if (creatureQuests == null)
             {
-                creatureQuests = new HashMap<Integer, CreatureQuestRelation>();
+                creatureQuests = new HashMap<>();
                 DBStorage.CreatureQuestRelationStore.put(relation.getCreatureTemplateId(), creatureQuests);
             }
             ++counter;

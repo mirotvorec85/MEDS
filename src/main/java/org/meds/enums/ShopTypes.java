@@ -13,10 +13,10 @@ public enum ShopTypes implements Valued
     ScribeShop(6),
     DepartmentStore(7),
     WeaponShop(8),
-    ArtefactArmourShop(9),
-    ArtefactJewelerShop(10),
-    ArtefactDepartmentStore(11),
-    ArtefactWeaponShop(12),
+    ArtifactArmourShop(9),
+    ArtifactJewelerShop(10),
+    ArtifactDepartmentStore(11),
+    ArtifactWeaponShop(12),
     _GoldenFlask(13);
 
     private static ShopTypes[] values = new ShopTypes[14];

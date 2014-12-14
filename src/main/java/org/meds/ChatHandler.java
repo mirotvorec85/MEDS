@@ -21,7 +21,7 @@ public final class ChatHandler
     public final static String SayChar = "\u0031";
     public final static String SystemChar = "\u0034";
 
-    private static HashMap<String, ChatCommand> chatCommands = new HashMap<String, ChatHandler.ChatCommand>();
+    private static final HashMap<String, ChatCommand> chatCommands = new HashMap<>();
 
     static
     {
@@ -104,7 +104,7 @@ public final class ChatHandler
         // Parsing commands
         // Each word except surrounding with quotes
 
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(commandArgs);
         while(m.find())
             list.add(m.group(1).replace("\"", ""));

@@ -13,7 +13,7 @@ public enum CreatureFlags implements Valued
     Beast(0x0004),
     QuestGiver(0x0008);
 
-    private static Map<Integer, CreatureFlags> values = new HashMap<Integer, CreatureFlags>();
+    private static Map<Integer, CreatureFlags> values = new HashMap<>();
 
     static
     {

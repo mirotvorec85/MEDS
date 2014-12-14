@@ -15,7 +15,7 @@ public class UnitParameters
 
         public Parameter()
         {
-            this.values = new HashMap<Parameters, Integer>();
+            this.values = new HashMap<>();
             clear();
         }
 
@@ -137,7 +137,7 @@ public class UnitParameters
         this.guildParameter = new Parameter();
         this.equipmentParameter = new EquipmentParameter();
         this.magicParameter = new Parameter();
-        this.total = new HashMap<Parameters, Integer>();
+        this.total = new HashMap<>();
         // Clear Total values
         for (Parameters parameter : Parameters.values())
         {
@@ -186,7 +186,7 @@ public class UnitParameters
 
     private void onParameterChanged(Parameters parameter)
     {
-        this.value(parameter, getTotalSumm(parameter));
+        this.value(parameter, getTotalSum(parameter));
         int modifier = 1;
         double modifierD = 1d;
 
@@ -230,8 +230,8 @@ public class UnitParameters
                     modifierD = 5d / 4;
 
                 // if MinDamage value has been changed, its total value calculated at the top of this method
-                this.value(Parameters.Damage, (int)((getTotalSumm(Parameters.Damage) + this.value(Parameters.MinDamage)) * modifierD));
-                this.value(Parameters.MaxDamage, (int)((getTotalSumm(Parameters.MaxDamage) + getTotalSumm(Parameters.Damage)) * modifierD));
+                this.value(Parameters.Damage, (int)((getTotalSum(Parameters.Damage) + this.value(Parameters.MinDamage)) * modifierD));
+                this.value(Parameters.MaxDamage, (int)((getTotalSum(Parameters.MaxDamage) + getTotalSum(Parameters.Damage)) * modifierD));
 
                 /*
                 switch (parameter)
@@ -241,12 +241,12 @@ public class UnitParameters
                         this.total[parameter] *= modifier;
                         break;
                     case Parameters.MaxDamage:
-                        this.total[parameter] += GetTotalSumm(Parameters.Damage);
+                        this.total[parameter] += GetTotalSum(Parameters.Damage);
                         this.total[parameter] *= modifier;
                         break;
                     case Parameters.MinDamage:
-                        this.total[Parameters.Damage] = GetTotalSumm(Parameters.Damage) + this.total[Parameters.MinDamage];
-                        this.total[Parameters.MaxDamage] = GetTotalSumm(Parameters.Damage) + GetTotalSumm(Parameters.Damage);
+                        this.total[Parameters.Damage] = GetTotalSum(Parameters.Damage) + this.total[Parameters.MinDamage];
+                        this.total[Parameters.MaxDamage] = GetTotalSum(Parameters.Damage) + GetTotalSum(Parameters.Damage);
                         this.total[Parameters.Damage] *= modifier;
                         this.total[Parameters.MaxDamage] *= modifier;
                         break;
@@ -278,10 +278,10 @@ public class UnitParameters
                 modifier = 1;
                 if (this.unit.getRace() == Races.Orc || this.unit.getRace() == Races.Dwarf)
                     modifier = 3;
-                this.value(Parameters.AllResistance, getTotalSumm(Parameters.AllResistance));
-                this.value(Parameters.FireResistance, getTotalSumm(Parameters.FireResistance) + this.value(Parameters.AllResistance));
-                this.value(Parameters.FrostResistance, getTotalSumm(Parameters.FrostResistance) + this.value(Parameters.AllResistance));
-                this.value(Parameters.LightningResistance, getTotalSumm(Parameters.LightningResistance) + this.value(Parameters.AllResistance));
+                this.value(Parameters.AllResistance, getTotalSum(Parameters.AllResistance));
+                this.value(Parameters.FireResistance, getTotalSum(Parameters.FireResistance) + this.value(Parameters.AllResistance));
+                this.value(Parameters.FrostResistance, getTotalSum(Parameters.FrostResistance) + this.value(Parameters.AllResistance));
+                this.value(Parameters.LightningResistance, getTotalSum(Parameters.LightningResistance) + this.value(Parameters.AllResistance));
                 this.value(Parameters.AllResistance,  this.value(Parameters.AllResistance) * modifier);
                 this.value(Parameters.FireResistance,  this.value(Parameters.FireResistance) * modifier);
                 this.value(Parameters.FrostResistance,  this.value(Parameters.FrostResistance) * modifier);
@@ -366,7 +366,7 @@ public class UnitParameters
         }
     }
 
-    private int getTotalSumm(Parameters parameter)
+    private int getTotalSum(Parameters parameter)
     {
         return this.baseParameter.value(parameter) + this.guildParameter.value(parameter) + this.equipmentParameter.value(parameter) + this.magicParameter.value(parameter);
     }

@@ -96,7 +96,7 @@ public enum ItemEssenceTypes implements Valued
     /**
      * Bonus % suppress absorption/damage reflection
      */
-    Supression(23),
+    Suppression(23),
     /**
      * Bonus % of maximum load capacity
      */

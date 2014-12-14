@@ -71,9 +71,9 @@ public class Session implements Runnable
     {
         this.socket = socket;
 
-        this.listeners = new HashSet<Session.DisconnectListener>();
+        this.listeners = new HashSet<>();
 
-        this.opcodeHandlers = new HashMap<ClientOpcodes, Session.OpcodeHandler>();
+        this.opcodeHandlers = new HashMap<>();
         this.opcodeHandlers.put(ClientOpcodes.Verification, new VerificationOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.Login, new LoginOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.Ready, new ReadyOpcodeHandler());
@@ -112,7 +112,7 @@ public class Session implements Runnable
         this.opcodeHandlers.put(ClientOpcodes.GuildLessonsInfo, new GuildLessonsInfoOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.LearnGuildInfo, new LearnGuildInfoOpcodeHandler());
 
-        this.packets = new HashMap<Long, ServerPacket>();
+        this.packets = new HashMap<>();
 
         this.key = Random.nextInt();
     }
@@ -184,7 +184,7 @@ public class Session implements Runnable
                     String[] data = opcode.getData();
                     if (handler.getMinDataLength() != -1 && data.length < handler.getMinDataLength())
                     {
-                        Logging.Warn.log("Opcode \"" + clientOpcode + "\" has the length " + data.length + ", but minimal is " + handler.getMinDataLength() + ". Handling abborted.");
+                        Logging.Warn.log("Opcode \"" + clientOpcode + "\" has the length " + data.length + ", but minimal is " + handler.getMinDataLength() + ". Handling aborted.");
                         continue;
                     }
 
@@ -194,7 +194,7 @@ public class Session implements Runnable
                     }
                     catch(Exception ex)
                     {
-                        Logging.Error.log("An exception has occured while handling the opcode " + clientOpcode.toString(), ex);
+                        Logging.Error.log("An exception has occurred while handling the opcode " + clientOpcode.toString(), ex);
                         continue;
                     }
 
@@ -209,7 +209,7 @@ public class Session implements Runnable
         catch (IOException e)
         {
             // Then the Server is stopping this exception is the expected
-            if (!Server.isStopping())
+            if (Server.isStopping())
                 Logging.Error.log("An exception while reading a socket.", e);
         }
     }

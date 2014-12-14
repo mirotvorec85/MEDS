@@ -7,7 +7,7 @@ public enum QuestStatuses implements Valued
     None(0),
     Taken(1),
     Completed(2),
-    Retaket(3),
+    Retaken(3),
     Failed(4);
 
     private static QuestStatuses[] values = new QuestStatuses[5];

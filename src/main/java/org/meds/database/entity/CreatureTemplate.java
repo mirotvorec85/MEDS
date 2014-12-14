@@ -58,7 +58,7 @@ public class CreatureTemplate
     }
     public void setCreatureFlags(int creatureFlags)
     {
-        this.creatureFlags = new EnumFlags<CreatureFlags>(creatureFlags);
+        this.creatureFlags = new EnumFlags<>(creatureFlags);
     }
 
     public boolean hasFlag(CreatureFlags flag)

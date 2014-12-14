@@ -15,7 +15,7 @@ public enum AchievementCriterionTypes implements Valued {
     ClanWar(9),
     AchievementComplete(10);
 
-    private static AchievementCriterionTypes[] values = new AchievementCriterionTypes[AchievementCriterionTypes.values().length + 1];
+    private static final AchievementCriterionTypes[] values = new AchievementCriterionTypes[AchievementCriterionTypes.values().length + 1];
 
     static {
         for (AchievementCriterionTypes state : AchievementCriterionTypes.values())

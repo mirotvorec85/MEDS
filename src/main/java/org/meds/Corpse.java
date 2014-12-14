@@ -21,7 +21,7 @@ public class Corpse
         this.owner = owner;
         this.guid = Map.getInstance().getNextCorpseGuid();
         setPosition(owner.getPosition());
-        this.loot = new HashSet<Item>();
+        this.loot = new HashSet<>();
     }
 
     public void fillWithLoot(Set<Item> items, int gold)

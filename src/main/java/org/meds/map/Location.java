@@ -58,10 +58,10 @@ public class Location
 
     public Location()
     {
-        this.units = new HashSet<Unit>();
+        this.units = new HashSet<>();
         this.unitsView = Collections.unmodifiableSet(this.units);
-        this.corpses = new HashMap<Integer, Corpse>();
-        this.items = new HashMap<Prototype, Item>();
+        this.corpses = new HashMap<>();
+        this.items = new HashMap<>();
     }
 
     public int getId()

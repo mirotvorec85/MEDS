@@ -67,10 +67,10 @@ public class Player extends Unit
         this.guid = guid;
         this.unitType = UnitTypes.Player;
 
-        this.statuses = new EnumFlags<PlayerStatuses>();
-        this.settings = new EnumFlags<PlayerSettings>();
+        this.statuses = new EnumFlags<>();
+        this.settings = new EnumFlags<>();
 
-        this.quests = new HashMap<Integer, Quest>();
+        this.quests = new HashMap<>();
 
         this.inn = new Inn(this);
         this.inventory = new Inventory(this);
@@ -363,7 +363,7 @@ public class Player extends Unit
         // Create new record
         if (currency == null)
         {
-            currency = new CharacterCurrency(this.guid, currencyId, 0);
+            currency = new CharacterCurrency(this.guid, currencyId);
             this.info.getCurrencies().put(currencyId, currency);
         }
 
@@ -494,8 +494,8 @@ public class Player extends Unit
         // AutoSpell
         // TODO: here or from info
 
-        this.settings = new EnumFlags<PlayerSettings>(this.info.getSettings());
-        this.statuses = new EnumFlags<PlayerStatuses>(this.info.getStatuses());
+        this.settings = new EnumFlags<>(this.info.getSettings());
+        this.statuses = new EnumFlags<>(this.info.getStatuses());
 
         this.inventory.load(this.info.getInventoryItems());
         this.inn.load(this.info.getInnItems());
@@ -681,7 +681,7 @@ public class Player extends Unit
                     return;
             }
 
-            charGuild = new CharacterGuild(this.guid, guildId, 0);
+            charGuild = new CharacterGuild(this.guid, guildId);
             this.info.getGuilds().put(guildId, charGuild);
         }
 

@@ -35,7 +35,7 @@ public enum ItemClasses implements Valued
     Component(13),
     Gemm(14),
     Recipe(15),
-    Artefact(16);
+    Artifact(16);
 
     private static final ItemClasses[] values = new ItemClasses[17];
 

@@ -122,7 +122,7 @@ public class AuraBuff extends Aura
                 int limit = (int)((this.owner.getParameters().base().value(parameter) + this.owner.getParameters().guild().value(parameter)) * 5.6);
                 if (effect > limit)
                     effect = limit;
-                this.bonusParameter1 = new KeyValuePair<Parameters, Integer>(parameter, effect);
+                this.bonusParameter1 = new KeyValuePair<>(parameter, effect);
                 break;
             case 17: // Bears Blood
                 double effectPercent = 0d;
@@ -159,7 +159,7 @@ public class AuraBuff extends Aura
                         effectPercent = 0.33;
                         break;
                 }
-                this.bonusParameter1 = new KeyValuePair<Parameters, Integer>(Parameters.Health,
+                this.bonusParameter1 = new KeyValuePair<>(Parameters.Health,
                     (int)(this.owner.getParameters().value(Parameters.Health) * effectPercent + this.owner.getLevel() * this.level * (1 + effectPercent)));
                 break;
         }

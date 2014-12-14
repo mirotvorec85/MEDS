@@ -51,14 +51,14 @@ public class CharacterInfo
     private Spell autoSpell;
     private Location home;
 
-    private Map<Integer, CharacterAchievement> achievements = new HashMap<Integer, CharacterAchievement>();
-    private Map<Integer, CharacterGuild> guilds = new HashMap<Integer, CharacterGuild>();
-    private Map<Integer, CharacterCurrency> currencies = new HashMap<Integer, CharacterCurrency>();
-    private Map<Prototype, CharacterInnItem> innItems = new HashMap<Prototype, CharacterInnItem>();
-    private Map<Integer, CharacterInventoryItem> inventoryItems = new HashMap<Integer, CharacterInventoryItem>();
-    private Map<Integer, CharacterQuest> quests = new HashMap<Integer, CharacterQuest>();
-    private Map<Integer, CharacterSkill> skills = new HashMap<Integer, CharacterSkill>();
-    private Map<Integer, CharacterSpell> spells = new HashMap<Integer, CharacterSpell>();
+    private Map<Integer, CharacterAchievement> achievements = new HashMap<>();
+    private Map<Integer, CharacterGuild> guilds = new HashMap<>();
+    private Map<Integer, CharacterCurrency> currencies = new HashMap<>();
+    private Map<Prototype, CharacterInnItem> innItems = new HashMap<>();
+    private Map<Integer, CharacterInventoryItem> inventoryItems = new HashMap<>();
+    private Map<Integer, CharacterQuest> quests = new HashMap<>();
+    private Map<Integer, CharacterSkill> skills = new HashMap<>();
+    private Map<Integer, CharacterSpell> spells = new HashMap<>();
 
     public int getCharacterId()
     {

@@ -14,8 +14,8 @@ public class MD5Hasher
         {
             MessageDigest dm = MessageDigest.getInstance("MD5");
             dm.update(string.getBytes());
-            byte[] digets = dm.digest();
-            for (byte b : digets)
+            byte[] digest = dm.digest();
+            for (byte b : digest)
                 sb.append(String.format("%02x", b & 0xff));
         }
         catch(NoSuchAlgorithmException ex)

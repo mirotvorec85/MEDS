@@ -16,11 +16,9 @@ public class CharacterGuild implements Serializable
 
     public CharacterGuild() { }
 
-    public CharacterGuild(int characterId, int guildId, int level)
-    {
-        this.characterId = characterId;
+    public CharacterGuild(int characterId, int guildId) {
+        setCharacterId(characterId);
         setGuildId(guildId);
-        this.level = level;
     }
 
     public int getCharacterId()

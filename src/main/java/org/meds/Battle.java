@@ -24,9 +24,9 @@ public class Battle
 
     public Battle()
     {
-        this.leftUnits = new LinkedHashSet<Unit>();
-        this.runUnits = new HashSet<Unit>();
-        this.participants = new HashSet<Unit>();
+        this.leftUnits = new LinkedHashSet<>();
+        this.runUnits = new HashSet<>();
+        this.participants = new HashSet<>();
         World.getInstance().addBattle(this);
     }
 
@@ -133,7 +133,7 @@ public class Battle
             if (this.runUnits.contains(attacker))
             {
                 Player player = attacker.isPlayer() ? (Player)attacker : null;
-                if (player.getSession() == null)
+                if (player != null && player.getSession() == null)
                     player = null;
                 // TODO: Found out chance calculation
                 double chanceToFlee = 0.5d;
@@ -143,7 +143,7 @@ public class Battle
 
                     sendBattleState(attacker, BattleStates.Runaway);
                     // Set target to NULL and leave the battle
-                    attacker.setTarget(null);;
+                    attacker.setTarget(null);
                     // Send run away result message
                     if (player != null)
                         player.getSession().addServerMessage(39, target.getName());

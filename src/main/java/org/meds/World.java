@@ -51,15 +51,15 @@ public class World implements Runnable
 
     private World()
     {
-        this.players = new HashMap<Integer, Player>();
-        this.units = new HashMap<Integer, Unit>();
+        this.players = new HashMap<>();
+        this.units = new HashMap<>();
         this.addPlayersPacket = new ServerPacket();
         this.updatePlayersPacket = new ServerPacket();
         this.deletePlayersPacket = new ServerPacket();
 
         this.battles = new ArrayList<>();
-        this.newBattles = new LinkedList<Battle>();
-        this.expiredBattles = new LinkedList<Battle>();
+        this.newBattles = new LinkedList<>();
+        this.expiredBattles = new LinkedList<>();
 
         this.dayTime = 0;
 

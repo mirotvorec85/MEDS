@@ -41,9 +41,9 @@ public class Creature extends Unit
     {
         super();
         this.unitType = UnitTypes.Creature;
-        this.spells = new HashMap<Integer, Integer>();
-        this.skills = new HashMap<Integer, Integer>();
-        this.loot = new HashSet<Item>();
+        this.spells = new HashMap<>();
+        this.skills = new HashMap<>();
+        this.loot = new HashSet<>();
     }
 
     @SuppressWarnings("unused")

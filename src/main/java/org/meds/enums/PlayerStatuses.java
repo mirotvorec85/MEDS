@@ -22,10 +22,9 @@ public enum PlayerStatuses implements Valued
     MainModerator(0x00800),
     Referee(0x01000);
 
-    private static Map<Integer, PlayerStatuses> values = new HashMap<Integer, PlayerStatuses>();
+    private static final Map<Integer, PlayerStatuses> values = new HashMap<>();
 
-    static
-    {
+    static {
         for (PlayerStatuses settings : PlayerStatuses.values())
             PlayerStatuses.values.put(settings.value, settings);
     }

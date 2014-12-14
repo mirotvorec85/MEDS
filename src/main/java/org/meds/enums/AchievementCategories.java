@@ -7,7 +7,7 @@ public enum AchievementCategories implements Valued {
     PvM(1),
     PvP(2);
 
-    private static AchievementCategories[] values = new AchievementCategories[3];
+    private static final AchievementCategories[] values = new AchievementCategories[3];
 
     static {
         for (AchievementCategories state : AchievementCategories.values())

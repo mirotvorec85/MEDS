@@ -51,7 +51,7 @@ public class Configuration
 
     public static boolean load()
     {
-        values = new HashMap<Configuration.Keys, String>();
+        values = new HashMap<>();
 
         BufferedReader reader = null;
         try

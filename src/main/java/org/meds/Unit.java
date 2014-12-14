@@ -103,11 +103,11 @@ public abstract class Unit
         this.clanMemberStatus = ClanMemberStatuses.Private;
         this.combatSpell = null;
         this.effectSpell = null;
-        this.auras = new HashMap<Integer, Aura>();
-        this.skills = new HashMap<Integer, Integer>();
-        this.spells = new HashMap<Integer, Integer>();
-        this.targetDiedListeners = new HashSet<Unit.TargetDiedListener>();
-        this.killingBlowListeners = new HashSet<KillingBlowListener>();
+        this.auras = new HashMap<>();
+        this.skills = new HashMap<>();
+        this.spells = new HashMap<>();
+        this.targetDiedListeners = new HashSet<>();
+        this.killingBlowListeners = new HashSet<>();
     }
 
     public void addTargetDiedListener(TargetDiedListener listener)
@@ -536,9 +536,9 @@ public abstract class Unit
             target = this;
 
         if (entry.getType() == SpellTypes.Combat)
-            this.combatSpell = new KeyValuePair<Spell, Unit>(entry, target);
+            this.combatSpell = new KeyValuePair<>(entry, target);
         else
-            this.effectSpell = new KeyValuePair<Spell, Unit>(entry, target);
+            this.effectSpell = new KeyValuePair<>(entry, target);
     }
 
     public boolean addAura(Aura aura)
@@ -609,7 +609,7 @@ public abstract class Unit
         {
             if (this.auras.size() > 0)
             {
-                List<Aura> removedAuras = new ArrayList<Aura>(this.auras.size());
+                List<Aura> removedAuras = new ArrayList<>(this.auras.size());
                 // Update auras
                 for (Aura aura : this.auras.values())
                 {
@@ -632,7 +632,7 @@ public abstract class Unit
         {
             this.castSpell(this.effectSpell.getKey().getId(), this.effectSpell.getValue());
 
-            this.effectSpell = new KeyValuePair<Spell, Unit>(null, null);
+            this.effectSpell = new KeyValuePair<>(null, null);
         }
 
         // HealthMana regeneration

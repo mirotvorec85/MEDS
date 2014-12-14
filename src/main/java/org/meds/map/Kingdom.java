@@ -13,7 +13,7 @@ public class Kingdom
 
     public Kingdom()
     {
-        this.regions = new ArrayList<Region>();
+        this.regions = new ArrayList<>();
     }
 
     public void setId(int id)
