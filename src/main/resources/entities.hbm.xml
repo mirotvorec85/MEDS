@@ -261,7 +261,7 @@
             <key-property name="characterId" type="int"><column name="character_id" /></key-property>
             <key-property name="questTemplateId" type="int"><column name="quest_template_id" /></key-property>
         </composite-id>
-        <property name="status" type="int">
+        <property name="statusInteger" type="int">
             <column name="`status`" />
         </property>
         <property name="progress" type="int">

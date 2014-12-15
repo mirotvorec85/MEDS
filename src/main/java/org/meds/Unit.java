@@ -472,10 +472,6 @@ public abstract class Unit
 
             Corpse corpse = victim.die();
 
-            /* TODO: KilledUnit event
-            if (this.KilledUnit != null)
-                this.KilledUnit(this, new KilledUnitEventArgs(victim));
-                */
             this.setTarget(null);
 
             DamageEvent damageEvent = new DamageEvent(this, damage, victim);

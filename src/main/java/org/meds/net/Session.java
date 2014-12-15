@@ -4,26 +4,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.EventListener;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.meds.*;
 import org.meds.Item.Prototype;
 import org.meds.database.DBStorage;
+import org.meds.database.entity.*;
 import org.meds.database.entity.Character;
-import org.meds.database.entity.Guild;
-import org.meds.database.entity.LevelCost;
-import org.meds.database.entity.NewMessage;
-import org.meds.database.entity.QuestTemplate;
-import org.meds.enums.BattleStates;
-import org.meds.enums.Currencies;
-import org.meds.enums.LoginResults;
-import org.meds.enums.MovementDirections;
-import org.meds.enums.PlayerSettings;
-import org.meds.enums.SpecialLocationTypes;
+import org.meds.enums.*;
 import org.meds.logging.Logging;
 import org.meds.map.Location;
 import org.meds.map.Map;
@@ -1097,19 +1085,19 @@ public class Session implements Runnable
         public void handle(String[] data)
         {
             // TODO: Implement Character Quests
-            /*
+
             boolean isHideCompleted = SafeConvert.toInt32(data[0]) == 1;
-            foreach (Quest quest in this.player.Quests.Values)
-            {
-                // Ignore not accepted quests
-                if (!quest.IsAccepted)
+            Iterator<CharacterQuest> iterator = Session.this.player.getQuestIterator();
+            while (iterator.hasNext()) {
+                CharacterQuest quest = iterator.next();
+
+                if (!quest.isAccepted())
                     continue;
 
-                if (isHideCompleted && quest.Status == QuestStatuses.Completed)
+                if (isHideCompleted && quest.getStatus() == QuestStatuses.Completed)
                     continue;
-                addData(quest.GetQuestData());
+                Session.this.addData(quest.getQuestData());
             }
-            */
         }
     }
 
@@ -1157,18 +1145,13 @@ public class Session implements Runnable
         @Override
         public void handle(String[] data)
         {
-
-
-            // TODO: implement CharacterQuest
-            /*
             int questId = SafeConvert.toInt32(data[0]);
-            Quest quest;
+            CharacterQuest quest = Session.this.player.getQuest(questId);
             // This quest previously wasn't requested to accept.
-            if (!this.player.Quests.TryGetValue(questId, out quest))
+            if (quest == null)
                 return;
 
-            quest.IsAccepted = true;
-            */
+            quest.accept(Session.this.player);
         }
     }
 

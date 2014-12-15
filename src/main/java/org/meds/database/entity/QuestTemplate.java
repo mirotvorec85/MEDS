@@ -32,8 +32,6 @@ public class QuestTemplate
     private int rewardItem2Count;
     private int tracking;
 
-    private QuestTemplate nextQuest;
-    private QuestTemplate prevQuest;
     private ItemTemplate sourceItemTemplate;
     private CreatureTemplate requiredCreatureTemplate;
     private ItemTemplate requiredItemTemplate;

@@ -1,5 +1,7 @@
 package org.meds.database.entity;
 
+import org.meds.database.DBStorage;
+
 import java.io.Serializable;
 
 public class CreatureQuestRelation implements Serializable
@@ -9,6 +11,7 @@ public class CreatureQuestRelation implements Serializable
     private int creatureTemplateId;
     private int questTemplateId;
     private int relation;
+    private QuestTemplate questTemplate;
 
     public int getCreatureTemplateId()
     {
@@ -22,10 +25,16 @@ public class CreatureQuestRelation implements Serializable
     {
         return questTemplateId;
     }
-    public void setQuestTemplateId(int questTemplateId)
-    {
+
+    public void setQuestTemplateId(int questTemplateId) {
         this.questTemplateId = questTemplateId;
+        this.questTemplate = DBStorage.QuestTemplateStore.get(questTemplateId);
     }
+
+    public QuestTemplate getQuestTemplate() {
+        return this.questTemplate;
+    }
+
     public int getRelation()
     {
         return relation;
@@ -49,5 +58,13 @@ public class CreatureQuestRelation implements Serializable
     public int hashCode()
     {
         return this.creatureTemplateId * 1000000 + this.questTemplateId;
+    }
+
+    public boolean canGiveQuest() {
+        return (this.relation & 1) > 0;
+    }
+
+    public boolean canCompleteQuest() {
+        return (this.relation & 2) > 0;
     }
 }
