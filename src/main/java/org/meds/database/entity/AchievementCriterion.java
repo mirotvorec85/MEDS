@@ -1,28 +1,20 @@
 package org.meds.database.entity;
 
-import org.meds.database.DBStorage;
-import org.meds.enums.AchievementCriterionTypes;
-
 import java.io.Serializable;
 
 public class AchievementCriterion implements Serializable {
 
-    private Achievement achievement;
+    private int achievementId;
     private int index;
-    private AchievementCriterionTypes type;
+    private int criteriaTypeId;
     private int requirement;
 
-    public Achievement getAchievement() {
-        return achievement;
-    }
-
     public int getAchievementId() {
-        return this.achievement.getId();
+        return this.achievementId;
     }
 
     public void setAchievementId(int achievementId) {
-        this.achievement = DBStorage.AchievementStore.get(achievementId);
-        this.achievement.getCriteria().add(this);
+        this.achievementId = achievementId;
     }
 
     public int getIndex() {
@@ -33,16 +25,12 @@ public class AchievementCriterion implements Serializable {
         this.index = index;
     }
 
-    public AchievementCriterionTypes getType() {
-        return type;
-    }
-
     public int getCriteriaTypeId() {
-        return this.type.getValue();
+        return this.criteriaTypeId;
     }
 
     public void setCriteriaTypeId(int criteriaTypeId) {
-        this.type = AchievementCriterionTypes.parse(criteriaTypeId);
+        this.criteriaTypeId = criteriaTypeId;
     }
 
     public int getRequirement() {
@@ -64,12 +52,12 @@ public class AchievementCriterion implements Serializable {
 
         AchievementCriterion that = (AchievementCriterion) o;
 
-        return this.achievement.getId() == that.achievement.getId()
+        return this.achievementId == that.achievementId
                 && this.index == that.index;
     }
 
     @Override
     public int hashCode() {
-        return this.achievement.getId() + this.index;
+        return this.achievementId + this.index;
     }
 }

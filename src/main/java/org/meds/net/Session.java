@@ -1087,9 +1087,9 @@ public class Session implements Runnable
             // TODO: Implement Character Quests
 
             boolean isHideCompleted = SafeConvert.toInt32(data[0]) == 1;
-            Iterator<CharacterQuest> iterator = Session.this.player.getQuestIterator();
+            Iterator<Quest> iterator = Session.this.player.getQuestIterator();
             while (iterator.hasNext()) {
-                CharacterQuest quest = iterator.next();
+                Quest quest = iterator.next();
 
                 if (!quest.isAccepted())
                     continue;
@@ -1146,12 +1146,12 @@ public class Session implements Runnable
         public void handle(String[] data)
         {
             int questId = SafeConvert.toInt32(data[0]);
-            CharacterQuest quest = Session.this.player.getQuest(questId);
+            Quest quest = Session.this.player.getQuest(questId);
             // This quest previously wasn't requested to accept.
             if (quest == null)
                 return;
 
-            quest.accept(Session.this.player);
+            quest.accept();
         }
     }
 

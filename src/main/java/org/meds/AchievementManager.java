@@ -23,14 +23,15 @@ public class AchievementManager {
 
         // Create a collection with non-completed achievements
         for (Achievement achievement : DBStorage.AchievementStore.values()) {
+            AchievementCategories category = AchievementCategories.parse(achievement.getCategoryId());
             CharacterAchievement charAchieve = this.player.getAchievement(achievement.getId());
             if (charAchieve != null && charAchieve.isCompleted()) {
                 continue;
             }
-            HashSet<Achievement> categoryAchievements = this.achievements.get(achievement.getCategory());
+            HashSet<Achievement> categoryAchievements = this.achievements.get(category);
             if (categoryAchievements == null) {
                 categoryAchievements = new HashSet<>(DBStorage.AchievementStore.size());
-                this.achievements.put(achievement.getCategory(), categoryAchievements);
+                this.achievements.put(category, categoryAchievements);
             }
             categoryAchievements.add(achievement);
         }
@@ -52,8 +53,8 @@ public class AchievementManager {
             return;
 
         // Check all criteria for all achievements
-        Set<AchievementCriterionTypes> completed = new HashSet<>(AchievementCriterionTypes.values().length);
-        Set<AchievementCriterionTypes> failed = new HashSet<>(AchievementCriterionTypes.values().length);
+        Set<Integer> completed = new HashSet<>(AchievementCriterionTypes.values().length);
+        Set<Integer> failed = new HashSet<>(AchievementCriterionTypes.values().length);
 
         Iterator<Achievement> iterator = this.achievements.get(category).iterator();
         while (iterator.hasNext()) {
@@ -65,11 +66,11 @@ public class AchievementManager {
                 // Do not need check
                 // If an alternative criterion with the same type
                 // is already passed checking successfully
-                if (completed.contains(criterion.getType()))
+                if (completed.contains(criterion.getCriteriaTypeId()))
                     continue;
 
                 boolean isComplete = false;
-                switch (criterion.getType()) {
+                switch (AchievementCriterionTypes.parse(criterion.getCriteriaTypeId())) {
                     case CreatureTemplate:
                         if (target.getUnitType() != UnitTypes.Creature)
                             break;
@@ -113,10 +114,10 @@ public class AchievementManager {
                 }
 
                 if (isComplete) {
-                    completed.add(criterion.getType());
-                    failed.remove(criterion.getType());
+                    completed.add(criterion.getCriteriaTypeId());
+                    failed.remove(criterion.getCriteriaTypeId());
                 } else {
-                    failed.add(criterion.getType());
+                    failed.add(criterion.getCriteriaTypeId());
                 }
             }
 
@@ -174,7 +175,7 @@ public class AchievementManager {
         packet.add(charAchieve.getProgress());
         packet.add(achievement.getCount());
         packet.add(charAchieve.getCompleteDate());
-        packet.add(achievement.getCategory());
+        packet.add(achievement.getCategoryId());
         packet.add(achievement.getPoints());
 
         this.player.getSession().addData(packet);

@@ -49,6 +49,8 @@ public class Player extends Unit
 
     private CharacterInfo info;
 
+    private Map<Integer, Quest> quests;
+
     private int guildLevel;
 
     private SessionDisconnect disconnector;
@@ -120,7 +122,7 @@ public class Player extends Unit
 
     public Location getHome()
     {
-        return this.info.getHome();
+        return org.meds.map.Map.getInstance().getLocation(this.info.getHomeId());
     }
 
     public void setHome()
@@ -135,7 +137,7 @@ public class Player extends Unit
         if (home.getSpecialLocationType() != SpecialLocationTypes.Star)
             return;
 
-        this.info.setHome(home);
+        this.info.setHomeId(home.getId());
         if (this.session != null)
             this.session.addServerMessage(17, home.getRegion().getName());
     }
@@ -189,12 +191,12 @@ public class Player extends Unit
         this.info.getAchievements().put(achievement.getAchievementId(), achievement);
     }
 
-    public CharacterQuest getQuest(int questTemplateId) {
-        return this.info.getQuests().get(questTemplateId);
+    public Quest getQuest(int questTemplateId) {
+        return this.quests.get(questTemplateId);
     }
 
-    public Iterator<CharacterQuest> getQuestIterator() {
-        return this.info.getQuests().values().iterator();
+    public Iterator<Quest> getQuestIterator() {
+        return this.quests.values().iterator();
     }
 
     public AchievementManager getAchievementManager() {
@@ -457,8 +459,11 @@ public class Player extends Unit
         }
 
         // Accept all the quests
-        for (CharacterQuest quest : this.info.getQuests().values()) {
-            quest.accept(this);
+        this.quests = new HashMap<>();
+        for (CharacterQuest charQuest : this.info.getQuests().values()) {
+            Quest quest = new Quest(this, DBStorage.QuestTemplateStore.get(charQuest.getQuestTemplateId()), charQuest);
+            quest.accept();
+            this.quests.put(quest.getQuestTemplate().getId(), quest);
         }
 
         // Unit fields
@@ -659,9 +664,10 @@ public class Player extends Unit
         ServerPacket packet = new ServerPacket(ServerOpcodes.GuildLevels);
         packet.add(this.guildLevel);
         packet.add(this.info.getGuilds().size());
-        for (CharacterGuild guild : this.info.getGuilds().values())
-        {
-            packet.add(guild.getGuild().getName());
+        Guild guildEntry;
+        for (CharacterGuild guild : this.info.getGuilds().values()) {
+            guildEntry = DBStorage.GuildStore.get(guild.getGuildId());
+            packet.add(guildEntry.getName());
             packet.add(guild.getLevel());
         }
         return packet;
@@ -767,7 +773,7 @@ public class Player extends Unit
                 packet.add(achievement.getCount());
                 packet.add(0);
             }
-            packet.add(achievement.getCategory());
+            packet.add(achievement.getCategoryId());
             packet.add(achievement.getPoints());
         }
 
@@ -871,7 +877,7 @@ public class Player extends Unit
                 if (creatureQuests == null)
                     return;
 
-                CharacterQuest quest;
+                Quest quest;
 
                 int nextQuestId = 0;
 
@@ -901,19 +907,20 @@ public class Player extends Unit
                 int count = 0;
                 // Search through quest relations of the NPC
                 for(CreatureQuestRelation creatureQuest : creatureQuests.values()) {
+                    QuestTemplate template = DBStorage.QuestTemplateStore.get(creatureQuest.getQuestTemplateId());
                     // NPC can give a quest
                     // The quest is valid
                     // The player level is enough
                     if (creatureQuest.canGiveQuest()
-                            && creatureQuest.getQuestTemplate() != null
-                            && creatureQuest.getQuestTemplate().getLevel() <= this.getLevel()) {
+                            && template != null
+                            && template.getLevel() <= this.getLevel()) {
                         // Player has not taken the quest before
                         quest = getQuest(creatureQuest.getQuestTemplateId());
                         if (quest != null)
                             continue;
 
-                        packet.add(creatureQuest.getQuestTemplate().getId());
-                        packet.add(creatureQuest.getQuestTemplate().getTitle());
+                        packet.add(template.getId());
+                        packet.add(template.getTitle());
                         ++count;
                     }
                 }
@@ -940,7 +947,7 @@ public class Player extends Unit
             return false;
         }
 
-        CharacterQuest quest = getQuest(questId);
+        Quest quest = getQuest(questId);
         if (quest != null) {
             if (quest.isAccepted())
                 return false;
@@ -949,9 +956,12 @@ public class Player extends Unit
             if (template.getLevel() > this.getLevel())
                 return false;
 
-            quest = new CharacterQuest(template);
-            quest.setCharacterId(this.getGuid());
-            this.info.getQuests().put(questId, quest);
+            CharacterQuest charQuest = new CharacterQuest();
+            charQuest.setCharacterId(this.getGuid());
+            charQuest.setQuestTemplateId(template.getId());
+            this.info.getQuests().put(questId, charQuest);
+            quest = new Quest(this, template, charQuest);
+            this.quests.put(questId, quest);
         }
 
         if (this.session != null) {

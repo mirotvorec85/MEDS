@@ -269,6 +269,7 @@ public class QuestTemplate
         return this.getQuestInfoData(false);
     }
 
+    // TODO: Remove this method from this class
     public ServerPacket getQuestInfoData(boolean isForAccept)
     {
         ServerPacket packet = new ServerPacket(isForAccept ? ServerOpcodes.QuestInfoForAccept : ServerOpcodes.QuestInfo);

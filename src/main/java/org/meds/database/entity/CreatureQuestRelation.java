@@ -1,7 +1,5 @@
 package org.meds.database.entity;
 
-import org.meds.database.DBStorage;
-
 import java.io.Serializable;
 
 public class CreatureQuestRelation implements Serializable
@@ -11,7 +9,6 @@ public class CreatureQuestRelation implements Serializable
     private int creatureTemplateId;
     private int questTemplateId;
     private int relation;
-    private QuestTemplate questTemplate;
 
     public int getCreatureTemplateId()
     {
@@ -28,11 +25,6 @@ public class CreatureQuestRelation implements Serializable
 
     public void setQuestTemplateId(int questTemplateId) {
         this.questTemplateId = questTemplateId;
-        this.questTemplate = DBStorage.QuestTemplateStore.get(questTemplateId);
-    }
-
-    public QuestTemplate getQuestTemplate() {
-        return this.questTemplate;
     }
 
     public int getRelation()

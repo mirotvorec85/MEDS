@@ -2,8 +2,6 @@ package org.meds.database.entity;
 
 import java.io.Serializable;
 
-import org.meds.database.DBStorage;
-
 public class CharacterGuild implements Serializable
 {
     private static final long serialVersionUID = 3887257152944922197L;
@@ -11,8 +9,6 @@ public class CharacterGuild implements Serializable
     private int characterId;
     private int guildId;
     private int level;
-
-    private Guild guild;
 
     public CharacterGuild() { }
 
@@ -31,20 +27,13 @@ public class CharacterGuild implements Serializable
         this.characterId = characterId;
     }
 
-    public int getGuildId()
-    {
+    public int getGuildId() {
         return guildId;
     }
 
     public void setGuildId(int guildId)
     {
         this.guildId = guildId;
-        this.guild = DBStorage.GuildStore.get(guildId);
-    }
-
-    public Guild getGuild()
-    {
-        return this.guild;
     }
 
     public int getLevel()

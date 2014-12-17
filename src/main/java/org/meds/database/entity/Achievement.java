@@ -1,7 +1,5 @@
 package org.meds.database.entity;
 
-import org.meds.enums.AchievementCategories;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,7 +10,7 @@ public class Achievement {
     private String description;
     private int count;
     private int points;
-    private AchievementCategories category;
+    private int categoryId;
     private Set<AchievementCriterion> criteria;
 
     public Achievement() {
@@ -59,16 +57,12 @@ public class Achievement {
         this.points = points;
     }
 
-    public AchievementCategories getCategory() {
-        return category;
-    }
-
     public int getCategoryId() {
-        return this.category.getValue();
+        return this.categoryId;
     }
 
     public void setCategoryId(int categoryId) {
-        this.category = AchievementCategories.parse(categoryId);
+        this.categoryId = categoryId;
     }
 
     public Set<AchievementCriterion> getCriteria() {

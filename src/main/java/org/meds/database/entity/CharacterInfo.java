@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.meds.Item.Prototype;
-import org.meds.map.Location;
-import org.meds.database.DBStorage;
 
 public class CharacterInfo
 {
@@ -47,9 +45,6 @@ public class CharacterInfo
     private Integer autoSpellId;
     private int settings;
     private int statuses;
-
-    private Spell autoSpell;
-    private Location home;
 
     private Map<Integer, CharacterAchievement> achievements = new HashMap<>();
     private Map<Integer, CharacterGuild> guilds = new HashMap<>();
@@ -339,35 +334,16 @@ public class CharacterInfo
     {
         return homeId;
     }
-    public void setHomeId(int homeId)
-    {
-        this.home = org.meds.map.Map.getInstance().getLocation(homeId);
+    public void setHomeId(int homeId) {
         this.homeId = homeId;
     }
-    public Location getHome()
-    {
-        return this.home;
-    }
-    public void setHome(Location home)
-    {
-        this.home = home;
-        this.homeId = home.getId();
-    }
-    public Integer getAutoSpellId()
-    {
+
+    public Integer getAutoSpellId() {
         return this.autoSpellId;
     }
     public void setAutoSpellId(Integer autoSpellId)
     {
-        if (autoSpell != null)
-        {
-            this.autoSpell = DBStorage.SpellStore.get(autoSpell);
-        }
         this.autoSpellId = autoSpellId;
-    }
-    public Spell getAutoSpell()
-    {
-        return this.autoSpell;
     }
     public int getSettings()
     {
