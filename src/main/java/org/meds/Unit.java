@@ -537,12 +537,33 @@ public abstract class Unit
             this.effectSpell = new KeyValuePair<>(entry, target);
     }
 
-    public boolean addAura(Aura aura)
-    {
-        if (this.auras.containsKey(aura.getSpellEntity().getId()))
-        {
-            // TODO: remove aura without any message
-            // but cancel bonus parameters
+    /**
+     * Adds the specified aura to the unit aura list.
+     * @param aura Aura instance to add (or update)
+     * @return A result whether the aura has been added/updated or not.
+     */
+    public boolean addAura(Aura aura) {
+        // An aura with the same spell is already applied
+        Aura currentAura = getAura(aura.getSpellEntity().getId());
+        if (currentAura != null) {
+            // Identical levels
+            if (currentAura.getLevel() == aura.getLevel()) {
+                // Nothing to do with isPermanent auras
+                // Timed auras should be updated (Current implementation: forceRemove => apply again)
+                if (currentAura.isPermanent()) {
+                    return false;
+                } else {
+                    removeAura(currentAura.getSpellEntity().getId(), true);
+                }
+            // Current level is higher then the new level => Send 'no effect' message
+            } else if (currentAura.getLevel() > aura.getLevel()) {
+                if (this.isPlayer() && ((Player)this).getSession() != null)
+                    ((Player)this).getSession().addServerMessage(301);
+                return false;
+            // Otherwise, just update the aur
+            } else {
+                removeAura(currentAura.getSpellEntity().getId(), true);
+            }
         }
 
         this.auras.put(aura.getSpellEntity().getId(), aura);
@@ -556,14 +577,29 @@ public abstract class Unit
 
     /**
      * Marks an aura with AuraStates.Removed. The aura will be removed from an aura list at the next Unit.Update
+     * @param spellId ID of a Spell that is the source of the aura.
      */
-    public void removeAura(int spellId)
-    {
+    public void removeAura(int spellId) {
+        removeAura(spellId, false);
+    }
+
+    /**
+     * Remove an aura with the specified Spell Id and by the specified method
+     * @param spellId ID of the Spell that is the source of the aura.
+     * @param force Whether the Aura removes usual (dispelled or expired) or just cancel effect of the Aura
+     *              without any messaging and triggering.
+     */
+    public void removeAura(int spellId, boolean force) {
         Aura aura = this.auras.get(spellId);
         if (aura == null)
             return;
 
-        aura.setState(Aura.States.Removed);
+        if (force) {
+            aura.forceRemove();
+            this.auras.remove(aura);
+        } else {
+            aura.setState(Aura.States.Removed);
+        }
     }
 
     public Aura getAura(int spellId)

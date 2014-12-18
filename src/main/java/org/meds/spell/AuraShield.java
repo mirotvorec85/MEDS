@@ -36,9 +36,15 @@ public class AuraShield extends Aura
         super.applyAura();
         // Server message
         if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null && this.spellEntry.getId() == 1141)
-            this.ownerPlayer.getSession().addServerMessage(436);
+            this.ownerPlayer.getSession().addServerMessage(476);
         this.absorptionHandler = new AbsorptionHandler();
         this.owner.addDamageReduction(Damage.ReductionTypes.Absorption, this.absorptionHandler);
+    }
+
+    @Override
+    public void forceRemove() {
+        super.forceRemove();
+        this.owner.removeDamageReduction(Damage.ReductionTypes.Absorption, this.absorptionHandler);
     }
 
     @Override

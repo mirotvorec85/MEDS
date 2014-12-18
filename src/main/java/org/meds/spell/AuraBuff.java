@@ -58,6 +58,12 @@ public class AuraBuff extends Aura
             this.owner.getPosition().addData(this.owner, new ServerPacket(ServerOpcodes.ServerMessage).add(positionMessage).add(this.owner.getName()));
     }
 
+    @Override
+    public void forceRemove() {
+        super.forceRemove();
+        removeBonus();
+    }
+
     protected void recalculateBonus()
     {
         this.removeBonus(false);

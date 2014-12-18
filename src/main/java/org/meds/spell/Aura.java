@@ -59,7 +59,7 @@ public class Aura
      * @param entry Entry of the related spell.
      * @param owner A unit who is target of the aura
      * @param level Level of the aura.
-     * @param duration Duration in milliseconds. If duration is negative the the aura is permanent.
+     * @param duration Duration in milliseconds. If duration is negative the the aura is isPermanent.
      * @return A new Aura instance for this Spell
      */
     public static Aura createAura(org.meds.database.entity.Spell entry, Unit owner, int level, int duration)
@@ -154,7 +154,7 @@ public class Aura
         this.state = state;
     }
 
-    public boolean permanent()
+    public boolean isPermanent()
     {
         return this.isPermanent;
     }
@@ -172,11 +172,9 @@ public class Aura
         setState(States.Active);
     }
 
-    protected void removeAura()
-    {
+    protected void removeAura() {
         // If a player - send result
-        if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null)
-        {
+        if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null) {
             this.ownerPlayer.getSession().addData(new ServerPacket(ServerOpcodes.DeleteAura).add(this.spellEntry.getId()));
         }
     }
@@ -189,9 +187,14 @@ public class Aura
             .add(this.isPermanent ? "-1" : this.remainingTime / 1000);
     }
 
-    public void forceRemove()
-    {
-
+    /**
+     * Removes the aura effect without any messages or triggering any events. Just cancels it.
+     */
+    public void forceRemove() {
+        // If the owner is a player => send result
+        if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null) {
+            this.ownerPlayer.getSession().addData(new ServerPacket(ServerOpcodes.DeleteAura).add(this.spellEntry.getId()));
+        }
     }
 
     public void update(int time)

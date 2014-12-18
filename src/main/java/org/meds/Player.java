@@ -8,7 +8,6 @@ import java.util.Set;
 import org.meds.database.DBStorage;
 import org.meds.database.Hibernate;
 import org.meds.database.entity.*;
-import org.meds.database.entity.Character;
 import org.meds.enums.*;
 import org.meds.logging.Logging;
 import org.meds.map.Location;
@@ -1005,7 +1004,7 @@ public class Player extends Unit
                     for(Aura aura : this.auras.values())
                     {
                         // Synchronize timed auras only!
-                        if (aura.permanent())
+                        if (aura.isPermanent())
                             continue;
 
                         this.session.addData(aura.getPacketData());

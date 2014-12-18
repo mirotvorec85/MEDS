@@ -153,7 +153,7 @@ public class Battle
                 // Send Fail message
                 else if (player != null)
                     player.getSession().addServerMessage(42, target.getName());
-                // TODO: solve permanent runaway state problem.
+                // TODO: solve isPermanent runaway state problem.
             }
             else
             {
