@@ -170,6 +170,10 @@ public class Group implements Iterable<Player> {
                         ServerOpcodes.GroupCreated)
                         .add(groupMember == this.leader ? "1" : "0")
                         .add(this.leader.getGuid());
+                // Send group settings to the new leader
+                if (groupMember == this.leader) {
+                    packet.add(this.getSettingsData());
+                }
                 groupMember.getSession().addData(message).addData(packet).send();
             }
         }
