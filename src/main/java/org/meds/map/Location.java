@@ -683,13 +683,27 @@ public class Location
                 pss.add(_unit.getAvatar());
                 pss.add((int)(73d *_unit.getHealth() / _unit.getParameters().value(Parameters.Health)));
                 pss.add(_unit.getLevel());
-                // TODO: next values is not magic numbers
-                pss.add("0").add("0").add("0").add("0");
+                pss.add(_unit.getReligion());
+                pss.add(_unit.getReligLevel());
+                if (!_unit.isPlayer() || ((Player)_unit).getGroup() == null) {
+                    pss.add("0"); // Is Group Leader
+                    pss.add("0"); // Group leader GUID
+                } else {
+                    Group group = ((Player)_unit).getGroup();
+                    pss.add(group.getLeader() == _unit ? "1" : "0");
+                    pss.add(group.getLeader().getGuid());
+                }
                 pss.add(_unit.getTarget() == null ? 0 : _unit.getTarget().getGuid());
-                pss.add("1212413397");
+                pss.add("1212413397"); // Avatar Time?
                 pss.add((int)(73d *_unit.getMana() / _unit.getParameters().value(Parameters.Mana)));
-                pss.add("0").add("0").add("0").add("0");
-                pss.add("1").add("0").add("0").add("0");
+                pss.add("0"); // Clan ID
+                pss.add("0"); // Clan Status
+                pss.add("0"); // is hidden
+                pss.add("0"); // is Out of law
+                pss.add("1"); // Gender
+                pss.add("0"); // Title
+                pss.add("0"); // is Pet
+                pss.add("0"); // Boss type
             }
 
             player.getSession().addData(pss);

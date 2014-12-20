@@ -93,13 +93,13 @@ public class World implements Runnable
             .add(player.getGuid())
             .add(player.getName())
             .add(player.getLevel())
-            .add("0") // Religion Id
+            .add(player.getReligion())
             .add(player.getReligLevel())
-            .add("0") // "1" is the group leader
+            .add(player.getGroup() != null && player.getGroup().getLeader() == player ? "1" : "0")
             .add(player.getStatuses())
             .add(player.getClanId())
             .add(player.getClanMemberStatus())
-            .add("0");
+            .add("0"); // Religion Status
         Logging.Debug.log("addPlayersPacket updated");
     }
 
@@ -116,10 +116,10 @@ public class World implements Runnable
         this.updatePlayersPacket.add(ServerOpcodes.PlayersListUpdate)
             .add(player.getGuid())
             .add(player.getLevel())
-            .add("0") // Religion Id
+            .add(player.getReligion())
             .add(player.getReligLevel())
-            .add("0") // "1" is the group leader
-            /* statuses here? */
+            // Next value sometimes is 4 or 5 (possibly related to pets)
+            .add(player.getGroup() != null && player.getGroup().getLeader() == player ? "1" : "0")
             .add(player.getClanId())
             .add(player.getClanMemberStatus())
             .add("0");
@@ -136,9 +136,9 @@ public class World implements Runnable
                 packet.add(player.getGuid())
                     .add(player.getName())
                     .add(player.getLevel())
-                    .add("0") // Religion ID
+                    .add(player.getReligion())
                     .add(player.getReligLevel())
-                    .add("0") // 1 WHen a player is a group leader
+                    .add(player.getGroup() != null && player.getGroup().getLeader() == player ? "1" : "0")
                     .add(player.getStatuses())
                     .add(player.getClanId())
                     .add(player.getClanMemberStatus())

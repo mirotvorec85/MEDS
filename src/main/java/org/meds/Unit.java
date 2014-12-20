@@ -79,6 +79,8 @@ public abstract class Unit
 
     protected Unit target;
 
+    protected Religions religion;
+
     /**
      * Current battle of the Unit. Do not set this value manually! Use setter.
      */
@@ -106,6 +108,7 @@ public abstract class Unit
         this.auras = new HashMap<>();
         this.skills = new HashMap<>();
         this.spells = new HashMap<>();
+        this.religion = Religions.None;
         this.targetDiedListeners = new HashSet<>();
         this.killingBlowListeners = new HashSet<>();
     }
@@ -172,6 +175,10 @@ public abstract class Unit
     public Races getRace()
     {
         return this.race;
+    }
+
+    public Religions getReligion() {
+        return this.religion;
     }
 
     public DeathStates getDeathState()
