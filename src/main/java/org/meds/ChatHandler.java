@@ -29,6 +29,9 @@ public final class ChatHandler
         chatCommands.put("set_level", new SetLevelChatCommand());
         chatCommands.put("announce", new AnnounceChatCommand());
         chatCommands.put("inspect_region", new InspectRegionChatCommand());
+        chatCommands.put("tlffa", new TeamLootChatCommand(Group.TeamLootModes.Regular));
+        chatCommands.put("tlrandom", new TeamLootChatCommand(Group.TeamLootModes.Random));
+        chatCommands.put("tlleader", new TeamLootChatCommand(Group.TeamLootModes.Leader));
     }
 
     public static void sendSystemMessage(Player player, String message)
@@ -195,6 +198,28 @@ public final class ChatHandler
                 for (Unit unit : location.getUnits())
                     sendSystemMessage(player, new StringBuilder().append("    [").append(unit.getGuid()).append("]")
                     .append(" ").append(unit.getName()).toString());
+            }
+        }
+    }
+
+    private static class TeamLootChatCommand extends ChatCommand {
+
+        private Group.TeamLootModes mode;
+
+        public TeamLootChatCommand(Group.TeamLootModes mode) {
+            this.mode = mode;
+        }
+
+        @Override
+        public void handle(Player player, String[] args) {
+            Group group = player.getGroup();
+            if (group == null || group.getLeader() != player)
+                return;
+
+            group.setTeamLootMode(this.mode);
+            if (player.getSession() != null) {
+                player.getSession().addServerMessage(group.getTeamLootMode().getModeMessage())
+                        .addData(group.getTeamLootData());
             }
         }
     }

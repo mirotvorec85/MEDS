@@ -56,6 +56,8 @@ public class Player extends Unit
 
     private AchievementManager achievementManager;
 
+    private Group group;
+
     public Player(int guid)
     {
         super();
@@ -409,6 +411,73 @@ public class Player extends Unit
     }
 
     // TODO: Implement BankExchange
+
+
+    public Group getGroup() {
+        return this.group;
+    }
+
+    public void createGroup() {
+        // Already in group
+        if (this.group != null)
+            return;
+
+        this.group = new Group(this);
+        if (this.session != null) {
+            this.session.addData(new ServerPacket(ServerOpcodes.GroupCreated)
+                        .add("1") // Created as leader
+                        .add(this.getGuid()) // Leader's GUID
+                        )
+                    .addData(this.group.getSettingsData())
+                    .addData(this.group.getTeamLootData())
+                    .addServerMessage(270) // Group has been created
+                    .addServerMessage(this.group.getTeamLootMode().getModeMessage());
+        }
+        // Show 'Group Leader' icon for everyone
+        onVisualChanged();
+        onDisplayChanged();
+    }
+
+    public boolean joinGroup(Player leader) {
+        if (leader == null)
+            return false;
+
+        Group group = leader.getGroup();
+        if (group == null)
+            return false;
+
+        if (group.getLeader() != leader)
+            return false;
+
+        if (group.join(this)) {
+            if (this.session != null) {
+                this.group = group;
+                // Group Loot message
+                this.session.addServerMessage(group.getTeamLootMode().getModeMessage())
+                        // "You join the group of {LEADER_NAME}
+                        .addServerMessage(273, group.getLeader().getName());
+            }
+            // Say to everyone that the player changes its Leader's GUID
+            onVisualChanged();
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean leaveGroup() {
+        if (this.group == null)
+            return false;
+
+        if (this.group.leave(this)) {
+            this.group = null;
+            // Say to everyone that the player changes its Leader's GUID
+            onVisualChanged();
+            return true;
+        }
+
+        return false;
+    }
 
     @Override
     public int create()

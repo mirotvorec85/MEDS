@@ -16,9 +16,11 @@ public enum ServerOpcodes
     Experience("exp"),
     _fex("fex"),
     _fpi("fpi"),
+    GroupCreated("gcr"),
     GuildInfo("gi"),
     @Deprecated
     GuildLessonInfo("ginf"), // Deprecated after 2.0.0.0
+    GroupSettings("glvl"),
     GuildLessonsInfo("gni"), // Appeared in 2.0.0.0 after new guild system.
     GetCorpse("gtr"),
     _hoi("hoi"),
@@ -74,6 +76,7 @@ public enum ServerOpcodes
     ServerTime("t"),
     _tc("tc"),
     CorpseList("tl"),
+    TeamLoot("tlt"),
     Version("version"),
     Currency("w$"), // Appeared in 1.2.7.6
     BattleState("war"),

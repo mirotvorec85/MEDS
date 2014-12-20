@@ -99,6 +99,13 @@ public class Session implements Runnable
         this.opcodeHandlers.put(ClientOpcodes.RegionLocations, new RegionLocationsOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.GuildLessonsInfo, new GuildLessonsInfoOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.LearnGuildInfo, new LearnGuildInfoOpcodeHandler());
+        this.opcodeHandlers.put(ClientOpcodes.GroupCreate, new GroupCreateOpcodeHandler());
+        this.opcodeHandlers.put(ClientOpcodes.GroupSettingsChange, new GroupSettingsChangeOpcodeHandler());
+        this.opcodeHandlers.put(ClientOpcodes.GroupJoin, new GroupJoinOpcodeHandler());
+        this.opcodeHandlers.put(ClientOpcodes.GroupDisband, new GroupDisbandOpcodeHandler());
+        this.opcodeHandlers.put(ClientOpcodes.GroupQuit, new GroupQuitOpcodeHandler());
+        this.opcodeHandlers.put(ClientOpcodes.GroupKick, new GroupKickOpcodeHandler());
+        this.opcodeHandlers.put(ClientOpcodes.GroupChangeLeader, new GroupChangeLeaderOpcodeHandler());
 
         this.packets = new HashMap<>();
 
@@ -1266,12 +1273,143 @@ public class Session implements Runnable
             packet.add(LevelCost.getTotalGold(Session.this.player.getGuildLevel() + 1, Session.this.player.getLevel()));
 
             // Lessons reset cost
+            // TODO: locale strings
             packet.add("free");
 
             // ??? Maybe next reset cost?
             packet.add("+100500 gold");
 
             Session.this.addData(packet);
+        }
+    }
+
+    private class GroupCreateOpcodeHandler extends OpcodeHandler {
+
+        @Override
+        public void handle(String[] data) {
+            Session.this.player.createGroup();
+        }
+    }
+
+    private class GroupSettingsChangeOpcodeHandler extends OpcodeHandler {
+
+        @Override
+        public int getMinDataLength() {
+            return 9;
+        }
+
+        @Override
+        public void handle(String[] data) {
+            Group group = Session.this.player.getGroup();
+
+            // The player is not in a group
+            // or is not a leader
+            if (group == null || group.getLeader() != Session.this.player)
+                return;
+
+            group.setMinLevel(SafeConvert.toInt32(data[0]));
+            group.setMaxLevel(SafeConvert.toInt32(data[1]));
+            group.setNoReligionAllowed(SafeConvert.toInt32(data[2], 1) != 0);
+            group.setSunAllowed(SafeConvert.toInt32(data[3], 1) != 0);
+            group.setMoonAllowed(SafeConvert.toInt32(data[4], 1) != 0);
+            group.setOrderAllowed(SafeConvert.toInt32(data[5], 1) != 0);
+            group.setChaosAllowed(SafeConvert.toInt32(data[6], 1) != 0);
+            Group.ClanAccessModes mode = Group.ClanAccessModes.parse(SafeConvert.toInt32(data[7], 0));
+            if (mode == null)
+                mode = Group.ClanAccessModes.All;
+            group.setClanAccessMode(mode);
+            group.setOpen(SafeConvert.toInt32(data[8], 1) != 0);
+
+            Session.this.addData(group.getSettingsData()).addData(group.getTeamLootData());
+        }
+    }
+
+    private class GroupDisbandOpcodeHandler extends OpcodeHandler {
+
+        @Override
+        public void handle(String[] data) {
+            Group group = Session.this.player.getGroup();
+
+            if (group == null || group.getLeader() != Session.this.player) {
+                return;
+            }
+
+            group.disband();
+        }
+    }
+
+    private class GroupJoinOpcodeHandler extends OpcodeHandler {
+
+        @Override
+        public int getMinDataLength() {
+            return 1;
+        }
+
+        @Override
+        public void handle(String[] data) {
+            Session.this.player.joinGroup(World.getInstance().getPlayer(SafeConvert.toInt32(data[0])));
+
+            // No matter a group has been create or has not
+            // send a group relation anyway
+            int leaderGuid;
+            if (Session.this.player.getGroup() == null) {
+                leaderGuid = 0;
+            } else {
+                leaderGuid = Session.this.player.getGroup().getLeader().getGuid();
+            }
+            Session.this.addData(new ServerPacket(ServerOpcodes.GroupCreated)
+                .add("0") // Not a leader
+                .add(leaderGuid));
+        }
+    }
+
+    private class GroupQuitOpcodeHandler extends OpcodeHandler {
+
+        @Override
+        public void handle(String[] data) {
+            Session.this.player.leaveGroup();
+        }
+    }
+
+    private class GroupKickOpcodeHandler extends  OpcodeHandler {
+
+        @Override
+        public int getMinDataLength() {
+            return 1;
+        }
+
+        @Override
+        public void handle(String[] data) {
+            // The player is in a group and is a leader
+            Group group = Session.this.player.getGroup();
+            if (group == null || group.getLeader() != Session.this.player)
+                return;
+
+            // Kicking target exists and is in the same group
+            Player player = World.getInstance().getPlayer(SafeConvert.toInt32(data[0]));
+            if (player == null || player.getGroup() != group)
+                return;
+
+            // Just leave as usual Quit
+            player.leaveGroup();
+        }
+    }
+
+    private class GroupChangeLeaderOpcodeHandler extends OpcodeHandler {
+
+        @Override
+        public int getMinDataLength() {
+            return 1;
+        }
+
+        @Override
+        public void handle(String[] data) {
+            // The player is in a group and is a leader
+            Group group = Session.this.player.getGroup();
+            if (group == null || group.getLeader() != Session.this.player)
+                return;
+
+            group.setLeader(World.getInstance().getPlayer(SafeConvert.toInt32(data[0])));
         }
     }
 }

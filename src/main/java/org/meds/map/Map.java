@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.meds.Group;
+import org.meds.Player;
 import org.meds.Unit;
 import org.meds.database.Hibernate;
 import org.meds.enums.MovementDirections;
@@ -146,10 +148,34 @@ public class Map
                 if (!mover.canMove())
                     continue;
 
+                if (mover.isPlayer()) {
+                    Player player = (Player) mover;
+                    // In a group but not a leader
+                    if (player.getGroup() != null && player.getGroup().getLeader() != player)
+                        continue;
+                }
+
                 // Does neighbour location exist?
                 Location location = mover.getPosition().getNeighbourLocation(entry.getValue());
                 if (location == null)
                     continue;
+
+                Location prevLocation = mover.getPosition();
+                // Move the unit
+                if (mover.isPlayer()) {
+                    Player player = (Player) mover;
+                    Group group = player.getGroup();
+                    // Move the whole group to this location
+                    if (group != null) {
+                        for (Player member : group) {
+                            member.setPosition(location);
+                        }
+                    } else {
+                        player.setPosition(location);
+                    }
+                } else {
+                    mover.setPosition(location);
+                }
 
                 ServerPacket packet = new ServerPacket(ServerOpcodes.ServerMessage);
                 switch (entry.getValue())
@@ -176,10 +202,7 @@ public class Map
                         break;
                 }
                 packet.add(mover.getName());
-
-                mover.getPosition().addData(mover, packet);
-
-                mover.setPosition(location);
+                prevLocation.addData(mover, packet);
             }
 
             this.unitMovement.clear();
