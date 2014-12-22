@@ -24,7 +24,7 @@ public abstract class Unit
         public void unitTargetDied(Unit unit);
     }
 
-    public class DamageEvent extends EventObject {
+    public static class DamageEvent extends EventObject {
 
         private Damage damage;
         private Unit victim;
@@ -51,6 +51,35 @@ public abstract class Unit
 
     public interface KillingBlowListener extends EventListener {
         void handleEvent(DamageEvent e);
+    }
+
+    public static class PositionEvent extends EventObject {
+
+        private Location prevLocation;
+        private Location newLocation;
+
+        public PositionEvent(Unit source, Location prevLocation, Location nextLocation) {
+            super(source);
+            this.prevLocation = prevLocation;
+            this.newLocation = nextLocation;
+        }
+
+        @Override
+        public Unit getSource() {
+            return (Unit) super.getSource();
+        }
+
+        public Location getPrevLocation() {
+            return prevLocation;
+        }
+
+        public Location getNewLocation() {
+            return newLocation;
+        }
+    }
+
+    public interface PositionChangedListener extends EventListener {
+        void handleEvent(PositionEvent event);
     }
 
     protected int guid;
@@ -92,6 +121,8 @@ public abstract class Unit
 
     private Set<KillingBlowListener> killingBlowListeners;
 
+    private Set<PositionChangedListener> positionChangedListeners;
+
     private Map<Damage.ReductionTypes, Set<Damage.AffectionHandler>> damageReductions = new HashMap<>(Damage.ReductionTypes.values().length);
 
     public Unit()
@@ -111,6 +142,7 @@ public abstract class Unit
         this.religion = Religions.None;
         this.targetDiedListeners = new HashSet<>();
         this.killingBlowListeners = new HashSet<>();
+        this.positionChangedListeners = new HashSet<>();
     }
 
     public void addTargetDiedListener(TargetDiedListener listener)
@@ -129,6 +161,14 @@ public abstract class Unit
 
     public void removeKillingBlowListener(KillingBlowListener listener) {
         this.killingBlowListeners.remove(listener);
+    }
+
+    public void addPositionChangedListener(PositionChangedListener listener) {
+        this.positionChangedListeners.add(listener);
+    }
+
+    public void removePositionChangedListener(PositionChangedListener listener) {
+        this.positionChangedListeners.remove(listener);
     }
 
     public void addDamageReduction(Damage.ReductionTypes type, Damage.AffectionHandler handler)
@@ -204,6 +244,13 @@ public abstract class Unit
             location.unitEntered(this);
         else
             Logging.Debug.log("Unit %s has new NULL position", this.getName());
+
+        if (this.positionChangedListeners.size() > 0) {
+            PositionEvent event = new PositionEvent(this, prevLocation, location);
+            for (PositionChangedListener listener : this.positionChangedListeners) {
+                listener.handleEvent(event);
+            }
+        }
     }
 
     public UnitParameters getParameters()
