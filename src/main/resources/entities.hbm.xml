@@ -581,7 +581,7 @@
         </property>
     </class>
 
-    <class name="org.meds.map.Region" table="`region`">
+    <class name="Region" table="`region`">
         <id name="id" type="int" column="id" >
             <generator class="assigned"/>
         </id>

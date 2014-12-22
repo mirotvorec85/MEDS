@@ -502,6 +502,9 @@ public class Player extends Unit
         this.session.addDisconnectListener(this.disconnector);
         // Reappear to the current location
         this.setPosition(this.position);
+        // Adds player into the region he's located as a player container.
+        // This provides moving tracking.
+        this.position.getRegion().addPlayer(this);
     }
 
     private boolean load()

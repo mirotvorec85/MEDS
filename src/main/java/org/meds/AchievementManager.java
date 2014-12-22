@@ -79,7 +79,7 @@ public class AchievementManager {
                         }
                         break;
                     case Kingdom:
-                        if (this.player.getPosition().getRegion().getKingdomId() == criterion.getRequirement()) {
+                        if (this.player.getPosition().getRegion().getKingdom().getId() == criterion.getRequirement()) {
                             isComplete = true;
                         }
                         break;

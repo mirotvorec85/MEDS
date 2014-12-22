@@ -85,9 +85,10 @@ public class Map
         }
         Logging.Info.log("Loaded " + this.kingdoms.size() + " kingdoms");
 
-        List<Region> regions = session.createCriteria(Region.class).list();
-        for (Region region : regions)
+        List<org.meds.database.entity.Region> regionEntries = session.createCriteria(org.meds.database.entity.Region.class).list();
+        for (org.meds.database.entity.Region entry : regionEntries)
         {
+            Region region = new Region(entry);
             this.regions.put(region.getId(), region);
             region.getKingdom().addRegion(region);
         }
