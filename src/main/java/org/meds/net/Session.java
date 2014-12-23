@@ -66,6 +66,8 @@ public class Session implements Runnable
 
     private Set<DisconnectListener> listeners;
 
+    private String sessionToString;
+
     public Session(Socket socket)
     {
         this.socket = socket;
@@ -121,6 +123,8 @@ public class Session implements Runnable
         this.packetBuffer = new ServerPacket();
 
         this.key = Random.nextInt();
+
+        this.sessionToString = "Session [" + this.socket.getInetAddress().toString() + "]: ";
     }
 
     public void addDisconnectListener(DisconnectListener listener)
@@ -143,7 +147,6 @@ public class Session implements Runnable
 
             while (true)
             {
-                Logging.Debug.log("Start reading next packets/.");
                 int receivedSize = 0;
                 String receivedString = "";
                 byte[] buffer = new byte[bufferSize];
@@ -153,14 +156,14 @@ public class Session implements Runnable
                     // End Of Stream / Socket is closed
                     if (receivedSize == -1)
                     {
-                        Logging.Debug.log("Received -1");
+                        Logging.Debug.log(toString() + "Received -1");
                         disconnect();
                         return;
                     }
                     receivedString += new String(Arrays.copyOf(buffer, receivedSize), "Unicode");
                 }
                 while (receivedSize == bufferSize);
-                Logging.Debug.log("Received string: " + receivedString);
+                Logging.Debug.log(toString() + "Received string: " + receivedString);
 
                 ClientPacket packet = new ClientPacket(receivedString);
 
@@ -171,26 +174,28 @@ public class Session implements Runnable
                     ClientOpcodes clientOpcode = ClientOpcodes.parse(opcode.getOpcode());
                     if (clientOpcode == null)
                     {
-                        Logging.Warn.log("Received unknown opcode \"" + opcode.getOpcode() + "\".");
+                        Logging.Warn.log(toString() + "Received unknown opcode \"" + opcode.getOpcode() + "\".");
                         continue;
                     }
 
                     OpcodeHandler handler = this.opcodeHandlers.get(clientOpcode);
                     if (handler == null)
                     {
-                        Logging.Warn.log("Handler for the opcode \"" + clientOpcode + "\" not found.");
+                        Logging.Warn.log(toString() + "Handler for the opcode \"" + clientOpcode + "\" not found.");
                         continue;
                     }
                     if (!this.isAuthenticated && handler.isAuthenticatedOnly())
                     {
-                        Logging.Warn.log("Attempt to handle the opcode \"" + clientOpcode + "\" with the not authenticated session.");
+                        Logging.Warn.log(toString() + "Attempt to handle the opcode \"" +
+                                clientOpcode + "\" with the not authenticated session.");
                         continue;
                     }
 
                     String[] data = opcode.getData();
                     if (handler.getMinDataLength() != -1 && data.length < handler.getMinDataLength())
                     {
-                        Logging.Warn.log("Opcode \"" + clientOpcode + "\" has the length " + data.length + ", but minimal is " + handler.getMinDataLength() + ". Handling aborted.");
+                        Logging.Warn.log(toString() + "Opcode \"" + clientOpcode + "\" has the length " + data.length +
+                                ", but minimal is " + handler.getMinDataLength() + ". Handling aborted.");
                         continue;
                     }
 
@@ -200,7 +205,8 @@ public class Session implements Runnable
                     }
                     catch(Exception ex)
                     {
-                        Logging.Error.log("An exception has occurred while handling the opcode " + clientOpcode.toString(), ex);
+                        Logging.Error.log( toString() + "An exception has occurred while handling the opcode " +
+                                clientOpcode.toString(), ex);
                         continue;
                     }
 
@@ -212,7 +218,7 @@ public class Session implements Runnable
         {
             // Then the Server is stopping this exception is the expected
             if (!Server.isStopping())
-                Logging.Error.log("An exception while reading a socket.", e);
+                Logging.Error.log(toString() + "An exception while reading a socket.", e);
         }
     }
 
@@ -224,7 +230,7 @@ public class Session implements Runnable
         }
         catch (IOException ex)
         {
-            Logging.Error.log("IOException while trying to close the Session socket", ex);
+            Logging.Error.log(toString() + "IOException while trying to close the Session socket", ex);
         }
 
         for (DisconnectListener listener : this.listeners)
@@ -245,9 +251,9 @@ public class Session implements Runnable
             os = this.socket.getOutputStream();
             byte[] bytes = packetBuffer.getBytes();
             os.write(bytes);
-            Logging.Debug.log("Sending data: " + packetBuffer.toString().replace('\u0000', '\n'));
+            Logging.Debug.log(toString() + "Sending data: " + packetBuffer.toString().replace('\u0000', '\n'));
         } catch (IOException e) {
-            Logging.Error.log("IOException while writing to a socket: " + e.getMessage());
+            Logging.Error.log(toString() + "IOException while writing to a socket: " + e.getMessage());
         } finally {
             // Clean it anyway
             this.packetBuffer.clear();
@@ -287,6 +293,11 @@ public class Session implements Runnable
     @Override
     public int hashCode() {
         return this.socket != null ? socket.hashCode() + this.key : this.key;
+    }
+
+    @Override
+    public String toString() {
+        return this.sessionToString;
     }
 
     private abstract class OpcodeHandler {
@@ -550,6 +561,9 @@ public class Session implements Runnable
 
             Session.this.isAuthenticated = true;
             send(packet);
+
+            // Change String representation of the Session
+            Session.this.sessionToString = "Session [" + Session.this.player.getName() + "]: ";
         }
     }
 
