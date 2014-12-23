@@ -209,9 +209,8 @@ public class Session implements Runnable
                                 clientOpcode.toString(), ex);
                         continue;
                     }
-
-                    Session.sendBuffers();
                 }
+                Session.sendBuffers();
             }
         }
         catch (IOException e)
