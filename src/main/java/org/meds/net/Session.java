@@ -211,7 +211,7 @@ public class Session implements Runnable
         catch (IOException e)
         {
             // Then the Server is stopping this exception is the expected
-            if (Server.isStopping())
+            if (!Server.isStopping())
                 Logging.Error.log("An exception while reading a socket.", e);
         }
     }
