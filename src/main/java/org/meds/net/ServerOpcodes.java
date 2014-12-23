@@ -53,7 +53,7 @@ public enum ServerOpcodes
     NoGo("ng"),
     _omg("omg"),
     PlayerLocation("pl"), // Appeared in 2.0.0.0
-    PlayersLocation("ppl"), // Appeared in 2.0.0.0
+    PlayersLocation("pll"), // Appeared in 2.0.0.0
     Professions("prof"),
     _prot1("prot1"),
     _prot2("prot2"),

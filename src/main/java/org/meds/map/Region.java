@@ -179,6 +179,7 @@ public class Region
     private ServerPacket getPlayersLocationData() {
         ServerPacket packet = new ServerPacket(ServerOpcodes.PlayersLocation);
         synchronized (this.players) {
+            packet.add(this.players.size());
             for (Player player : this.players) {
                 packet.add(player.getGuid());
                 packet.add(player.getPosition().getId());
