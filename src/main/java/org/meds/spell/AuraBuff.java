@@ -53,9 +53,9 @@ public class AuraBuff extends Aura
         }
 
         if (this.ownerPlayer != null && selfMessage != -1)
-            this.ownerPlayer.getSession().addServerMessage(selfMessage);
+            this.ownerPlayer.getSession().sendServerMessage(selfMessage);
         if (positionMessage != -1)
-            this.owner.getPosition().addData(this.owner, new ServerPacket(ServerOpcodes.ServerMessage).add(positionMessage).add(this.owner.getName()));
+            this.owner.getPosition().send(this.owner, new ServerPacket(ServerOpcodes.ServerMessage).add(positionMessage).add(this.owner.getName()));
     }
 
     @Override
@@ -191,13 +191,13 @@ public class AuraBuff extends Aura
         {
             this.owner.getParameters().magic().change(this.bonusParameter1.getKey(), -this.bonusParameter1.getValue());
             if (isSendToPlayer && this.ownerPlayer != null && this.ownerPlayer.getSession() != null)
-                this.ownerPlayer.getSession().addData( new ServerPacket(ServerOpcodes.BonusMagicParameter).add(this.bonusParameter1.getKey()).add("0"));
+                this.ownerPlayer.getSession().send(new ServerPacket(ServerOpcodes.BonusMagicParameter).add(this.bonusParameter1.getKey()).add("0"));
 
             if (this.bonusParameter2 != null)
             {
                 this.owner.getParameters().magic().change(this.bonusParameter2.getKey(), -this.bonusParameter2.getValue());
                  if (isSendToPlayer && this.ownerPlayer != null && this.ownerPlayer.getSession() != null)
-                     this.ownerPlayer.getSession().addData( new ServerPacket(ServerOpcodes.BonusMagicParameter).add(this.bonusParameter2.getKey()).add("0"));
+                     this.ownerPlayer.getSession().send(new ServerPacket(ServerOpcodes.BonusMagicParameter).add(this.bonusParameter2.getKey()).add("0"));
             }
             this.bonusParameter1 = null;
             this.bonusParameter2 = null;

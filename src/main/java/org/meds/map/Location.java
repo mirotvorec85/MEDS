@@ -438,7 +438,7 @@ public class Location
     public void addCorpse(Corpse corpse)
     {
         this.corpses.put(corpse.getGuid(), corpse);
-        addData(getCorpseData());
+        send(getCorpseData());
     }
 
     /**
@@ -460,7 +460,7 @@ public class Location
         }
         else
             this.items.put(item.getPrototype(), item);
-        addData(getCorpseData());
+        send(getCorpseData());
     }
 
     public Item getItem(Prototype proto)
@@ -471,13 +471,13 @@ public class Location
     public void removeItem(Item item)
     {
         if (this.items.remove(item.getPrototype()) != null)
-            addData(getCorpseData());
+            send(getCorpseData());
     }
 
     public void removeCorpse(Corpse corpse)
     {
         if (this.corpses.remove(corpse.getGuid()) != null)
-            addData(getCorpseData());
+            send(getCorpseData());
     }
 
     public void unitEntered(Unit unit)
@@ -488,9 +488,9 @@ public class Location
             Player player = (Player)unit;
             if (player.getSession() != null)
             {
-                player.getSession().addData(getData());
-                player.getSession().addData(getNeighborsInfoData());
-                player.getSession().addData(getCorpseData());
+                player.getSession().send(getData());
+                player.getSession().send(getNeighborsInfoData());
+                player.getSession().send(getCorpseData());
             }
         }
 
@@ -525,72 +525,23 @@ public class Location
     }
 
     /**
-     * Adds the specified packet data to all players at this location.
+     * Sends the specified packet data to all players at this location
      */
-    public void addData(ServerPacket packet)
-    {
-        this.send(null, null, packet, true);
-    }
-
-    /**
-     * Adds the specified packet data to all players at this location
-     * except the specified unit (but this unit should be a Player class instance).
-     */
-    public void addData(Unit exception, ServerPacket packet)
-    {
-        this.send(exception, null, packet, true);
-    }
-
-    /**
-     * Adds the specified packet data to all players at this location
-     * except two specified units (but these units should be a Player class instances).
-     */
-    public void addData(Unit exception1, Unit exception2, ServerPacket packet)
-    {
-        this.send(exception1, exception2, packet, true);
-    }
-
-    /**
-     * Sends a packet buffer of all players at this location.
-     */
-    public void send()
-    {
-        for (Unit unit : this.units)
-        {
-            if (unit.getUnitType() == UnitTypes.Player)
-            {
-                Player player = (Player)unit;
-
-                if (player.getSession() == null)
-                    continue;
-                player.getSession().send();
-            }
-        }
+    public void send(ServerPacket packet) {
+        this.send(null, null, packet);
     }
 
     /**
      * Sends the specified packet data to all players at this location
      * except the specified unit (but this unit should be a Player class instance).
      */
-    public void send(Unit exception, ServerPacket packet)
-    {
-        this.send(exception, null, packet, false);
+    public void send(Unit exception, ServerPacket packet) {
+        this.send(exception, null, packet);
     }
 
-    /**
-     * Sends specified packet data to all players at this location
-     * except two specified units (but these units should be a Player class instances).
-     */
-    public void send(Unit exception1, Unit exception2, ServerPacket packet)
-    {
-        this.send(exception1, exception2, packet, false);
-    }
-
-    private void send(Unit exception1, Unit exception2, ServerPacket packet, boolean add)
-    {
+    public void send(Unit exception1, Unit exception2, ServerPacket packet) {
         for (Unit unit : this.units)
-            if (unit.getUnitType() == UnitTypes.Player)
-            {
+            if (unit.getUnitType() == UnitTypes.Player) {
                 Player pl = (Player)unit;
                 // Except Player
                 if (pl == exception1 || pl == exception2)
@@ -598,10 +549,8 @@ public class Location
 
                 if (pl.getSession() == null)
                     continue;
-                if (add)
-                    pl.getSession().addData(packet);
-                else
-                    pl.getSession().send(packet);
+
+                pl.getSession().send(packet);
             }
     }
 
@@ -706,7 +655,7 @@ public class Location
                 pss.add("0"); // Boss type
             }
 
-            player.getSession().addData(pss);
+            player.getSession().send(pss);
         }
 
 

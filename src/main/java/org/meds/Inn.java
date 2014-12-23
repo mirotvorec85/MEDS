@@ -121,6 +121,6 @@ public class Inn
     private void onInnChanged()
     {
         if (this.owner.getSession() != null)
-            this.owner.getSession().addData(getInnData());
+            this.owner.getSession().send(getInnData());
     }
 }

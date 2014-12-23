@@ -113,7 +113,7 @@ public class Player extends Unit
         this.info.setAutoSpellId(spellId);
 
         if (this.session != null)
-            this.session.addData(new ServerPacket(ServerOpcodes.AutoSpell).add(spellId));
+            this.session.send(new ServerPacket(ServerOpcodes.AutoSpell).add(spellId));
     }
 
     public boolean isRelax()
@@ -140,7 +140,7 @@ public class Player extends Unit
 
         this.info.setHomeId(home.getId());
         if (this.session != null)
-            this.session.addServerMessage(17, home.getRegion().getName());
+            this.session.sendServerMessage(17, home.getRegion().getName());
     }
 
     public org.meds.net.Session getSession()
@@ -227,7 +227,7 @@ public class Player extends Unit
         super.setHealth(health);
         this.info.setHealth(health);
         if (this.session != null)
-            this.session.addData(this.getHealthManaData());
+            this.session.send(this.getHealthManaData());
     }
 
     @Override
@@ -236,7 +236,7 @@ public class Player extends Unit
         super.setMana(mana);
         this.info.setMana(mana);
         if (this.session != null)
-            this.session.addData(this.getHealthManaData());
+            this.session.send(this.getHealthManaData());
     }
 
     @Override
@@ -246,7 +246,7 @@ public class Player extends Unit
         this.info.setHealth(health);
         this.info.setMana(mana);
         if (this.session != null)
-            this.session.addData(this.getHealthManaData());
+            this.session.send(this.getHealthManaData());
     }
 
     @Override
@@ -286,14 +286,14 @@ public class Player extends Unit
             onVisualChanged();
             onDisplayChanged();
             if (this.session != null)
-                this.session.addServerMessage(497). // You gain a new level
-                    addServerMessage(492). // You can learn new lesson in a guild
-                    addData(this.getLevelData()).addData(getParametersData());
+                this.session.sendServerMessage(497). // You gain a new level
+                        sendServerMessage(492). // You can learn new lesson in a guild
+                        send(this.getLevelData()).send(getParametersData());
         }
         else
         {
             if (this.session != null)
-                this.session.addData(this.getLevelData(true));
+                this.session.send(this.getLevelData(true));
         }
 
     }
@@ -308,7 +308,7 @@ public class Player extends Unit
         onDisplayChanged();
 
         if (this.session != null)
-            this.session.addData(this.getLevelData());
+            this.session.send(this.getLevelData());
     }
 
     public ServerPacket getLevelData()
@@ -424,14 +424,13 @@ public class Player extends Unit
 
         this.group = new Group(this);
         if (this.session != null) {
-            this.session.addData(new ServerPacket(ServerOpcodes.GroupCreated)
-                        .add("1") // Created as leader
-                        .add(this.getGuid()) // Leader's GUID
-                        )
-                    .addData(this.group.getSettingsData())
-                    .addData(this.group.getTeamLootData())
-                    .addServerMessage(270) // Group has been created
-                    .addServerMessage(this.group.getTeamLootMode().getModeMessage());
+            this.session.send(new ServerPacket(ServerOpcodes.GroupCreated).add("1") // Created as leader
+                    .add(this.getGuid()) // Leader's GUID
+            )
+                    .send(this.group.getSettingsData())
+                    .send(this.group.getTeamLootData())
+                    .sendServerMessage(270) // Group has been created
+                    .sendServerMessage(this.group.getTeamLootMode().getModeMessage());
         }
         // Show 'Group Leader' icon for everyone
         onVisualChanged();
@@ -453,9 +452,9 @@ public class Player extends Unit
             if (this.session != null) {
                 this.group = group;
                 // Group Loot message
-                this.session.addServerMessage(group.getTeamLootMode().getModeMessage())
+                this.session.sendServerMessage(group.getTeamLootMode().getModeMessage())
                         // "You join the group of {LEADER_NAME}
-                        .addServerMessage(273, group.getLeader().getName());
+                        .sendServerMessage(273, group.getLeader().getName());
             }
             // Say to everyone that the player changes its Leader's GUID
             onVisualChanged();
@@ -784,12 +783,9 @@ public class Player extends Unit
         if (this.session != null)
         {
 
-            session.addServerMessage(498);
+            session.sendServerMessage(498);
             // TODO: Implement sound sending (Sound 31 here)
-            session.addData(new ServerPacket()
-                    .add(this.getMagicData())
-                    .add(this.getParametersData())
-                    .add(this.getGuildLevelData()));
+            session.send(new ServerPacket().add(this.getMagicData()).add(this.getParametersData()).add(this.getGuildLevelData()));
         }
 
     }
@@ -882,7 +878,7 @@ public class Player extends Unit
 
         // Partial Data change
         if (this.session != null)
-            this.session.addData(new ServerPacket(ServerOpcodes.Currency).add(currencyId).add(getCurrencyAmount(currencyId)));
+            this.session.send(new ServerPacket(ServerOpcodes.Currency).add(currencyId).add(getCurrencyAmount(currencyId)));
     }
 
     @Override
@@ -898,7 +894,7 @@ public class Player extends Unit
             //player.Session.AddData("r0");
             ServerPacket packet = new ServerPacket(ServerOpcodes._lh0).add("");
             packet.add(ServerOpcodes.NoGo).add(this.getHome().getId());
-            this.session.addData(packet);
+            this.session.send(packet);
         }
         this.setPosition(this.getHome());
         this.deathState = DeathStates.Alive;
@@ -913,8 +909,14 @@ public class Player extends Unit
         if (corpse.getGold() > 0)
         {
             if (this.session != null)
-                this.session.addServerMessage(998, corpse.getOwner().getName(), Integer.toString(corpse.getGold()), " золота"); // TODO: Remove locale string form here and below
-            this.position.addData(this, new ServerPacket(ServerOpcodes.ServerMessage).add("999").add(this.getName()).add(corpse.getOwner().getName()).add(corpse.getGold()).add(" золота"));
+                // TODO: Remove locale string form here and below
+                this.session.sendServerMessage(998, corpse.getOwner().getName(), Integer.toString(corpse.getGold()), " золота");
+            this.position.send(this,
+                    new ServerPacket(ServerOpcodes.ServerMessage)
+                            .add("999").add(this.getName())
+                            .add(corpse.getOwner().getName())
+                            .add(corpse.getGold())
+                            .add(" золота"));
             this.changeCurrency(Currencies.Gold, corpse.getGold());
         }
 
@@ -924,8 +926,14 @@ public class Player extends Unit
             for (Item item : items)
             {
                 if (this.session != null)
-                this.session.addServerMessage(998, corpse.getOwner().getName(), item.getCount() > 1 ? item.getCount() + " " : "", item.Template.getTitle());
-                this.position.addData(this, new ServerPacket(ServerOpcodes.ServerMessage).add("999").add(this.getName()).add(corpse.getOwner().getName()).add(item.getCount() > 1 ? item.getCount() + " " : "").add(item.Template.getTitle()));
+                this.session.sendServerMessage(998, corpse.getOwner().getName(), item.getCount() > 1 ? item.getCount() + " " : "", item.Template.getTitle());
+                this.position.send(this,
+                        new ServerPacket(ServerOpcodes.ServerMessage)
+                                .add("999")
+                                .add(this.getName())
+                                .add(corpse.getOwner().getName())
+                                .add(item.getCount() > 1 ? item.getCount() + " " : "")
+                                .add(item.Template.getTitle()));
                 this.inventory.tryStoreItem(item);
                 // TODO: leave corpse if a player didn't take all the loot
             }
@@ -1000,7 +1008,7 @@ public class Player extends Unit
                     return;
 
                 if (this.session != null) {
-                    this.session.addData(packet);
+                    this.session.send(packet);
                 }
 
                 return;
@@ -1036,7 +1044,7 @@ public class Player extends Unit
         }
 
         if (this.session != null) {
-            this.session.addData(quest.getQuestTemplate().getQuestInfoData(true));
+            this.session.send(quest.getQuestTemplate().getQuestInfoData(true));
         }
         return true;
     }
@@ -1045,7 +1053,7 @@ public class Player extends Unit
     public void addServerMessage(int messageId, String... args)
     {
         if (this.session != null)
-            this.session.addServerMessage(messageId, args);
+            this.session.sendServerMessage(messageId, args);
     }
 
     /**
@@ -1079,7 +1087,7 @@ public class Player extends Unit
                         if (aura.isPermanent())
                             continue;
 
-                        this.session.addData(aura.getPacketData());
+                        this.session.send(aura.getPacketData());
                     }
                 }
             }

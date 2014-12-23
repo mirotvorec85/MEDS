@@ -165,20 +165,18 @@ public class Group implements Iterable<Player> {
         ServerPacket message = new ServerPacket(ServerOpcodes.ServerMessage).add(279).add(member.getName());
         ServerPacket packet;
         for (Player groupMember : this) {
-            if (groupMember.getSession() != null) {
-                packet = new ServerPacket(
-                        ServerOpcodes.GroupCreated)
-                        .add(groupMember == this.leader ? "1" : "0")
-                        .add(this.leader.getGuid());
-                // Send group settings to the new leader
-                if (groupMember == this.leader) {
-                    packet.add(this.getSettingsData());
-                }
-                groupMember.getSession().addData(message).addData(packet).send();
+            if (groupMember.getSession() == null)
+                continue;
+            packet = new ServerPacket(
+                    ServerOpcodes.GroupCreated)
+                    .add(groupMember == this.leader ? "1" : "0")
+                    .add(this.leader.getGuid());
+            // Send group settings to the new leader
+            if (groupMember == this.leader) {
+                packet.add(this.getSettingsData());
             }
+            groupMember.getSession().send(message).send(packet);
         }
-
-
     }
 
     public int getMinLevel() {

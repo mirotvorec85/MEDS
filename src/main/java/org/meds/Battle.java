@@ -91,7 +91,7 @@ public class Battle
             return;
         Player player = (Player)unit;
         if (player.getSession() != null)
-            player.getSession().addData(new ServerPacket(ServerOpcodes.BattleState).add(state));
+            player.getSession().send(new ServerPacket(ServerOpcodes.BattleState).add(state));
     }
 
     public void update(int time)
@@ -146,13 +146,13 @@ public class Battle
                     attacker.setTarget(null);
                     // Send run away result message
                     if (player != null)
-                        player.getSession().addServerMessage(39, target.getName());
+                        player.getSession().sendServerMessage(39, target.getName());
                     // Relocate target
                     attacker.setPosition(attacker.getPosition().getRandomNeighbour(attacker.isPlayer(), attacker.isPlayer()));
                 }
                 // Send Fail message
                 else if (player != null)
-                    player.getSession().addServerMessage(42, target.getName());
+                    player.getSession().sendServerMessage(42, target.getName());
                 // TODO: solve isPermanent runaway state problem.
             }
             else

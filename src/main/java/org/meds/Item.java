@@ -561,7 +561,7 @@ public class Item
                 // TODO: level checking
                 user.setHealth(user.parameters.value(Parameters.Health));
                 if (user.getSession() != null)
-                    user.getSession().addServerMessage(500, this.Template.getTitle(), Integer.toString(amount));
+                    user.getSession().sendServerMessage(500, this.Template.getTitle(), Integer.toString(amount));
                 break;
             case 3581: // Small Mana Potion
                 // TODO: Implement

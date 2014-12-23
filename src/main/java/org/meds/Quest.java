@@ -28,13 +28,8 @@ public class Quest {
             quest.setProgress(quest.getProgress() + 1);
 
             if (quest.player.getSession() != null) {
-                quest.player.getSession().addData(quest.getUpdateQuestData());
-                quest.player.getSession().addData(
-                        new ServerPacket(ServerOpcodes.ServerMessage)
-                                .add(337)
-                                .add(quest.questTemplate.getTitle())
-                                .add(quest.getProgress())
-                                .add(quest.questTemplate.getRequiredCount()));
+                quest.player.getSession().send(quest.getUpdateQuestData());
+                quest.player.getSession().send(new ServerPacket(ServerOpcodes.ServerMessage).add(337).add(quest.questTemplate.getTitle()).add(quest.getProgress()).add(quest.questTemplate.getRequiredCount()));
             }
 
             if (quest.getProgress() == quest.questTemplate.getRequiredCount()) {
@@ -157,7 +152,7 @@ public class Quest {
         }
 
         if (player.getSession() != null)
-            player.getSession().addData(getUpdateQuestData());
+            player.getSession().send(getUpdateQuestData());
 
         activateHandlers();
     }
@@ -165,27 +160,20 @@ public class Quest {
     public void complete() {
         // Send Final Text
         if (this.player.getSession() != null) {
-            this.player.getSession().addData(
-                    new ServerPacket(ServerOpcodes.QuestFinalText)
-                            .add(this.questTemplate.getTitle())
-                            .add(this.questTemplate.getEndText()));
+            this.player.getSession().send(new ServerPacket(ServerOpcodes.QuestFinalText).add(this.questTemplate.getTitle()).add(this.questTemplate.getEndText()));
         }
 
         // Change quest status
         this.setStatus(QuestStatuses.Completed);
         this.characterQuest.setCompleteDate((int)(new Date().getTime() / 1000));
         if (this.player.getSession() != null) {
-            this.player.getSession().addData(getUpdateQuestData());
+            this.player.getSession().send(getUpdateQuestData());
         }
 
         // Reward
         if (this.questTemplate.getRewardGold() != 0) {
             if (this.player.getSession() != null) {
-                this.player.getSession().addData(
-                        new ServerPacket(ServerOpcodes.ServerMessage)
-                                .add(1096)
-                                .add(this.questTemplate.getRewardGold())
-                                .add(DBStorage.CurrencyStore.get(Currencies.Gold.getValue()).getTitle()));
+                this.player.getSession().send(new ServerPacket(ServerOpcodes.ServerMessage).add(1096).add(this.questTemplate.getRewardGold()).add(DBStorage.CurrencyStore.get(Currencies.Gold.getValue()).getTitle()));
             }
             this.player.changeCurrency(Currencies.Gold, this.questTemplate.getRewardGold());
         }

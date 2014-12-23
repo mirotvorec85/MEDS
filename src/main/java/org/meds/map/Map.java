@@ -203,7 +203,7 @@ public class Map
                         break;
                 }
                 packet.add(mover.getName());
-                prevLocation.addData(mover, packet);
+                prevLocation.send(mover, packet);
             }
 
             this.unitMovement.clear();

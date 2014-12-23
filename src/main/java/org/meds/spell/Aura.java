@@ -117,7 +117,7 @@ public class Aura
     {
         this.level = level;
         if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null)
-            this.ownerPlayer.getSession().addData(getPacketData());
+            this.ownerPlayer.getSession().send(getPacketData());
     }
 
     public int getRemainingTime()
@@ -143,7 +143,7 @@ public class Aura
                 {
                     Player player = (Player)this.owner;
                     if (player.getSession() != null)
-                        player.getSession().addServerMessage(1529, this.spellEntry.getName());
+                        player.getSession().sendServerMessage(1529, this.spellEntry.getName());
                 }
                 break;
             case Removed:
@@ -175,7 +175,7 @@ public class Aura
     protected void removeAura() {
         // If a player - send result
         if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null) {
-            this.ownerPlayer.getSession().addData(new ServerPacket(ServerOpcodes.DeleteAura).add(this.spellEntry.getId()));
+            this.ownerPlayer.getSession().send(new ServerPacket(ServerOpcodes.DeleteAura).add(this.spellEntry.getId()));
         }
     }
 
@@ -193,7 +193,7 @@ public class Aura
     public void forceRemove() {
         // If the owner is a player => send result
         if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null) {
-            this.ownerPlayer.getSession().addData(new ServerPacket(ServerOpcodes.DeleteAura).add(this.spellEntry.getId()));
+            this.ownerPlayer.getSession().send(new ServerPacket(ServerOpcodes.DeleteAura).add(this.spellEntry.getId()));
         }
     }
 

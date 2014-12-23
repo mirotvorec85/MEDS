@@ -147,7 +147,7 @@ public class Spell
             .add(this.target.getParameters().value(Parameters.Dexterity))
             .add(this.target.getParameters().value(Parameters.Intelligence))
             .add(this.target.getParameters().value(Parameters.Constitution));
-        player.getSession().addData(packet);
+        player.getSession().send(packet);
     }
 
     private void handleSpellFirstAid()
@@ -173,7 +173,7 @@ public class Spell
 
         if (this.caster.isPlayer() && ((Player)this.caster).getSession() != null)
         {
-            ((Player)this.caster).getSession().addServerMessage(501, Integer.toString(recoveredHealth));
+            ((Player)this.caster).getSession().sendServerMessage(501, Integer.toString(recoveredHealth));
         }
 
         this.caster.changeHealth(recoveredHealth);
@@ -274,7 +274,11 @@ public class Spell
                 SendMessage(target, targetMessage, this.caster.getName());
         }
         if (this.caster != null)
-            target.getPosition().addData(this.caster, this.target, new ServerPacket(ServerOpcodes.ServerMessage).add(positionMessage).add(this.caster.getName()).add(this.target.getName()));
+            target.getPosition().send(this.caster, this.target,
+                    new ServerPacket(ServerOpcodes.ServerMessage)
+                            .add(positionMessage)
+                            .add(this.caster.getName())
+                            .add(this.target.getName()));
     }
 
     private void handleSpellBattleMagic()
@@ -287,8 +291,9 @@ public class Spell
         {
             Player pCaster = (Player)this.caster;
             Item rightHandItem = pCaster.getInventory().get(Inventory.Slots.RightHand);
-            if (rightHandItem != null && rightHandItem.Template.getItemClass() == ItemClasses.Weapon && rightHandItem.Template.getSubClass() == ItemSubClassWeapon.Staff.getValue())
-            {
+            if (rightHandItem != null
+                    && rightHandItem.Template.getItemClass() == ItemClasses.Weapon
+                    && rightHandItem.Template.getSubClass() == ItemSubClassWeapon.Staff.getValue()) {
                 minDamage = rightHandItem.getBonusValue(ItemBonusParameters.BaseMinDamage);
                 maxDamage = rightHandItem.getBonusValue(ItemBonusParameters.BaseMaxDamage);
             }
@@ -446,6 +451,6 @@ public class Spell
         Player player = (Player)unit;
         if (player.getSession() == null)
             return;
-        player.getSession().addServerMessage(messageId, data);
+        player.getSession().sendServerMessage(messageId, data);
     }
 }

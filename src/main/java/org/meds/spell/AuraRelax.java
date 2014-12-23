@@ -13,7 +13,7 @@ public class AuraRelax extends Aura
     protected void applyAura()
     {
         if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null)
-            this.ownerPlayer.getSession().addServerMessage(1051).addData(new ServerPacket(ServerOpcodes.RelaxOn));
+            this.ownerPlayer.getSession().sendServerMessage(1051).send(new ServerPacket(ServerOpcodes.RelaxOn));
         this.healthRegenBonus = this.owner.getParameters().base().value(Parameters.HealthRegeneration);
         this.manaRegenBonus = this.owner.getParameters().base().value(Parameters.ManaRegeneration);
         this.owner.getParameters().magic().change(Parameters.HealthRegeneration, this.healthRegenBonus);
@@ -25,7 +25,7 @@ public class AuraRelax extends Aura
     protected void removeAura()
     {
         if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null)
-            this.ownerPlayer.getSession().addServerMessage(303).addData(new ServerPacket(ServerOpcodes.RelaxOff));
+            this.ownerPlayer.getSession().sendServerMessage(303).send(new ServerPacket(ServerOpcodes.RelaxOff));
         this.owner.getParameters().magic().change(Parameters.HealthRegeneration, -this.healthRegenBonus);
         this.owner.getParameters().magic().change(Parameters.ManaRegeneration, -this.manaRegenBonus);
         super.removeAura();

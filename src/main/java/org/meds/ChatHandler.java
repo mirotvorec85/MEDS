@@ -43,7 +43,7 @@ public final class ChatHandler
         StringBuilder text = new StringBuilder();
         text.append(Separator).append(SystemChar).append(message);
         packet.add(text);
-        player.getSession().addData(packet);
+        player.getSession().send(packet);
     }
 
     public static void sendSystemMessage(String message)
@@ -55,7 +55,7 @@ public final class ChatHandler
         StringBuilder text = new StringBuilder();
         text.append(Separator).append(SystemChar).append(message);
         packet.add(text);
-        World.getInstance().sendToAll(packet);
+        World.getInstance().send(packet);
     }
 
     public static void handleSay(Player player, String message)
@@ -63,6 +63,13 @@ public final class ChatHandler
         // Ignore empty messages
         if (message == null || message.length() == 0)
             return;
+
+        // Player is located nowhere
+        if (player.getPosition() == null) {
+            Logging.Error.log("Player " + player.getName() + " says to chat" +
+                    ", but he is not on the map (no location specified)");
+            return;
+        }
 
         // Message contains only whitespace
         for (int i = 0; i < message.length(); ++i)
@@ -88,13 +95,14 @@ public final class ChatHandler
         }
 
         // Say this message
-        // TODO: Say to the region after Region implementation
         ServerPacket packet = new ServerPacket(ServerOpcodes.ChatMessage);
         StringBuilder response = new StringBuilder();
         response.append(Separator).append(SayChar).append("[").append(player.getName()).append("]: ")
         .append(Separator).append(MessageSeparator).append(message);
         packet.add(response);
-        World.getInstance().sendToAll(packet);
+
+        // Send to all at the player's region
+        player.getPosition().getRegion().send(packet);
     }
 
     public static void handleWhisper(Player player, String message)
@@ -218,8 +226,8 @@ public final class ChatHandler
 
             group.setTeamLootMode(this.mode);
             if (player.getSession() != null) {
-                player.getSession().addServerMessage(group.getTeamLootMode().getModeMessage())
-                        .addData(group.getTeamLootData());
+                player.getSession().sendServerMessage(group.getTeamLootMode().getModeMessage())
+                        .send(group.getTeamLootData());
             }
         }
     }

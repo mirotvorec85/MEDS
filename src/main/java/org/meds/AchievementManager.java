@@ -160,7 +160,7 @@ public class AchievementManager {
         ServerPacket packet = new ServerPacket(ServerOpcodes.AchievementUpdate);
         packet.add(charAchieve.getAchievementId());
         packet.add(charAchieve.getProgress());
-        this.player.getSession().addData(packet);
+        this.player.getSession().send(packet);
     }
 
     private void sendAchievementComplete(Achievement achievement, CharacterAchievement charAchieve) {
@@ -178,6 +178,6 @@ public class AchievementManager {
         packet.add(achievement.getCategoryId());
         packet.add(achievement.getPoints());
 
-        this.player.getSession().addData(packet);
+        this.player.getSession().send(packet);
     }
 }

@@ -412,7 +412,7 @@ public abstract class Unit
         Session session;
         if (this.isPlayer() && (session = ((Player)this).getSession()) != null)
         {
-            session.addServerMessage(254);
+            session.sendServerMessage(254);
         }
         this.battle.runAway(this);
     }
@@ -554,7 +554,7 @@ public abstract class Unit
                 if (exp > 0)
                 {
                     player.addExp(exp);
-                    player.getSession().addServerMessage(1038, Integer.toString(exp)); // You gain experience
+                    player.getSession().sendServerMessage(1038, Integer.toString(exp)); // You gain experience
                 }
 
                 // AutoLoot
@@ -612,7 +612,7 @@ public abstract class Unit
             // Current level is higher then the new level => Send 'no effect' message
             } else if (currentAura.getLevel() > aura.getLevel()) {
                 if (this.isPlayer() && ((Player)this).getSession() != null)
-                    ((Player)this).getSession().addServerMessage(301);
+                    ((Player)this).getSession().sendServerMessage(301);
                 return false;
             // Otherwise, just update the aur
             } else {
@@ -625,7 +625,7 @@ public abstract class Unit
 
         // Send aura data;
         if (this.isPlayer() && ((Player)this).getSession() != null)
-            ((Player)this).getSession().addData(aura.getPacketData());
+            ((Player)this).getSession().send(aura.getPacketData());
         return true;
     }
 

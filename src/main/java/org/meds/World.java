@@ -222,20 +222,11 @@ public class World implements Runnable
             .add(time);
     }
 
-    public void addDataToAll(ServerPacket packet)
-    {
-        synchronized (this.players)
-        {
-            for (Player player : this.players.values())
-                if (player.getSession() != null)
-                    player.getSession().addData(packet);
-        }
-    }
-
-    public void sendToAll(ServerPacket packet)
-    {
-        synchronized (this.players)
-        {
+    /**
+     * Sends the specified packet to all players in the game.
+     */
+    public void send(ServerPacket packet) {
+        synchronized (this.players) {
             for (Player player : this.players.values())
                 if (player.getSession() != null)
                     player.getSession().send(packet);
@@ -306,69 +297,57 @@ public class World implements Runnable
         // Set new Day Time
         this.dayTime += time;
         // Night begins
-        if (this.dayTime - time < 360000 && this.dayTime >= 360000)
-        {
-            addDataToAll(getDayTimeData());
+        if (this.dayTime - time < 360000 && this.dayTime >= 360000) {
+            send(getDayTimeData());
         }
         // New day begins
-        else if (this.dayTime >= 720000)
-        {
+        else if (this.dayTime >= 720000) {
             this.dayTime -= 720000;
-            addDataToAll(getDayTimeData());
+            send(getDayTimeData());
         }
 
         // Update all units (Creatures and Players)
-        synchronized (this.units)
-        {
+        synchronized (this.units) {
             for (java.util.Map.Entry<Integer, Unit> entry : this.units.entrySet())
                 entry.getValue().update(time);
         }
 
         // Add new battles
-        synchronized (this.newBattles)
-        {
+        synchronized (this.newBattles) {
             this.battles.addAll(this.newBattles);
             this.newBattles.clear();
         }
 
         // Remove ended battles
-        synchronized (this.expiredBattles)
-        {
+        synchronized (this.expiredBattles) {
             this.battles.removeAll(expiredBattles);
             this.expiredBattles.clear();
         }
 
         // Update battle process
-        synchronized (this.battles)
-        {
+        synchronized (this.battles) {
             for (Battle battle : this.battles)
                 battle.update(time);
         }
 
         // Update online lists
-        synchronized (this.deletePlayersPacket)
-        {
-            if (!this.deletePlayersPacket.isEmpty())
-            {
-                this.addDataToAll(this.deletePlayersPacket);
+        synchronized (this.deletePlayersPacket) {
+            if (!this.deletePlayersPacket.isEmpty()) {
+                send(this.deletePlayersPacket);
                 this.deletePlayersPacket.clear();
             }
         }
 
-        synchronized (this.updatePlayersPacket)
-        {
-            if (!this.updatePlayersPacket.isEmpty())
-            {
-                this.addDataToAll(this.updatePlayersPacket);
+        synchronized (this.updatePlayersPacket) {
+            if (!this.updatePlayersPacket.isEmpty()) {
+                send(this.updatePlayersPacket);
                 this.updatePlayersPacket.clear();
             }
         }
 
-        synchronized (this.addPlayersPacket)
-        {
-            if (!this.addPlayersPacket.isEmpty())
-            {
-                this.addDataToAll(this.addPlayersPacket);
+        synchronized (this.addPlayersPacket) {
+            if (!this.addPlayersPacket.isEmpty()) {
+                send(this.addPlayersPacket);
                 this.addPlayersPacket.clear();
             }
         }
@@ -377,12 +356,13 @@ public class World implements Runnable
         Map.getInstance().update(time);
 
         // Add Server Time Data and send the packet
-        synchronized (this.players)
-        {
+        synchronized (this.players) {
             for (java.util.Map.Entry<Integer, Player> entry : this.players.entrySet())
                 if (entry.getValue().getSession() != null)
-                    entry.getValue().getSession().addData(new ServerPacket(ServerOpcodes.ServerTime).add(Server.getServerTimeMillis())).send();
+                    entry.getValue().getSession().send(new ServerPacket(ServerOpcodes.ServerTime).add(Server.getServerTimeMillis()));
         }
+
+        org.meds.net.Session.sendBuffers();
 
         Logging.Debug.log("World update ends. Server Time: " + Server.getServerTimeMillis());
     }

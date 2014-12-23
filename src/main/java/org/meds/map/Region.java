@@ -24,7 +24,7 @@ public class Region
 
                 // Send "Region arrival" and "Region left" messages
                 if (player.getSession() != null) {
-                    player.getSession().addServerMessage(10, Region.this.getName());
+                    player.getSession().sendServerMessage(10, Region.this.getName());
 
                     ServerPacket arrivalMessage = new ServerPacket(ServerOpcodes.ServerMessage);
                     arrivalMessage.add(11);
@@ -33,12 +33,12 @@ public class Region
                         arrivalMessage.add(newRegion.getMinLevel());
                         arrivalMessage.add(newRegion.getMaxLevel());
                     }
-                    player.getSession().addData(arrivalMessage);
+                    player.getSession().send(arrivalMessage);
                 }
 
             // Otherwise just notify everyone about location changed
             } else {
-                Region.this.addToAll(new ServerPacket(ServerOpcodes.PlayerLocation)
+                Region.this.send(new ServerPacket(ServerOpcodes.PlayerLocation)
                         .add(player.getGuid())
                         .add(event.getNewLocation().getId()));
             }
@@ -127,11 +127,11 @@ public class Region
 
         // Send the region content to the new player
         if (player.getSession() != null) {
-            player.getSession().addData(getPlayersLocationData());
+            player.getSession().send(getPlayersLocationData());
         }
 
         // Notify the region about player entered
-        addToAll(new ServerPacket(ServerOpcodes.PlayerLocation)
+        send(new ServerPacket(ServerOpcodes.PlayerLocation)
                 .add(player.getGuid())
                 .add(player.getPosition().getId()));
         player.addPositionChangedListener(this.positionChangedHandler);
@@ -143,7 +143,7 @@ public class Region
             return;
 
         // Notify the region about player left
-        addToAll(new ServerPacket(ServerOpcodes.PlayerLocation)
+        send(new ServerPacket(ServerOpcodes.PlayerLocation)
                 .add(player.getGuid())
                 .add(0));
         player.removePositionChangedListener(this.positionChangedHandler);
@@ -164,20 +164,14 @@ public class Region
         return this.ordinaryLocations.get(Random.nextInt(0, this.ordinaryLocations.size()));
     }
 
-    public void sendToAll(ServerPacket packet) {
+    /**
+     * Sends the specified packet to all players in this region
+     */
+    public void send(ServerPacket packet) {
         synchronized (this.players) {
             for (Player player : this.players) {
                 if (player.getSession() != null)
                     player.getSession().send(packet);
-            }
-        }
-    }
-
-    public void addToAll(ServerPacket packet) {
-        synchronized (this.players) {
-            for (Player player : this.players) {
-                if (player.getSession() != null)
-                    player.getSession().addData(packet);
             }
         }
     }

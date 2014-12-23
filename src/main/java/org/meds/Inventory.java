@@ -356,8 +356,8 @@ public class Inventory
         // No matters the result of swapping - send current inventory data
         if (this.owner.getSession() != null)
         {
-            this.owner.getSession().addData(getUpdatedSlotData(currentSlot));
-            this.owner.getSession().addData(getUpdatedSlotData(newSlot));
+            this.owner.getSession().send(getUpdatedSlotData(currentSlot));
+            this.owner.getSession().send(getUpdatedSlotData(newSlot));
         }
     }
 
@@ -517,7 +517,7 @@ public class Inventory
 
     private void onInventoryChanged()
     {
-        this.owner.getSession().addData(getInventoryData());
+        this.owner.getSession().send(getInventoryData());
     }
 
     public Item takeItem(Prototype proto, int count)
@@ -591,7 +591,7 @@ public class Inventory
             item = item.unstackItem(count);
 
         // Send Message
-        this.owner.getSession().addServerMessage(1016, count > 1 ? Integer.toString(count) + " " : "", item.Template.getTitle());
+        this.owner.getSession().sendServerMessage(1016, count > 1 ? Integer.toString(count) + " " : "", item.Template.getTitle());
         // TODO: Implement Location items
         //this.owner.getPosition.addItem(item);
 
@@ -625,7 +625,7 @@ public class Inventory
         // Send updated slot info
         if (this.owner.getSession() != null)
         {
-            this.owner.getSession().addData(getUpdatedSlotData(slot));
+            this.owner.getSession().send(getUpdatedSlotData(slot));
         }
 
     }

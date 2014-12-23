@@ -28,20 +28,31 @@ public class Session implements Runnable
         public void disconnect(Session session);
     }
 
+    private static Set<Session> sessionsToSend;
+
+    static {
+        sessionsToSend = new HashSet<>();
+    }
+
+    public static void sendBuffers() {
+        synchronized (Session.sessionsToSend) {
+            Iterator<Session> iterator = Session.sessionsToSend.iterator();
+            while (iterator.hasNext()) {
+                iterator.next().send();
+                iterator.remove();
+            }
+        }
+    }
+
     /**
      * Related Socket for this session.
      */
     private Socket socket;
     private HashMap<ClientOpcodes, OpcodeHandler> opcodeHandlers;
 
-    /**
-     * Queue of data for sending.
-     * Key - Managed Thread ID.
-     * Value - Data Packet
-     */
-    private HashMap<Long, ServerPacket> packets;
-
     private Player player;
+
+    private ServerPacket packetBuffer;
 
     /**
      * Indicating whether the player passed login verification successful and loaded from DB.
@@ -107,7 +118,7 @@ public class Session implements Runnable
         this.opcodeHandlers.put(ClientOpcodes.GroupKick, new GroupKickOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.GroupChangeLeader, new GroupChangeLeaderOpcodeHandler());
 
-        this.packets = new HashMap<>();
+        this.packetBuffer = new ServerPacket();
 
         this.key = Random.nextInt();
     }
@@ -193,11 +204,7 @@ public class Session implements Runnable
                         continue;
                     }
 
-                    // Send a packet buffer
-                    if (handler.isPositionSend() && this.player != null && this.player.getPosition() != null)
-                        this.player.getPosition().send();
-                    else
-                        send();
+                    Session.sendBuffers();
                 }
             }
         }
@@ -226,65 +233,34 @@ public class Session implements Runnable
         this.listeners.clear();
     }
 
-    public void send(ServerPacket packet)
-    {
-        if (packet == null || packet.isEmpty())
+    /**
+     * Sends an accumulated packet buffer for the current session.
+     */
+    private void send() {
+        if (this.packetBuffer == null || this.packetBuffer.isEmpty())
             return;
 
         OutputStream os;
-        try
-        {
+        try {
             os = this.socket.getOutputStream();
-            byte[] bytes = packet.getBytes();
+            byte[] bytes = packetBuffer.getBytes();
             os.write(bytes);
-            Logging.Debug.log("Sending data: " + packet.toString().replace('\u0000', '\n'));
-            //os.close();
-        }
-        catch (IOException e)
-        {
+            Logging.Debug.log("Sending data: " + packetBuffer.toString().replace('\u0000', '\n'));
+        } catch (IOException e) {
             Logging.Error.log("IOException while writing to a socket: " + e.getMessage());
+        } finally {
+            // Clean it anyway
+            this.packetBuffer.clear();
         }
     }
 
-    /**
-     * Sends an accumulated packet buffer for the current thread.
-     */
-    public void send()
-    {
-        ServerPacket packet = this.packets.get(Thread.currentThread().getId());
-        if (packet != null)
-        {
-            this.send(packet);
-            this.packets.remove(Thread.currentThread().getId());
-        }
-    }
-
-    public Session addData(ServerPacket packet)
-    {
-        ServerPacket _packet = this.packets.get(Thread.currentThread().getId());
-        if (_packet == null)
-        {
-            this.packets.put(Thread.currentThread().getId(), packet.clone());
-        }
-        else
-        {
-            _packet.add(packet);
-        }
-
+    public Session send(ServerPacket packet) {
+        this.packetBuffer.add(packet);
+        Session.sessionsToSend.add(this);
         return this;
     }
 
-    public Session addServerMessage(int messageId, String... values)
-    {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.ServerMessage).add(messageId);
-        for (String string : values)
-            packet.add(string);
-        this.addData(packet);
-        return this;
-    }
-
-    public Session sendServerMessage(int messageId, String... values)
-    {
+    public Session sendServerMessage(int messageId, String... values) {
         ServerPacket packet = new ServerPacket(ServerOpcodes.ServerMessage).add(messageId);
         for (String string : values)
             packet.add(string);
@@ -313,13 +289,11 @@ public class Session implements Runnable
         return this.socket != null ? socket.hashCode() + this.key : this.key;
     }
 
-    private abstract class OpcodeHandler
-    {
+    private abstract class OpcodeHandler {
         /**
          *  Gets a minimal length that allows to handle an opcode
          */
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             // No limit
             return -1;
         }
@@ -327,17 +301,8 @@ public class Session implements Runnable
         /**
          * Indicates whether an opcode may be handled for only logged players.
          */
-        public boolean isAuthenticatedOnly()
-        {
+        public boolean isAuthenticatedOnly() {
             return true;
-        }
-
-        /**
-         * Indicates whether an opcode handling requires sending data to all players at the current location.
-         */
-        public boolean isPositionSend()
-        {
-            return false;
         }
 
         public abstract void handle(String[] data);
@@ -481,7 +446,7 @@ public class Session implements Runnable
             /*
              * No sharp data after 1.2.7.6
             // sharp "#"
-            packet.addData(ServerOpcodes.Sharp, "0", "0");
+            packet.send(ServerOpcodes.Sharp, "0", "0");
              * */
 
             /*
@@ -577,7 +542,7 @@ public class Session implements Runnable
 
             /*
             // Mentor
-            packet.addData(ServerOpcodes._mmy, "Mentor Name");
+            packet.send(ServerOpcodes._mmy, "Mentor Name");
              * */
 
             // Send the custom welcome message
@@ -845,7 +810,7 @@ public class Session implements Runnable
             int itemDurability = SafeConvert.toInt32(data[2]);
 
             // Do not know why but always true
-            Session.this.addData(new ServerPacket(ServerOpcodes.GetCorpse).add("true"));
+            Session.this.send(new ServerPacket(ServerOpcodes.GetCorpse).add("true"));
 
             // TODO: sound 26 on gold collect. Sound 27 on item collect
 
@@ -868,14 +833,14 @@ public class Session implements Runnable
                 int itemCount = item.getCount();
                 if (Session.this.player.getInventory().tryStoreItem(item))
                 {
-                    Session.this.addServerMessage(1014, itemCount > 1 ? itemCount + " " : "", item.Template.getTitle());
-                    Session.this.player.getPosition().addData(Session.this.player, new ServerPacket(ServerOpcodes.ServerMessage).add("1026").add(Session.this.player.getName()).add(itemCount > 1 ? itemCount + " " : "").add(item.Template.getTitle()));
+                    Session.this.sendServerMessage(1014, itemCount > 1 ? itemCount + " " : "", item.Template.getTitle());
+                    Session.this.player.getPosition().send(Session.this.player, new ServerPacket(ServerOpcodes.ServerMessage).add("1026").add(Session.this.player.getName()).add(itemCount > 1 ? itemCount + " " : "").add(item.Template.getTitle()));
                     if (item.getCount() == 0)
                         Session.this.player.getPosition().removeItem(item);
                 }
                 else
                 {
-                    Session.this.addServerMessage(1001, item.Template.getTitle());
+                    Session.this.sendServerMessage(1001, item.Template.getTitle());
                 }
             }
         }
@@ -894,7 +859,7 @@ public class Session implements Runnable
             if (shop == null)
                 return;
 
-            Session.this.addData(shop.getData());
+            Session.this.send(shop.getData());
         }
     }
 
@@ -925,7 +890,7 @@ public class Session implements Runnable
                 return;
 
             if (shop.buyItem(player, proto, count) && player.getSession() != null)
-                player.getSession().addData(shop.getData());
+                player.getSession().send(shop.getData());
         }
     }
 
@@ -956,7 +921,7 @@ public class Session implements Runnable
                 return;
 
             if (shop.sellItem(player, proto, count) && player.getSession() != null)
-                player.getSession().addData(shop.getData());
+                player.getSession().send(shop.getData());
         }
     }
 
@@ -1091,8 +1056,6 @@ public class Session implements Runnable
         @Override
         public void handle(String[] data)
         {
-            // TODO: Implement Character Quests
-
             boolean isHideCompleted = SafeConvert.toInt32(data[0]) == 1;
             Iterator<Quest> iterator = Session.this.player.getQuestIterator();
             while (iterator.hasNext()) {
@@ -1103,7 +1066,7 @@ public class Session implements Runnable
 
                 if (isHideCompleted && quest.getStatus() == QuestStatuses.Completed)
                     continue;
-                Session.this.addData(quest.getQuestData());
+                Session.this.send(quest.getQuestData());
             }
         }
     }
@@ -1122,7 +1085,7 @@ public class Session implements Runnable
             int questId = SafeConvert.toInt32(data[0]);
             QuestTemplate template = DBStorage.QuestTemplateStore.get(questId);
             if (template != null)
-                addData(template.getQuestInfoData());
+                send(template.getQuestInfoData());
         }
     }
 
@@ -1182,14 +1145,12 @@ public class Session implements Runnable
         @Override
         public void handle(String[] data)
         {
-            addData(new ServerPacket(ServerOpcodes.StarInfo)
-                .add(Session.this.player.getHome().getId())
-                .add("0") // Corpse1 Location ID
-                .add("0") // Corpse2 Location ID
-                .add("0") // Corpse3 Location ID
-                .add("") // ???
-                .add("") // ???
-                .add("")); // ???
+            send(new ServerPacket(ServerOpcodes.StarInfo).add(Session.this.player.getHome().getId()).add("0") // Corpse1 Location ID
+                    .add("0") // Corpse2 Location ID
+                    .add("0") // Corpse3 Location ID
+                    .add("") // ???
+                    .add("") // ???
+                    .add("")); // ???
         }
     }
 
@@ -1215,7 +1176,7 @@ public class Session implements Runnable
         {
             Location location = Map.getInstance().getLocation(SafeConvert.toInt32(data[0]));
             if (location != null)
-                Session.this.addData(location.getInfoData());
+                Session.this.send(location.getInfoData());
         }
     }
 
@@ -1232,7 +1193,7 @@ public class Session implements Runnable
         {
             Region region = Map.getInstance().getRegion(SafeConvert.toInt32(data[0]));
             if (region != null)
-                Session.this.addData(region.getLocationListData());
+                Session.this.send(region.getLocationListData());
         }
     }
 
@@ -1249,7 +1210,7 @@ public class Session implements Runnable
         {
             Guild guild = DBStorage.GuildStore.get(SafeConvert.toInt32(data[0]));
             if (guild != null)
-                Session.this.addData(guild.getLessonsData());
+                Session.this.send(guild.getLessonsData());
         }
     }
 
@@ -1279,7 +1240,7 @@ public class Session implements Runnable
             // ??? Maybe next reset cost?
             packet.add("+100500 gold");
 
-            Session.this.addData(packet);
+            Session.this.send(packet);
         }
     }
 
@@ -1320,7 +1281,7 @@ public class Session implements Runnable
             group.setClanAccessMode(mode);
             group.setOpen(SafeConvert.toInt32(data[8], 1) != 0);
 
-            Session.this.addData(group.getSettingsData()).addData(group.getTeamLootData());
+            Session.this.send(group.getSettingsData()).send(group.getTeamLootData());
         }
     }
 
@@ -1357,9 +1318,8 @@ public class Session implements Runnable
             } else {
                 leaderGuid = Session.this.player.getGroup().getLeader().getGuid();
             }
-            Session.this.addData(new ServerPacket(ServerOpcodes.GroupCreated)
-                .add("0") // Not a leader
-                .add(leaderGuid));
+            Session.this.send(new ServerPacket(ServerOpcodes.GroupCreated).add("0") // Not a leader
+                    .add(leaderGuid));
         }
     }
 
