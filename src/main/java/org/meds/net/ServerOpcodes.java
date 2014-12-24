@@ -6,6 +6,8 @@ public enum ServerOpcodes
     AchievementList("acl"),
     AchievementUpdate("acu"),
     BuyBackList("bbl"), // Appeared in 2.0.0.0
+    TradeUpdate("change"),
+    TradeResult("ch_res"),
     CultInfo("ci"),
     BonusMagicParameter("cms"),
     UpdateQuest("cq"),
@@ -17,6 +19,7 @@ public enum ServerOpcodes
     _fex("fex"),
     _fpi("fpi"),
     GroupCreated("gcr"),
+    GetTrade("get_ch"),
     GuildInfo("gi"),
     @Deprecated
     GuildLessonInfo("ginf"), // Deprecated after 2.0.0.0

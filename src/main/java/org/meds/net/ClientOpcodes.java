@@ -10,9 +10,13 @@ public enum ClientOpcodes
     Attack("at"),
     BuyBackItem("bbi"), // Appeared in 2.0.0.0
     BuyItem("bi"),
+    TradeApply("ch_apply"),
+    TradeCancel("ch_depp"),
+    TradeUpdate("change"),
     BankExchange("chp"),
     DestroyItem("di"),
     GetLocationInfo("gei"), // Appeared in 2.0.0.0
+    GetTrade("get_ch"),
     @Deprecated
     EnterGuild("gg"), // Deprecated after 2.0.0.0
     GetItemInfo("gii"),
