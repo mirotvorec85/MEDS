@@ -103,14 +103,12 @@ public class Player extends Unit
         return spell.getLevel();
     }
 
-    public void setAutoSpell(int spellId)
-    {
-        if (this.getSpellLevel(spellId) != 0)
-        {
+    public void setAutoSpell(int spellId) {
+        if (this.getSpellLevel(spellId) == 0) {
             spellId = 0;
+        } else {
+            this.info.setAutoSpellId(spellId);
         }
-
-        this.info.setAutoSpellId(spellId);
 
         if (this.session != null)
             this.session.send(new ServerPacket(ServerOpcodes.AutoSpell).add(spellId));
