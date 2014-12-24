@@ -682,7 +682,8 @@ public class Player extends Unit
         for (Map.Entry<Integer, Guild> entry : DBStorage.GuildStore.entrySet())
         {
             packet.add(entry.getValue().getId())
-                .add(entry.getValue().getName());
+                .add(entry.getValue().getName())
+                .add(entry.getValue().getPrevId());
             CharacterGuild characterGuild = this.info.getGuilds().get(entry.getValue().getId());
             if (characterGuild == null)
                 packet.add("0");
@@ -780,14 +781,11 @@ public class Player extends Unit
         charGuild.setLevel(charGuild.getLevel() + 1);
         ++this.guildLevel;
 
-        if (this.session != null)
-        {
-
+        if (this.session != null) {
             session.sendServerMessage(498);
             // TODO: Implement sound sending (Sound 31 here)
             session.send(new ServerPacket().add(this.getMagicData()).add(this.getParametersData()).add(this.getGuildLevelData()));
         }
-
     }
 
     private void applyGuildImprovement(GuildLesson.ImprovementTypes type, int id, int count)
@@ -805,15 +803,18 @@ public class Player extends Unit
                     this.info.getSkills().put(id, characterSkill);
                 }
                 characterSkill.setLevel(characterSkill.getLevel() + count);
+                Logging.Debug.log(this + "has learnt skill id " + id + " and the current level is " +
+                        characterSkill.getLevel());
                 break;
             case Spell:
                 CharacterSpell characterSpell = this.info.getSpells().get(id);
-                if (characterSpell == null)
-                {
+                if (characterSpell == null) {
                     characterSpell = new CharacterSpell(this.guid, id, 0);
                     this.info.getSpells().put(id, characterSpell);
                 }
                 characterSpell.setLevel(characterSpell.getLevel() + count);
+                Logging.Debug.log(this + "has learnt spell id " + id + " and the current level is " +
+                        characterSpell.getLevel());
                 // TODO: Message about new level with spell
                 // TODO: Set AutoSpell if not set
                 break;
