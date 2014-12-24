@@ -15,16 +15,15 @@ import org.meds.enums.ItemSubClassWeapon;
 import org.meds.enums.Parameters;
 import org.meds.util.Random;
 
-public class Spell
-{
+public class Spell {
+
     private org.meds.database.entity.Spell entry;
     private Unit caster;
     private Unit target;
     private int level;
     private Item item;
 
-    public Spell(org.meds.database.entity.Spell entry, Unit caster, int level, Unit target, Item item)
-    {
+    public Spell(org.meds.database.entity.Spell entry, Unit caster, int level, Unit target, Item item) {
         this.entry = entry;
         this.caster = caster;
         this.level = level;
@@ -32,41 +31,35 @@ public class Spell
         this.item = item;
     }
 
-    public Spell(org.meds.database.entity.Spell entry, Unit caster, int level, Unit target)
-    {
+    public Spell(org.meds.database.entity.Spell entry, Unit caster, int level, Unit target) {
         this(entry, caster, level, target, null);
     }
 
-    public Spell(org.meds.database.entity.Spell entry, Unit caster, int level)
-    {
+    public Spell(org.meds.database.entity.Spell entry, Unit caster, int level) {
         this(entry, caster, level, null, null);
     }
 
-    public Spell(int spellId, Unit caster, int level, Unit target, Item item)
-    {
+    public Spell(int spellId, Unit caster, int level, Unit target, Item item) {
         this(DBStorage.SpellStore.get(spellId), caster, level, target, item);
     }
 
-    public Spell(int spellId, Unit caster, int level, Unit target)
-    {
+    public Spell(int spellId, Unit caster, int level, Unit target) {
         this(spellId, caster, level, target, null);
     }
 
-    public Spell(int spellId, Unit caster, int level)
-    {
+    public Spell(int spellId, Unit caster, int level) {
         this(spellId, caster, level, null, null);
     }
 
-    public boolean cast()
-    {
+    public boolean cast() {
         if (this.entry == null)
             return false;
 
-        switch (this.entry.getId())
-        {
+        switch (this.entry.getId()) {
             // Frost, Fire and Lightning magic spells
-            // Electroshock
-            case 3:
+            case 1: // Fire Ball
+            case 2: // Ice Arrow
+            case 3: // Electroshock
                 handleSpellBattleMagic();
             break;
             case 14: // Tigers Strength
@@ -90,13 +83,10 @@ public class Spell
                 break;
             // Relax
             case 60:
-                if (this.caster.hasAura(1000))
-                {
-                this.caster.removeAura(1000);
-                }
-                else
-                {
-                this.caster.addAura(Aura.createAura(DBStorage.SpellStore.get(1000), this.caster, -1, -10));
+                if (this.caster.hasAura(1000)) {
+                    this.caster.removeAura(1000);
+                } else {
+                    this.caster.addAura(Aura.createAura(DBStorage.SpellStore.get(1000), this.caster, -1, -10));
                 }
                 break;
             default:
@@ -281,14 +271,12 @@ public class Spell
                             .add(this.target.getName()));
     }
 
-    private void handleSpellBattleMagic()
-    {
+    private void handleSpellBattleMagic() {
         int minDamage = 0;
         int maxDamage = 0;
 
         // Staff damage
-        if (this.caster.isPlayer())
-        {
+        if (this.caster.isPlayer()) {
             Player pCaster = (Player)this.caster;
             Item rightHandItem = pCaster.getInventory().get(Inventory.Slots.RightHand);
             if (rightHandItem != null
@@ -306,11 +294,11 @@ public class Spell
         // Effect percentage
         int effect = 100;
 
-        // Electroshock
-        if (this.entry.getId() == 3)
-        {
-            switch (this.level)
-            {
+
+        if (this.entry.getId() == 1 // Fire Ball
+                || this.entry.getId() == 2 // Ice Arrow
+                || this.entry.getId() == 3) { // Electroshock
+            switch (this.level) {
                 case 1:
                     effect = 43;
                     break;
@@ -386,11 +374,25 @@ public class Spell
         /*
         * Dispersion
         * */
-        // Lightning - 30%
-        if (this.entry.getId() == 3)
-        {
-            initialDamage = (int)(initialDamage * (Random.nextDouble() * 0.6 - 0.3 + 1));
+        double dispersion;
+        switch (this.entry.getId()) {
+            // Fire
+            case 1:
+                dispersion = 0.1d;
+                break;
+            // Frost
+            case 2:
+                dispersion = 0.2d;
+                break;
+            // Lightning
+            case 3:
+                dispersion = 0.3d;
+                break;
+            default:
+                dispersion = 0d;
+                break;
         }
+        initialDamage = (int)(initialDamage * (Random.nextDouble() * (dispersion * 2) - dispersion + 1));
 
         Damage damage = new Damage(initialDamage, this.target);
         damage.Spell = this;
@@ -398,8 +400,37 @@ public class Spell
         /*
         * Messages
         * */
-        switch (this.entry.getId())
-        {
+        switch (this.entry.getId()) {
+            // Fire Ball
+            case 1:
+                damage.MessageDealerDamage = 101;
+                damage.MessageDealerKillingBlow = 107;
+
+                //damage.MessageVictimMiss;
+                //damage.MessageVictimNoDamage;
+                damage.MessageVictimDamage = 102;
+                damage.MessageVictimKillingBlow = 108;
+
+                //damage.MessagePositionMiss;
+                //damage.MessagePositionNoDamage;
+                damage.MessagePositionDamage = 103;
+                damage.MessagePositionKillingBlow = 109;
+                break;
+            // Ice Arrow
+            case 2:
+                damage.MessageDealerDamage = 113;
+                damage.MessageDealerKillingBlow = 119;
+
+                //damage.MessageVictimMiss;
+                //damage.MessageVictimNoDamage;
+                damage.MessageVictimDamage = 114;
+                damage.MessageVictimKillingBlow = 120;
+
+                //damage.MessagePositionMiss;
+                //damage.MessagePositionNoDamage;
+                damage.MessagePositionDamage = 115;
+                damage.MessagePositionKillingBlow = 121;
+                break;
             // Electroshock
             case 3:
                 //damage.MessageDealerMiss;
