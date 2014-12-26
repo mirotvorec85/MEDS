@@ -100,6 +100,12 @@ public class Item
 
             return item.equals(this);
         }
+
+        @Override
+        public String toString() {
+            return "Item.Prototype - ID: " + this.templateId +
+                    "; Mod: " + this.modification + "; Dur: " + this.durability;
+        }
     }
 
     public static class Modification implements Valued
