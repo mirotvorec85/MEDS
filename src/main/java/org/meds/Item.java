@@ -18,61 +18,56 @@ import org.meds.net.ServerPacket;
 import org.meds.spell.Spell;
 import org.meds.util.Valued;
 
-public class Item
-{
-    public static class Prototype implements Serializable, Cloneable
-    {
+public class Item {
+
+    public static class Prototype implements Serializable, Cloneable {
+
         private static final long serialVersionUID = -2685946807316472347L;
         private int templateId;
         private int modification;
         private int durability;
 
-        public Prototype()
-        {
+        public Prototype() {
 
         }
 
-        public Prototype(int templateId, int modification, int durability)
-        {
+        public Prototype(int templateId, int modification, int durability) {
             this.templateId = templateId;
             this.modification = modification;
             this.durability = durability;
         }
 
-        public int getTemplateId()
-        {
+        public int getTemplateId()  {
             return templateId;
         }
-        public void setTemplateId(int templateId)
-        {
+
+        private void setTemplateId(int templateId) {
             this.templateId = templateId;
         }
-        public int getModification()
-        {
+
+        public int getModification() {
             return modification;
         }
-        public void setModification(int modification)
-        {
+
+        private void setModification(int modification) {
             this.modification = modification;
         }
-        public int getDurability()
-        {
+
+        public int getDurability() {
             return durability;
         }
-        public void setDurability(int durability)
-        {
+
+        private void setDurability(int durability) {
             this.durability = durability;
         }
 
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return (this.templateId * 1000 + this.durability) | this.modification;
         }
 
         @Override
-        public boolean equals(Object obj)
-        {
+        public boolean equals(Object obj) {
             if (obj == null)
                 return false;
             if (obj instanceof Prototype)
@@ -83,18 +78,16 @@ public class Item
             return false;
         }
 
-        public boolean equals(Prototype proto)
-        {
-            if (proto == null)
+        public boolean equals(Prototype prototype) {
+            if (prototype == null)
                 return false;
 
-            return this.templateId == proto.templateId &&
-                    this.modification == proto.modification &&
-                    this.durability == proto.durability;
+            return this.templateId == prototype.templateId &&
+                    this.modification == prototype.modification &&
+                    this.durability == prototype.durability;
         }
 
-        public boolean equals(Item item)
-        {
+        public boolean equals(Item item) {
             if (item == null)
                 return false;
 
@@ -108,8 +101,8 @@ public class Item
         }
     }
 
-    public static class Modification implements Valued
-    {
+    public static class Modification implements Valued {
+
         private int value;
 
         private ItemTotemicTypes totem;
@@ -120,8 +113,7 @@ public class Item
         /**
          * Private constructor that is only used for clonning.
          */
-        private Modification()
-        {
+        private Modification() {
 
         }
 
@@ -225,13 +217,11 @@ public class Item
         return Item.getWeight(DBStorage.ItemTemplateStore.get(templateId));
     }
 
-    public static int getWeight(ItemTemplate template)
-    {
+    public static int getWeight(ItemTemplate template) {
         if (template == null)
             return 0;
 
-        switch (template.getItemClass())
-        {
+        switch (template.getItemClass()) {
             case Ring:
                 return 2;
 
@@ -258,6 +248,31 @@ public class Item
 
             default:
                 return 1;
+        }
+    }
+
+    public static boolean isEquipment(int templateId) {
+        return isEquipment(DBStorage.ItemTemplateStore.get(templateId));
+    }
+
+    public static boolean isEquipment(ItemTemplate template) {
+        if (template == null)
+            return false;
+        switch (template.getItemClass()) {
+            case Head:
+            case Neck:
+            case Back:
+            case Hands:
+            case Body:
+            case Ring:
+            case Weapon:
+            case Shield:
+            case Waist:
+            case Legs:
+            case Foot:
+                return true;
+            default:
+                return false;
         }
     }
 
@@ -348,8 +363,7 @@ public class Item
         this.durability = proto.getDurability();
     }
 
-    public Item(Prototype proto, int count)
-    {
+    public Item(Prototype proto, int count) {
         this(proto);
         this.count = count;
     }
@@ -359,32 +373,12 @@ public class Item
         return this.count;
     }
 
-    public Prototype getPrototype()
-    {
+    public Prototype getPrototype() {
         return new Prototype(this.Template.getId(), this.modification.value, this.durability);
     }
 
-    public boolean isEquipment()
-    {
-        if (this.Template == null)
-            return false;
-        switch (this.Template.getItemClass())
-        {
-            case Head:
-            case Neck:
-            case Back:
-            case Hands:
-            case Body:
-            case Ring:
-            case Weapon:
-            case Shield:
-            case Waist:
-            case Legs:
-            case Foot:
-                return true;
-            default:
-                return false;
-        }
+    public boolean isEquipment() {
+        return isEquipment(this.Template);
     }
 
     public Modification getModification()
@@ -518,8 +512,7 @@ public class Item
         return equals(item.getPrototype());
     }
 
-    public boolean equals(Prototype proto)
-    {
+    public boolean equals(Prototype proto) {
         return proto.equals(this.getPrototype());
     }
 
