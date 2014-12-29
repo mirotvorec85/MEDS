@@ -58,6 +58,8 @@ public class Player extends Unit
 
     private Group group;
 
+    private Trade trade;
+
     public Player(int guid)
     {
         super();
@@ -474,6 +476,14 @@ public class Player extends Unit
         }
 
         return false;
+    }
+
+    public Trade getTrade() {
+        return trade;
+    }
+
+    public void setTrade(Trade trade) {
+        this.trade = trade;
     }
 
     @Override

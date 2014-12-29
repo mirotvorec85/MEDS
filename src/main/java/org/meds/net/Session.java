@@ -119,6 +119,10 @@ public class Session implements Runnable
         this.opcodeHandlers.put(ClientOpcodes.GroupQuit, new GroupQuitOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.GroupKick, new GroupKickOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.GroupChangeLeader, new GroupChangeLeaderOpcodeHandler());
+        this.opcodeHandlers.put(ClientOpcodes.GetTrade, new GetTradeOpcodeHandler());
+        this.opcodeHandlers.put(ClientOpcodes.TradeUpdate, new TradeUpdateOpcodeHandler());
+        this.opcodeHandlers.put(ClientOpcodes.TradeApply, new TradeApplyOpcodeHandler());
+        this.opcodeHandlers.put(ClientOpcodes.TradeCancel, new TradeCancelOpcodeHandler());
 
         this.packetBuffer = new ServerPacket();
 
@@ -1383,6 +1387,188 @@ public class Session implements Runnable
                 return;
 
             group.setLeader(World.getInstance().getPlayer(SafeConvert.toInt32(data[0])));
+        }
+    }
+
+    private class GetTradeOpcodeHandler extends OpcodeHandler {
+
+        @Override
+        public int getMinDataLength() {
+            return 1;
+        }
+
+        @Override
+        public void handle(String[] data) {
+            // Try to find the trader
+            Player trader = World.getInstance().getPlayer(SafeConvert.toInt32(data[0]));
+            if (trader == null) {
+                return;
+            }
+
+            // Create a new trade
+            if (Session.this.player.getTrade() == null) {
+                // The trader is trading already
+                if (trader.getTrade() != null) {
+                    // The other side of the trade is this player
+                    if (trader.getTrade().getOtherSide().getPlayer() == Session.this.player) {
+                        Logging.Warn.log(toString() + " has not trade, but " + trader.toString() + " has a trade" +
+                                "where the other side is the current player.");
+                        // Send the existing trade data
+                        Session.this.player.setTrade(trader.getTrade().getOtherSide());
+                        Session.this.player.getTrade().sendTradeData();
+                    } else {
+                        // TODO: Determine what to do in this situation
+                        return;
+                    }
+                } else {
+                    new Trade(Session.this.player, trader);
+                }
+
+            // Send the existing trade data
+            } else {
+                Session.this.player.getTrade().sendTradeData();
+            }
+        }
+    }
+
+    private class TradeUpdateOpcodeHandler extends OpcodeHandler {
+
+        @Override
+        public int getMinDataLength() {
+            return 15;
+        }
+
+        @Override
+        public void handle(String[] data) {
+            Trade trade = Session.this.player.getTrade();
+            if (trade == null)
+                return;
+            Player trader = World.getInstance().getPlayer(SafeConvert.toInt32(data[0]));
+            // The real trader and the new supply trader do not match
+            if (trader != trade.getOtherSide().getPlayer()) {
+                return;
+            }
+
+            Trade.Supply supply = trade.new Supply();
+            int counter = 1;
+            for (int i = 0; i < 3; ++i) {
+                Item item = new Item(new Prototype(
+                        SafeConvert.toInt32(data[counter++]),
+                        SafeConvert.toInt32(data[counter++]),
+                        SafeConvert.toInt32(data[counter++])),
+                        SafeConvert.toInt32(data[counter++]));
+                if (item.Template == null || item.getCount() == 0)
+                    continue;
+                if (!Session.this.player.getInventory().hasItem(item)) {
+                    Logging.Warn.log("Trade: " + Session.this.player.toString() + "places item " +
+                            item.getPrototype().toString() + "but he has no this item in the inventory");
+                    continue;
+                }
+                supply.setItem(i, item);
+            }
+
+            int gold = SafeConvert.toInt32(data[counter++]);
+            int platinum = SafeConvert.toInt32(data[counter++]);
+            if (gold > 0) {
+                if (gold > Session.this.player.getCurrencyAmount(Currencies.Gold)) {
+                    gold = Session.this.player.getCurrencyAmount(Currencies.Gold);
+                }
+                supply.setGold(gold);
+            }
+            if (platinum > 0) {
+                if (platinum > Session.this.player.getCurrencyAmount(Currencies.Platinum)) {
+                    platinum = Session.this.player.getCurrencyAmount(Currencies.Platinum);
+                }
+                supply.setPlatinum(platinum);
+            }
+
+            trade.setCurrentSupply(supply);
+        }
+    }
+
+    private class TradeApplyOpcodeHandler extends OpcodeHandler {
+
+        @Override
+        public int getMinDataLength() {
+            return 29;
+        }
+
+        @Override
+        public void handle(String[] data) {
+            Trade trade = Session.this.player.getTrade();
+            if (trade == null)
+                return;
+            Player trader = World.getInstance().getPlayer(SafeConvert.toInt32(data[0]));
+            // The real trader and the new supply trader do not match
+            if (trader != trade.getOtherSide().getPlayer()) {
+                return;
+            }
+
+            Trade.Supply supply = trade.new Supply();
+            int counter = 1;
+            for (int i = 0; i < 3; ++i) {
+                Item item = new Item(new Prototype(
+                            SafeConvert.toInt32(data[counter++]),
+                            SafeConvert.toInt32(data[counter++]),
+                            SafeConvert.toInt32(data[counter++])),
+                        SafeConvert.toInt32(data[counter++]));
+                if (item.Template == null || item.getCount() == 0)
+                    continue;
+                if (!Session.this.player.getInventory().hasItem(item)) {
+                    Logging.Warn.log("Trade: " + Session.this.player.toString() + "places item " +
+                            item.getPrototype().toString() + "but he has no this item in the inventory");
+                    continue;
+                }
+                supply.setItem(i, item);
+            }
+
+            int gold = SafeConvert.toInt32(data[counter++]);
+            int platinum = SafeConvert.toInt32(data[counter++]);
+            if (gold > Session.this.player.getCurrencyAmount(Currencies.Gold)) {
+                gold = Session.this.player.getCurrencyAmount(Currencies.Gold);
+            }
+            if (platinum > Session.this.player.getCurrencyAmount(Currencies.Platinum)) {
+                platinum = Session.this.player.getCurrencyAmount(Currencies.Platinum);
+            }
+            supply.setGold(gold);
+            supply.setPlatinum(platinum);
+
+            if (!trade.getCurrentSupply().equals(supply)) {
+                Logging.Warn.log("Trade: " + Session.this.player.toString() + " agreed to a trade, but his own" +
+                        "supply does not match. The current supply is updated");
+                trade.setCurrentSupply(supply);
+            }
+
+            Trade.Supply demand = trade.new Supply();
+            for (int i = 0; i < 3; ++i) {
+                Item item = new Item(new Prototype(
+                        SafeConvert.toInt32(data[counter++]),
+                        SafeConvert.toInt32(data[counter++]),
+                        SafeConvert.toInt32(data[counter++])),
+                        SafeConvert.toInt32(data[counter++]));
+                if (item.Template == null || item.getCount() == 0)
+                    continue;
+                demand.setItem(i, item);
+            }
+
+            gold = SafeConvert.toInt32(data[counter++]);
+            platinum = SafeConvert.toInt32(data[counter++]);
+
+            demand.setGold(gold);
+            demand.setPlatinum(platinum);
+
+            trade.agree(demand);
+        }
+    }
+
+    private class TradeCancelOpcodeHandler extends OpcodeHandler {
+
+        @Override
+        public void handle(String[] data) {
+            if (Session.this.player.getTrade() == null) {
+                return;
+            }
+            Session.this.player.getTrade().cancel();
         }
     }
 }
