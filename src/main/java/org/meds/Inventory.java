@@ -361,6 +361,71 @@ public class Inventory
         }
     }
 
+    public boolean canStoreItems(Item... items) {
+        // Calculate total weight
+        int weight = 0;
+        for (Item item : items) {
+            if (item == null)
+                continue;
+            weight += item.Weight;
+        }
+
+        // TODO: Check weight after implementation
+
+        // Count occupying slots
+        int slots = 0;
+        for (Item item : items) {
+            if (item == null)
+                continue;
+            // Equipment cannot be stacked
+            if (item.isEquipment()) {
+                slots += item.getCount();
+                continue;
+            }
+
+            // Already contains the specified prototype
+            if (findItem(item.getPrototype()) > 0) {
+                // Just will be stacked
+                continue;
+            } else {
+                slots++;
+            }
+        }
+
+        // Calculate free slots count
+        for (int i = Slots.Inventory1.getValue(); i <= Slots.Inventory25.getValue(); i++) {
+            if (this.inventorySlots[i] == null)
+                slots--;
+        }
+
+        return slots <= 0;
+    }
+
+    public boolean hasItem(int templateId) {
+        return findItem(templateId) != -1;
+    }
+
+    public boolean hasItem(Prototype prototype) {
+        return findItem(prototype) != -1;
+    }
+
+    public boolean hasItem(Item item) {
+        if (item == null)
+            return false;
+
+        Integer[] slots = findAllItems(item.getPrototype());
+        if (slots.length == 0)
+            return false;
+
+        // Count having items count
+        int count = 0;
+        for (Integer slot : slots) {
+            count += this.inventorySlots[slot].getCount();
+        }
+
+        return item.getCount() <= count;
+    }
+
     /**
      * Returns slot number of the first item that has the specified template ID or returns -1 if no items are found.
      * @return The first slot index of the item if an item was found; othrewise, -1
@@ -380,17 +445,14 @@ public class Inventory
 
     /**
      * Returns slot number of the first item that has the same specified basic parameters or -1 of no items are found.
-     * @return The first slot index of the item if an item was found; othrewise, -1
+     * @return The first slot index of the item if an item was found; otherwise, -1
      */
-    public int findItem(Item.Prototype proto)
-    {
-        for (int i = Slots.Inventory1.getValue(); i <= Slots.Inventory25.getValue(); ++i)
-        {
-            if (this.inventorySlots[i] == null)
-                continue;
-            if (!this.inventorySlots[i].equals(proto))
-                continue;
-            return i;
+    public int findItem(Item.Prototype prototype) {
+        if (prototype == null)
+            return -1;
+        for (int i = Slots.Inventory1.getValue(); i <= Slots.Inventory25.getValue(); ++i) {
+            if (prototype.equals(this.inventorySlots[i]))
+                return i;
         }
         return -1;
     }
@@ -410,15 +472,13 @@ public class Inventory
         return slots.toArray(new Integer[slots.size()]);
     }
 
-    public Integer[] findAllItems(Prototype proto)
-    {
-        if (proto == null)
+    public Integer[] findAllItems(Prototype prototype) {
+        if (prototype == null)
             return new Integer[0];
 
-        List<Integer> slots = new ArrayList<>();
-        for (int i = Slots.Inventory1.getValue(); i <= Slots.Inventory25.getValue(); ++i)
-        {
-            if (!proto.equals(this.inventorySlots[i]))
+        List<Integer> slots = new ArrayList<>(25);
+        for (int i = Slots.Inventory1.getValue(); i <= Slots.Inventory25.getValue(); ++i) {
+            if (!prototype.equals(this.inventorySlots[i]))
                 continue;
             slots.add(i);
         }
@@ -426,13 +486,11 @@ public class Inventory
         return slots.toArray(new Integer[slots.size()]);
     }
 
-    public boolean tryStoreItem(Item item)
-    {
+    public boolean tryStoreItem(Item item) {
         return this.tryStoreItem(item, item.getCount());
     }
 
-    public boolean tryStoreItem(Item item, int count)
-    {
+    public boolean tryStoreItem(Item item, int count) {
         // TODO: Check Weight
 
         // Find appropriate slot
@@ -460,7 +518,7 @@ public class Inventory
 
     private boolean canSlotStoreItem(int slot, Item item)
     {
-     // Slot is equimpent: check a compatibility between slot type and item type. Also check the item requirements.
+        // Slot is equipment: check a compatibility between slot type and item type. Also check the item requirements.
         if (isEquipmentSlot(slot))
         {
             // Check min level
@@ -520,13 +578,12 @@ public class Inventory
         this.owner.getSession().send(getInventoryData());
     }
 
-    public Item takeItem(Prototype proto, int count)
-    {
-        if (proto == null || proto.getTemplateId() == 0)
+    public Item takeItem(Prototype prototype, int count) {
+        if (prototype == null || prototype.getTemplateId() == 0)
             return null;
 
         // Try to find all the slots contain the specified prototype
-        Integer[] itemSlots = this.findAllItems(proto);
+        Integer[] itemSlots = this.findAllItems(prototype);
 
         if (itemSlots.length == 0)
             return null;
@@ -552,6 +609,12 @@ public class Inventory
         if (item.getCount() != 0)
             onInventoryChanged();
         return item;
+    }
+
+    public Item takeItem(Item item) {
+        if (item == null)
+            return null;
+        return takeItem(item.getPrototype(), item.getCount());
     }
 
     public Item takeItem(int slot, int count)
