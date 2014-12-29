@@ -123,6 +123,7 @@ public class Session implements Runnable
         this.opcodeHandlers.put(ClientOpcodes.TradeUpdate, new TradeUpdateOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.TradeApply, new TradeApplyOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.TradeCancel, new TradeCancelOpcodeHandler());
+        this.opcodeHandlers.put(ClientOpcodes.SetAsceticism, new SetAsceticismOpcodeHandler());
 
         this.packetBuffer = new ServerPacket();
 
@@ -1569,6 +1570,28 @@ public class Session implements Runnable
                 return;
             }
             Session.this.player.getTrade().cancel();
+        }
+    }
+
+    private class SetAsceticismOpcodeHandler extends OpcodeHandler {
+
+        @Override
+        public int getMinDataLength() {
+            return 1;
+        }
+
+        @Override
+        public void handle(String[] data) {
+            boolean set = SafeConvert.toInt32(data[0]) == 1;
+            if (set) {
+                Session.this.player.getSettings().set(PlayerSettings.Asceticism);
+                Session.this.sendServerMessage(430);
+            } else {
+                Session.this.player.getSettings().unset(PlayerSettings.Asceticism);
+                Session.this.sendServerMessage(431);
+            }
+
+            Session.this.send(Session.this.player.getParametersData());
         }
     }
 }

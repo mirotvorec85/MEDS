@@ -40,6 +40,7 @@ public enum ClientOpcodes
     LearnGuildInfo("lni"), // Appeared in 2.0.0.0 after new guild system.
     Login("login"),
     Ready("lur"),
+    SetAsceticism("opt_asket"),
     PutMoney("pm"),
     QuestAccept("qa"),
     QuestListFilter("qf"),
