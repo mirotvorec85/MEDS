@@ -52,7 +52,7 @@ public class AuraBuff extends Aura
                 break;
         }
 
-        if (this.ownerPlayer != null && selfMessage != -1)
+        if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null && selfMessage != -1)
             this.ownerPlayer.getSession().sendServerMessage(selfMessage);
         if (positionMessage != -1)
             this.owner.getPosition().send(this.owner, new ServerPacket(ServerOpcodes.ServerMessage).add(positionMessage).add(this.owner.getName()));
