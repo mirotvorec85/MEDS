@@ -196,16 +196,14 @@ public class Item {
         }
     }
 
-    public static int getMaxDurability(int templateId)
-    {
-        ItemTemplate template = DBStorage.ItemTemplateStore.get(templateId);
-        if (template == null)
-            return 0;
-        return Item.getMaxDurability(template);
+    public static int getMaxDurability(int templateId) {
+        return Item.getMaxDurability(DBStorage.ItemTemplateStore.get(templateId));
     }
 
-    public static int getMaxDurability(ItemTemplate template)
-    {
+    public static int getMaxDurability(ItemTemplate template){
+        if (template == null)
+            return 0;
+
         if (template.getLevel() == 0)
             return 30;
 
