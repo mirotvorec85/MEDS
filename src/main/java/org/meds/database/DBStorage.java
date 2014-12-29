@@ -54,10 +54,11 @@ public class DBStorage {
         Logging.Info.log("Loaded " + DBStorage.AchievementStore.size() + " achievements");
 
         // Achievement Criteria
-        List<AchievementCriterion> criterias = session.createCriteria(AchievementCriterion.class).list();
-        // Adding to Achievement criteria list implemented
-        // inside AchievementCriteria.setAchievementId method
-        Logging.Info.log("Loaded " + criterias.size() + " achievement criterias");
+        List<AchievementCriterion> criteria = session.createCriteria(AchievementCriterion.class).list();
+        for (AchievementCriterion criterion : criteria) {
+            DBStorage.AchievementStore.get(criterion.getAchievementId()).getCriteria().add(criterion);
+        }
+        Logging.Info.log("Loaded " + criteria.size() + " achievement criterias");
 
         // Currency
         List<Currency> currencies = session.createCriteria(Currency.class).list();
