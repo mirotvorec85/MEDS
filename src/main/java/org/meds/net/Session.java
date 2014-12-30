@@ -78,6 +78,7 @@ public class Session implements Runnable
         this.opcodeHandlers.put(ClientOpcodes.Verification, new VerificationOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.Login, new LoginOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.Ready, new ReadyOpcodeHandler());
+        this.opcodeHandlers.put(ClientOpcodes.Ping, new PingOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.Movement, new MovementOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.PutMoney, new PutMoneyOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.TakeMoney, new TakeMoneyOpcodeHandler());
@@ -578,6 +579,14 @@ public class Session implements Runnable
         {
             Session.this.player.logIn(Session.this);
             World.getInstance().playerLoggedIn(Session.this.player);
+        }
+    }
+
+    private class PingOpcodeHandler extends OpcodeHandler {
+
+        @Override
+        public void handle(String[] data) {
+            // PING!:)
         }
     }
 
