@@ -1,5 +1,6 @@
 package org.meds.database.entity;
 
+import org.meds.Locale;
 import org.meds.net.ServerOpcodes;
 import org.meds.net.ServerPacket;
 import org.meds.database.DBStorage;
@@ -303,12 +304,12 @@ public class QuestTemplate
 
         if (this.rewardExp != 0)
         {
-            packet.add(this.rewardExp + " опыта"); // TODO: Remove locale strings
+            packet.add(this.rewardExp + Locale.getString(1));
             ++rewardCount;
         }
         if (this.rewardGold != 0)
         {
-            packet.add(this.rewardGold + " золота"); // TODO: Remove locale strings
+            packet.add(this.rewardGold + Locale.getString(2));
             ++rewardCount;
         }
 

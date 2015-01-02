@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.meds.Configuration;
+import org.meds.Locale;
 import org.meds.map.Map;
 import org.meds.World;
 import org.meds.database.DBStorage;
@@ -131,6 +132,8 @@ public class Server
             // Initialize Map instance and load its data
             Map.getInstance().load();
             Logging.Info.log("Map is loaded");
+
+            Locale.load();
 
             Server server = new Server();
             World.getInstance().createCreatures();

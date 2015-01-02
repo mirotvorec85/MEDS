@@ -8,6 +8,7 @@ import java.util.*;
 
 import org.meds.*;
 import org.meds.Item.Prototype;
+import org.meds.Locale;
 import org.meds.database.DBStorage;
 import org.meds.database.entity.*;
 import org.meds.database.entity.Character;
@@ -1265,8 +1266,7 @@ public class Session implements Runnable
             packet.add(LevelCost.getTotalGold(Session.this.player.getGuildLevel() + 1, Session.this.player.getLevel()));
 
             // Lessons reset cost
-            // TODO: locale strings
-            packet.add("free");
+            packet.add(Locale.getString(3));
 
             // ??? Maybe next reset cost?
             packet.add("+100500 gold");

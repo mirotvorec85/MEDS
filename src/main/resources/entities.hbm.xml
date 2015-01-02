@@ -500,6 +500,15 @@
         </property>
     </class>
 
+    <class name="LocaleString" table="`locale_string`">
+        <id name="id" type="int" column="id">
+            <generator class="assigned" />
+        </id>
+        <property name="string" type="string">
+            <column name="string" />
+        </property>
+    </class>
+
     <class name="org.meds.map.Location" table="`location`">
         <id name="id" type="int" column="id" >
             <generator class="assigned"/>

@@ -918,14 +918,13 @@ public class Player extends Unit
         if (corpse.getGold() > 0)
         {
             if (this.session != null)
-                // TODO: Remove locale string form here and below
-                this.session.sendServerMessage(998, corpse.getOwner().getName(), Integer.toString(corpse.getGold()), " золота");
+                this.session.sendServerMessage(998, corpse.getOwner().getName(), Integer.toString(corpse.getGold()), Locale.getString(2));
             this.position.send(this,
                     new ServerPacket(ServerOpcodes.ServerMessage)
                             .add("999").add(this.getName())
                             .add(corpse.getOwner().getName())
                             .add(corpse.getGold())
-                            .add(" золота"));
+                            .add(Locale.getString(2)));
             this.changeCurrency(Currencies.Gold, corpse.getGold());
         }
 
