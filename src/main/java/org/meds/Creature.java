@@ -178,10 +178,10 @@ public class Creature extends Unit
          * Level * Level * 0.001 + Level / 22 - 11
          *
          * Armour:
-         *   Level * Level * 0.03 + 3 * Level => FLoor
+         *   Level * Level * 0.03 + 3 * Level => Floor
          * - Religious (Sun, Moon, Order, Chaos)
          *   x 1
-         * - Monk, Mauler, Barbarian, Swordsman, Vindicator, Assasin, Duelist
+         * - Monk, Mauler, Barbarian, Swordsman, Vindicator, Assassin, Duelist
          *   x 2
          * - Elemental (Cold, Fire, Lightning)
          *   x 0.5
@@ -198,7 +198,7 @@ public class Creature extends Unit
          *   Level * Level * 0.03 + Level * 3
          * - Elemental
          *   x 2
-         * - Vindicator, Monk, Assasin, Duelist
+         * - Vindicator, Monk, Assassin, Duelist
          *   x 0.5
          *
          * */

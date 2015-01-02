@@ -27,7 +27,7 @@ public class Hibernate
         }
         catch(Exception ex)
         {
-            Logging.Fatal.log("An exception occurred while confuguring Hibernate", ex);
+            Logging.Fatal.log("An exception occurred while configuring Hibernate", ex);
             return;
         }
         Logging.Info.log("Hibernate has been configured.");

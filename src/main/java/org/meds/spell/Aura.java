@@ -76,7 +76,7 @@ public class Aura
             }
             catch (InstantiationException | IllegalAccessException e)
             {
-                Logging.Error.log("Can not instantinate the Aura class " + auraClass.getName() + " for spell ID " + entry.getId() + " Error: " + e.getMessage());
+                Logging.Error.log("Can not instantiate the Aura class " + auraClass.getName() + " for spell ID " + entry.getId() + " Error: " + e.getMessage());
             }
         }
         // Generic (this) aura class
@@ -202,7 +202,7 @@ public class Aura
         if (this.isPermanent)
             return;
 
-        // Only active auras are updatable
+        // Only active auras may be updated
         if (this.state == States.Created || this.state == States.Removed)
             return;
 

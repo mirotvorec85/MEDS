@@ -137,7 +137,7 @@ public class Server
 
             server.Start();
         } catch (Exception ex) {
-            Logging.Fatal.log("An exception has occured while starting the Server", ex);
+            Logging.Fatal.log("An exception has occurred while starting the Server", ex);
         }
     }
 

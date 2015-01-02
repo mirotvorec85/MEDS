@@ -20,18 +20,18 @@ public class CharacterInnItem implements Serializable
     }
 
     // TODO: Check primary key assignment
-    public CharacterInnItem(int characterId, Prototype proto, int count)
+    public CharacterInnItem(int characterId, Prototype prototype, int count)
     {
         this.characterId = characterId;
-        this.itemTemplateId = proto.getTemplateId();
-        this.modification = proto.getModification();
-        this.durability = proto.getDurability();
+        this.itemTemplateId = prototype.getTemplateId();
+        this.modification = prototype.getModification();
+        this.durability = prototype.getDurability();
         this.count = count;
     }
 
-    public CharacterInnItem(int characterId, Prototype proto)
+    public CharacterInnItem(int characterId, Prototype prototype)
     {
-        this(characterId, proto, 0);
+        this(characterId, prototype, 0);
     }
 
     @Override

@@ -89,13 +89,13 @@ public class AchievementManager {
                         }
                         break;
                     case SpecialCreature:
-                        // TODO: Implemement special creatures
+                        // TODO: Implement special creatures
                         break;
                     case TargetReligion:
-                        // TODO: Implemenet player and creature religion
+                        // TODO: Implement player and creature religion
                         break;
                     case TargetReligiousStatus:
-                        // TODO: Implemenet players religion and statuses
+                        // TODO: Implement players religion and statuses
                         break;
                     case TargetRace:
                         if (target.getRace().getValue() == criterion.getRequirement()) {

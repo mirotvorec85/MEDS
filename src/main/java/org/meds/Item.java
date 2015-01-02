@@ -111,7 +111,7 @@ public class Item {
         private ItemReinforcementTypes reinforcement;
 
         /**
-         * Private constructor that is only used for clonning.
+         * Private constructor that is only used for cloning.
          */
         private Modification() {
 
@@ -354,15 +354,15 @@ public class Item {
         this.count = count;
     }
 
-    public Item(Prototype proto)
+    public Item(Prototype prototype)
     {
-        this(proto.getTemplateId());
-        this.modification = new Modification(proto.getModification());
-        this.durability = proto.getDurability();
+        this(prototype.getTemplateId());
+        this.modification = new Modification(prototype.getModification());
+        this.durability = prototype.getDurability();
     }
 
-    public Item(Prototype proto, int count) {
-        this(proto);
+    public Item(Prototype prototype, int count) {
+        this(prototype);
         this.count = count;
     }
 
@@ -510,8 +510,8 @@ public class Item {
         return equals(item.getPrototype());
     }
 
-    public boolean equals(Prototype proto) {
-        return proto.equals(this.getPrototype());
+    public boolean equals(Prototype prototype) {
+        return prototype.equals(this.getPrototype());
     }
 
     @Override

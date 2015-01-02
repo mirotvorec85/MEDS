@@ -105,16 +105,16 @@ public class Shop
     /**
      * The shop buys items from a player.
      * @param seller The Player seller instance
-     * @param proto Item prototype for sale
+     * @param prototype Item prototype for sale
      * @param count Count of items to buy
      * @return A boolean value, indicating whether the transaction was completed
      */
-    public boolean buyItem(Player seller, Prototype proto, int count)
+    public boolean buyItem(Player seller, Prototype prototype, int count)
     {
-        if (!this.isAppropriateItem(proto))
+        if (!this.isAppropriateItem(prototype))
             return false;
 
-        Item item = seller.getInventory().takeItem(proto, count);
+        Item item = seller.getInventory().takeItem(prototype, count);
         if (item == null)
             return false;
 
@@ -128,13 +128,13 @@ public class Shop
     /**
      * The shop sells items to a player
      * @param buyer A Player buyer instance.
-     * @param proto Item Prototype to sell
+     * @param prototype Item Prototype to sell
      * @param count How much items to sell
      * @return A boolean value indicating whether the transaction was completed.
      */
-    public boolean sellItem(Player buyer, Prototype proto, int count)
+    public boolean sellItem(Player buyer, Prototype prototype, int count)
     {
-        ItemTemplate template = DBStorage.ItemTemplateStore.get(proto.getTemplateId());
+        ItemTemplate template = DBStorage.ItemTemplateStore.get(prototype.getTemplateId());
         if (template == null)
             return false;
 
@@ -144,7 +144,7 @@ public class Shop
             return false;
 
         // Correct count by source count
-        if (count > shopItemCount && shopItemCount != Integer.valueOf(-1))
+        if (count > shopItemCount && shopItemCount != -1)
             count = shopItemCount;
 
         // Correct count by payable ability
@@ -160,7 +160,7 @@ public class Shop
         buyer.changeCurrency(this.currencyId, - template.getCost() * count);
 
         // Subtract the bought count if not an infinite item stack
-        if (shopItemCount != Integer.valueOf(-1))
+        if (shopItemCount != -1)
         {
             shopItemCount -= count;
             // The last items
@@ -174,9 +174,9 @@ public class Shop
         return true;
     }
 
-    public boolean isAppropriateItem(Prototype proto)
+    public boolean isAppropriateItem(Prototype prototype)
     {
-        return this.isAppropriateItem(DBStorage.ItemTemplateStore.get(proto.getTemplateId()));
+        return this.isAppropriateItem(DBStorage.ItemTemplateStore.get(prototype.getTemplateId()));
     }
 
     public boolean isAppropriateItem(Item item)

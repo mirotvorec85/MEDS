@@ -110,7 +110,7 @@ public class Battle
             Unit target = attacker.getTarget();
 
             // An attacker should not be in leftUnit list
-            // For ex., a previuos participant has killed this unit
+            // For ex., a previous participant has killed this unit
             // And both are still in the list
             if (this.leftUnits.contains(attacker))
                 continue;

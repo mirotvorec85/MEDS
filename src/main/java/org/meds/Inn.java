@@ -52,19 +52,19 @@ public class Inn
         // empty items or something
     }
 
-    public boolean tryStoreItem(Prototype proto, int count)
+    public boolean tryStoreItem(Prototype prototype, int count)
     {
         // TODO: check the inn capacity and correct an item storing count
 
         Item item;
-        if ((item = this.owner.getInventory().takeItem(proto, count)) == null)
+        if ((item = this.owner.getInventory().takeItem(prototype, count)) == null)
             return false;
 
-        CharacterInnItem innItem = this.items.get(proto);
+        CharacterInnItem innItem = this.items.get(prototype);
         if (innItem == null)
         {
-            innItem = new CharacterInnItem(this.owner.getGuid(), proto);
-            this.items.put(proto, innItem);
+            innItem = new CharacterInnItem(this.owner.getGuid(), prototype);
+            this.items.put(prototype, innItem);
         }
         innItem.setCount(innItem.getCount() + item.getCount());
 
@@ -72,21 +72,21 @@ public class Inn
         return true;
     }
 
-    public boolean tryTakeItem(Prototype proto, int count)
+    public boolean tryTakeItem(Prototype prototype, int count)
     {
-        // TODO: Inn capacity traking
-        CharacterInnItem innItem = this.items.get(proto);
+        // TODO: Inn capacity tracking
+        CharacterInnItem innItem = this.items.get(prototype);
         if (innItem == null)
             return false;
 
-        Item item = new Item(proto, count);
+        Item item = new Item(prototype, count);
 
         // Item is found but an inventory can not store anymore.
         if (!this.owner.getInventory().tryStoreItem(item, count))
             return false;
 
         if (item.getCount() == 0)
-            this.items.remove(proto);
+            this.items.remove(prototype);
         else
             innItem.setCount(item.getCount());
 

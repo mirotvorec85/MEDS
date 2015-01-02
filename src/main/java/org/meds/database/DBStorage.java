@@ -58,7 +58,7 @@ public class DBStorage {
         for (AchievementCriterion criterion : criteria) {
             DBStorage.AchievementStore.get(criterion.getAchievementId()).getCriteria().add(criterion);
         }
-        Logging.Info.log("Loaded " + criteria.size() + " achievement criterias");
+        Logging.Info.log("Loaded " + criteria.size() + " achievement criteria");
 
         // Currency
         List<Currency> currencies = session.createCriteria(Currency.class).list();

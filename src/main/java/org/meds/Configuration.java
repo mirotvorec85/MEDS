@@ -141,7 +141,7 @@ public class Configuration
             pw.println("#        on which the server is working.");
             pw.println("#        Default: \"127.0.0.1\"");
             pw.println("#");
-            pw.println("#    Port - the port on which the TCPListenter of the server");
+            pw.println("#    Port - the port on which the TCPListener of the server");
             pw.println("#        will be listening for incoming connections.");
             pw.println("#        Default: 7777");
             pw.println("#");

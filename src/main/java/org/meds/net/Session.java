@@ -84,7 +84,7 @@ public class Session implements Runnable
         this.opcodeHandlers.put(ClientOpcodes.TakeMoney, new TakeMoneyOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.BankExchange, new BankExchangeOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.Attack, new AttackOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.UseMagic, new UseMagicOpcodeHander());
+        this.opcodeHandlers.put(ClientOpcodes.UseMagic, new UseMagicOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.Relax, new RelaxOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.GuildLearn, new GuildLearnOpcodeHandler());
         this.opcodeHandlers.put(ClientOpcodes.GetGuildLevels, new GetGuildLevelsOpcodeHandler());
@@ -506,7 +506,7 @@ public class Session implements Runnable
             // TODO: add auras
             // TODO: add quest statuses
 
-            // NOTE: Sometimes the data above is sended as a separate packet
+            // NOTE: Sometimes the data above is sent as a separate packet
 
             packet.add(Session.this.player.getAchievementData());
 
@@ -711,7 +711,7 @@ public class Session implements Runnable
         }
     }
 
-    private class UseMagicOpcodeHander extends OpcodeHandler
+    private class UseMagicOpcodeHandler extends OpcodeHandler
     {
         @Override
         public int getMinDataLength()
@@ -901,10 +901,11 @@ public class Session implements Runnable
         @Override
         public void handle(String[] data)
         {
-            Prototype proto = new Prototype(SafeConvert.toInt32(data[0]), SafeConvert.toInt32(data[1], -1), SafeConvert.toInt32(data[2], -1));
+            Prototype prototype = new Prototype(SafeConvert.toInt32(data[0]), SafeConvert.toInt32(data[1], -1),
+                    SafeConvert.toInt32(data[2], -1));
             int count = SafeConvert.toInt32(data[3], -1);
             // int unk5 = SafeConvert.ToInt32(data[4]); // Always 0
-            if (proto.getTemplateId() == 0 || count == -1)
+            if (prototype.getTemplateId() == 0 || count == -1)
                 return;
 
             // Player must be at shop
@@ -916,7 +917,7 @@ public class Session implements Runnable
             if (shop == null)
                 return;
 
-            if (shop.buyItem(player, proto, count) && player.getSession() != null)
+            if (shop.buyItem(player, prototype, count) && player.getSession() != null)
                 player.getSession().send(shop.getData());
         }
     }
@@ -932,10 +933,11 @@ public class Session implements Runnable
         @Override
         public void handle(String[] data)
         {
-            Prototype proto = new Prototype(SafeConvert.toInt32(data[0]), SafeConvert.toInt32(data[1], -1), SafeConvert.toInt32(data[2], -1));
+            Prototype prototype = new Prototype(SafeConvert.toInt32(data[0]), SafeConvert.toInt32(data[1], -1),
+                    SafeConvert.toInt32(data[2], -1));
             int count = SafeConvert.toInt32(data[3], -1);
             // int unk5 = SafeConvert.ToInt32(data[4]); // Always 0
-            if (proto.getTemplateId() == 0 || count == -1)
+            if (prototype.getTemplateId() == 0 || count == -1)
                 return;
 
             // Player must be at shop
@@ -947,7 +949,7 @@ public class Session implements Runnable
             if (shop == null)
                 return;
 
-            if (shop.sellItem(player, proto, count) && player.getSession() != null)
+            if (shop.sellItem(player, prototype, count) && player.getSession() != null)
                 player.getSession().send(shop.getData());
         }
     }
@@ -991,12 +993,13 @@ public class Session implements Runnable
         @Override
         public void handle(String[] data)
         {
-            Prototype proto = new Prototype(SafeConvert.toInt32(data[0]), SafeConvert.toInt32(data[1], -1), SafeConvert.toInt32(data[2], -1));
+            Prototype prototype = new Prototype(SafeConvert.toInt32(data[0]), SafeConvert.toInt32(data[1], -1),
+                    SafeConvert.toInt32(data[2], -1));
             int count = SafeConvert.toInt32(data[3], -1);
 
-            if (proto.getTemplateId() == 0 || count == -1)
+            if (prototype.getTemplateId() == 0 || count == -1)
                 return;
-            Session.this.player.getInn().tryStoreItem(proto, count);
+            Session.this.player.getInn().tryStoreItem(prototype, count);
         }
     }
 
@@ -1011,12 +1014,13 @@ public class Session implements Runnable
         @Override
         public void handle(String[] data)
         {
-            Prototype proto = new Prototype(SafeConvert.toInt32(data[0]), SafeConvert.toInt32(data[1], -1), SafeConvert.toInt32(data[2], -1));
+            Prototype prototype = new Prototype(SafeConvert.toInt32(data[0]), SafeConvert.toInt32(data[1], -1),
+                    SafeConvert.toInt32(data[2], -1));
             int count = SafeConvert.toInt32(data[3], -1);
 
-            if (proto.getTemplateId() == 0 || count == -1)
+            if (prototype.getTemplateId() == 0 || count == -1)
                 return;
-            Session.this.player.getInn().tryTakeItem(proto, count);
+            Session.this.player.getInn().tryTakeItem(prototype, count);
         }
     }
 

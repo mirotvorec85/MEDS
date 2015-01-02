@@ -22,10 +22,10 @@ public enum SpecialLocationTypes implements Valued
     Inn(15),
     Dock(16),
 
-    ArtefactWeaponShop(22),
-    ArtefactArmourShop(23),
-    ArtefactDepartmentStore(24),
-    ArtefactJewelerShop(25),
+    ArtifactWeaponShop(22),
+    ArtifactArmourShop(23),
+    ArtifactDepartmentStore(24),
+    ArtifactJewelerShop(25),
     Arane(26),
 
     PrivateShop(31),

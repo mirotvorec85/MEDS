@@ -9,7 +9,7 @@ public class MD5Hasher
 {
     public static String ComputeHash(String string)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         try
         {
             MessageDigest dm = MessageDigest.getInstance("MD5");

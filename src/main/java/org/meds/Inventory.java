@@ -190,8 +190,9 @@ public class Inventory
 
         for (CharacterInventoryItem charItem : items.values())
         {
-            Prototype proto = new Prototype(charItem.getItemTemplateId(), charItem.getModification(), charItem.getDurability());
-            Item item = new Item(proto, charItem.getCount());
+            Prototype prototype = new Prototype(charItem.getItemTemplateId(), charItem.getModification(),
+                    charItem.getDurability());
+            Item item = new Item(prototype, charItem.getCount());
             // Item is valid
             if (item.Template != null)
                 this.inventorySlots[charItem.getSlot()] = item;
@@ -428,7 +429,7 @@ public class Inventory
 
     /**
      * Returns slot number of the first item that has the specified template ID or returns -1 if no items are found.
-     * @return The first slot index of the item if an item was found; othrewise, -1
+     * @return The first slot index of the item if an item was found; otherwise, -1
      */
     public int findItem(int templateId)
     {
@@ -498,7 +499,7 @@ public class Inventory
         {
             if (this.inventorySlots[i] != null)
             {
-                // Tries to stack (includes items' all compability checkings)
+                // Tries to stack (includes items comparability checking)
                 if (this.inventorySlots[i].tryStackItem(item, count))
                 {
                     onInventoryChanged();
