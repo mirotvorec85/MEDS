@@ -4,7 +4,7 @@ import java.util.*;
 
 import org.meds.Player;
 import org.meds.Unit;
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.Random;
 
@@ -26,7 +26,7 @@ public class Region
                 if (player.getSession() != null) {
                     player.getSession().sendServerMessage(10, Region.this.getName());
 
-                    ServerPacket arrivalMessage = new ServerPacket(ServerOpcodes.ServerMessage);
+                    ServerPacket arrivalMessage = new ServerPacket(ServerCommands.ServerMessage);
                     arrivalMessage.add(11);
                     arrivalMessage.add(newRegion.getName());
                     if (!newRegion.isRoad()) {
@@ -38,7 +38,7 @@ public class Region
 
             // Otherwise just notify everyone about location changed
             } else {
-                Region.this.send(new ServerPacket(ServerOpcodes.PlayerLocation)
+                Region.this.send(new ServerPacket(ServerCommands.PlayerLocation)
                         .add(player.getGuid())
                         .add(event.getNewLocation().getId()));
             }
@@ -131,7 +131,7 @@ public class Region
         }
 
         // Notify the region about player entered
-        send(new ServerPacket(ServerOpcodes.PlayerLocation)
+        send(new ServerPacket(ServerCommands.PlayerLocation)
                 .add(player.getGuid())
                 .add(player.getPosition().getId()));
         player.addPositionChangedListener(this.positionChangedHandler);
@@ -143,7 +143,7 @@ public class Region
             return;
 
         // Notify the region about player left
-        send(new ServerPacket(ServerOpcodes.PlayerLocation)
+        send(new ServerPacket(ServerCommands.PlayerLocation)
                 .add(player.getGuid())
                 .add(0));
         player.removePositionChangedListener(this.positionChangedHandler);
@@ -177,7 +177,7 @@ public class Region
     }
 
     private ServerPacket getPlayersLocationData() {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.PlayersLocation);
+        ServerPacket packet = new ServerPacket(ServerCommands.PlayersLocation);
         synchronized (this.players) {
             packet.add(this.players.size());
             for (Player player : this.players) {
@@ -190,7 +190,7 @@ public class Region
 
     public ServerPacket getLocationListData() {
         if (this.locationListData == null) {
-            this.locationListData = new ServerPacket(ServerOpcodes.RegionLocations)
+            this.locationListData = new ServerPacket(ServerCommands.RegionLocations)
                 .add(this.entry.getId());
             for (Location location : this.locations)
                 this.locationListData.add(location.getId());

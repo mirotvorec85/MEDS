@@ -1,23 +1,21 @@
 package org.meds.net;
 
-import org.meds.net.PacketOpcode;
-
 public class ClientPacket
 {
-    private PacketOpcode[] packetOpcodes;
+    private PacketCommand[] packetCommands;
 
     public ClientPacket(String data)
     {
-        String[] opcodes = data.split("\u0000");
-        this.packetOpcodes = new PacketOpcode[opcodes.length];
-        for (int i = 0; i < opcodes.length; ++i)
+        String[] commands = data.split("\u0000");
+        this.packetCommands = new PacketCommand[commands.length];
+        for (int i = 0; i < commands.length; ++i)
         {
-            this.packetOpcodes[i] = new PacketOpcode(opcodes[i]);
+            this.packetCommands[i] = new PacketCommand(commands[i]);
         }
     }
 
-    public PacketOpcode[] getPacketOpcodes()
+    public PacketCommand[] getPacketCommands()
     {
-        return this.packetOpcodes;
+        return this.packetCommands;
     }
 }

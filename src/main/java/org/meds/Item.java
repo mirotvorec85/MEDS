@@ -13,7 +13,7 @@ import org.meds.enums.ItemEssenceTypes;
 import org.meds.enums.ItemReinforcementTypes;
 import org.meds.enums.ItemTotemicTypes;
 import org.meds.enums.Parameters;
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.spell.Spell;
 import org.meds.util.Valued;
@@ -280,7 +280,7 @@ public class Item {
         if (template == null)
             return packet;
 
-        packet.add(ServerOpcodes.ItemInfo);
+        packet.add(ServerCommands.ItemInfo);
         packet.add(template.getId())
             // TODO: additional bonuses of the modification value
             .add(modification);

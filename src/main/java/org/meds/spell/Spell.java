@@ -4,7 +4,7 @@ import org.meds.Damage;
 import org.meds.Inventory;
 import org.meds.Item;
 import org.meds.Player;
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.Unit;
 import org.meds.UnitTypes;
@@ -108,30 +108,30 @@ public class Spell {
             this.target = this.caster;
 
         ServerPacket packet = new ServerPacket();
-        packet.add(ServerOpcodes.ServerMessage)
+        packet.add(ServerCommands.ServerMessage)
             .add("1261")
             .add(this.target.getName())
             .add(this.target.getName())
-            .add(ServerOpcodes.ServerMessage)
+            .add(ServerCommands.ServerMessage)
             .add("1265")
             .add(this.target.getHealth() + "/" + this.target.getParameters().value(Parameters.Health))
             .add(this.target.getMana()).add(this.target.getParameters().value(Parameters.Mana))
             .add(this.target.getParameters().value(Parameters.Damage) + "/" + this.target.getParameters().value(Parameters.MaxDamage))
             .add(this.target.getParameters().value(Parameters.MagicDamage))
-            .add(ServerOpcodes.ServerMessage)
+            .add(ServerCommands.ServerMessage)
             .add("1266")
             .add(this.target.getParameters().value(Parameters.Protection))
             .add(this.target.getParameters().value(Parameters.HealthRegeneration))
             .add(this.target.getParameters().value(Parameters.ManaRegeneration))
             .add(this.target.getParameters().value(Parameters.ChanceToHit))
             .add(this.target.getParameters().value(Parameters.ChanceToCast))
-            .add(ServerOpcodes.ServerMessage)
+            .add(ServerCommands.ServerMessage)
             .add("1267")
             .add(this.target.getParameters().value(Parameters.Armour))
             .add(this.target.getParameters().value(Parameters.FireResistance))
             .add(this.target.getParameters().value(Parameters.FrostResistance))
             .add(this.target.getParameters().value(Parameters.LightningResistance))
-            .add(ServerOpcodes.ServerMessage)
+            .add(ServerCommands.ServerMessage)
             .add("1271")
             .add(this.target.getParameters().value(Parameters.Strength))
             .add(this.target.getParameters().value(Parameters.Dexterity))
@@ -265,7 +265,7 @@ public class Spell {
         }
         if (this.caster != null)
             target.getPosition().send(this.caster, this.target,
-                    new ServerPacket(ServerOpcodes.ServerMessage)
+                    new ServerPacket(ServerCommands.ServerMessage)
                             .add(positionMessage)
                             .add(this.caster.getName())
                             .add(this.target.getName()));

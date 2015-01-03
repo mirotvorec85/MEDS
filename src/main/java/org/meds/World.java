@@ -12,7 +12,7 @@ import org.meds.database.Hibernate;
 import org.meds.logging.Logging;
 
 import org.hibernate.Session;
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 
 public class World implements Runnable
@@ -89,7 +89,7 @@ public class World implements Runnable
         this.players.put(player.getGuid(), player);
         this.units.put(player.getGuid(), player);
         Logging.Debug.log("World adds a new player: " + player.getGuid() + "-" + player.getName());
-        this.addPlayersPacket.add(ServerOpcodes.PlayersListAdd)
+        this.addPlayersPacket.add(ServerCommands.PlayersListAdd)
             .add(player.getGuid())
             .add(player.getName())
             .add(player.getLevel())
@@ -107,13 +107,13 @@ public class World implements Runnable
     {
         this.units.remove(player.getGuid());
         this.players.remove(player.getGuid());
-        this.deletePlayersPacket.add(ServerOpcodes.PlayersListDelete).add(player.getGuid());
+        this.deletePlayersPacket.add(ServerCommands.PlayersListDelete).add(player.getGuid());
         Logging.Debug.log("Player \"" + player.getName() + "\" just logged out.");
     }
 
     public void playerUpdated(Player player)
     {
-        this.updatePlayersPacket.add(ServerOpcodes.PlayersListUpdate)
+        this.updatePlayersPacket.add(ServerCommands.PlayersListUpdate)
             .add(player.getGuid())
             .add(player.getLevel())
             .add(player.getReligion())
@@ -127,7 +127,7 @@ public class World implements Runnable
 
     public ServerPacket getOnlineData()
     {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.OnlineList);
+        ServerPacket packet = new ServerPacket(ServerCommands.OnlineList);
         packet.add(this.players.size());
         synchronized (this.players)
         {
@@ -217,7 +217,7 @@ public class World implements Runnable
         String day = this.dayTime < 360000 ? "0" : "1";
         String time = this.dayTime < 360000 ? Integer.toString(this.dayTime / 1000) : Integer.toString(this.dayTime / 1000 - 360);
 
-        return new ServerPacket(ServerOpcodes.DayTime)
+        return new ServerPacket(ServerCommands.DayTime)
             .add(day)
             .add(time);
     }
@@ -359,7 +359,7 @@ public class World implements Runnable
         synchronized (this.players) {
             for (java.util.Map.Entry<Integer, Player> entry : this.players.entrySet())
                 if (entry.getValue().getSession() != null)
-                    entry.getValue().getSession().send(new ServerPacket(ServerOpcodes.ServerTime).add(Server.getServerTimeMillis()));
+                    entry.getValue().getSession().send(new ServerPacket(ServerCommands.ServerTime).add(Server.getServerTimeMillis()));
         }
 
         org.meds.net.Session.sendBuffers();

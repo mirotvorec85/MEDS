@@ -1,6 +1,6 @@
 package org.meds.net;
 
-public enum ServerOpcodes
+public enum ServerCommands
 {
     Aura("a"),
     AchievementList("acl"),
@@ -61,7 +61,7 @@ public enum ServerOpcodes
     _prot1("prot1"),
     _prot2("prot2"),
     PositionUnitList("pss"),
-    MoneyInfo("$"), // No longer exists after 1.2.7.6 (See l$ opcode instead)
+    MoneyInfo("$"), // No longer exists after 1.2.7.6 (See l$ command instead)
     QuestInfo("q"),
     QuestFinalText("qft"),
     NpcQuestList("qli"),
@@ -88,7 +88,7 @@ public enum ServerOpcodes
 
     private final String value;
 
-    private ServerOpcodes(String value)
+    private ServerCommands(String value)
     {
         this.value = value;
     }

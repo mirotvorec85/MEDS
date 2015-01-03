@@ -1,6 +1,6 @@
 package org.meds.spell;
 
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.enums.Parameters;
 
@@ -13,7 +13,7 @@ public class AuraRelax extends Aura
     protected void applyAura()
     {
         if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null)
-            this.ownerPlayer.getSession().sendServerMessage(1051).send(new ServerPacket(ServerOpcodes.RelaxOn));
+            this.ownerPlayer.getSession().sendServerMessage(1051).send(new ServerPacket(ServerCommands.RelaxOn));
         this.healthRegenBonus = this.owner.getParameters().base().value(Parameters.HealthRegeneration);
         this.manaRegenBonus = this.owner.getParameters().base().value(Parameters.ManaRegeneration);
         this.owner.getParameters().magic().change(Parameters.HealthRegeneration, this.healthRegenBonus);
@@ -25,7 +25,7 @@ public class AuraRelax extends Aura
     protected void removeAura()
     {
         if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null)
-            this.ownerPlayer.getSession().sendServerMessage(303).send(new ServerPacket(ServerOpcodes.RelaxOff));
+            this.ownerPlayer.getSession().sendServerMessage(303).send(new ServerPacket(ServerCommands.RelaxOff));
         this.owner.getParameters().magic().change(Parameters.HealthRegeneration, -this.healthRegenBonus);
         this.owner.getParameters().magic().change(Parameters.ManaRegeneration, -this.manaRegenBonus);
         super.removeAura();

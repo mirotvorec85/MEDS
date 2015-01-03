@@ -6,7 +6,7 @@ import org.meds.enums.AchievementCategories;
 import org.meds.enums.AchievementCriterionTypes;
 import org.meds.enums.Currencies;
 import org.meds.logging.Logging;
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 
 import java.util.*;
@@ -157,7 +157,7 @@ public class AchievementManager {
     private void sendAchievementUpdate(CharacterAchievement charAchieve) {
         if (this.player.getSession() == null)
             return;
-        ServerPacket packet = new ServerPacket(ServerOpcodes.AchievementUpdate);
+        ServerPacket packet = new ServerPacket(ServerCommands.AchievementUpdate);
         packet.add(charAchieve.getAchievementId());
         packet.add(charAchieve.getProgress());
         this.player.getSession().send(packet);
@@ -166,7 +166,7 @@ public class AchievementManager {
     private void sendAchievementComplete(Achievement achievement, CharacterAchievement charAchieve) {
         if (this.player.getSession() == null)
             return;
-        ServerPacket packet = new ServerPacket(ServerOpcodes.AchievementList);
+        ServerPacket packet = new ServerPacket(ServerCommands.AchievementList);
         packet.add(1); // Achievement Complete list
 
         packet.add(achievement.getId());

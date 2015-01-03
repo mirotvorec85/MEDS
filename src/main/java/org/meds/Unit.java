@@ -9,7 +9,7 @@ import org.meds.database.entity.Spell;
 import org.meds.enums.*;
 import org.meds.logging.Logging;
 import org.meds.map.*;
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.net.Session;
 import org.meds.spell.Aura;
@@ -397,7 +397,7 @@ public abstract class Unit
 
     public ServerPacket getHealthManaData()
     {
-        return new ServerPacket(ServerOpcodes.Health)
+        return new ServerPacket(ServerCommands.Health)
         .add(this.health)
         .add(this.mana)
         .add("0");
@@ -494,7 +494,7 @@ public abstract class Unit
                 this.addServerMessage(damage.MessageDealerMiss, victim.getName());
                 victim.addServerMessage(damage.MessageVictimMiss, getName());
 
-                this.position.send(this, victim, new ServerPacket(ServerOpcodes.ServerMessage).add(damage.MessagePositionMiss).add(this.getName()).add(victim.getName()));
+                this.position.send(this, victim, new ServerPacket(ServerCommands.ServerMessage).add(damage.MessagePositionMiss).add(this.getName()).add(victim.getName()));
 
                 return;
             }
@@ -510,7 +510,7 @@ public abstract class Unit
             addServerMessage(damage.MessageDealerNoDamage, victim.getName());
             victim.addServerMessage(damage.MessageVictimNoDamage, getName());
 
-            this.position.send(this, victim, new ServerPacket(ServerOpcodes.ServerMessage).add(damage.MessagePositionNoDamage).add(this.getName()).add(victim.getName()));
+            this.position.send(this, victim, new ServerPacket(ServerCommands.ServerMessage).add(damage.MessagePositionNoDamage).add(this.getName()).add(victim.getName()));
 
             return;
         }
@@ -522,7 +522,7 @@ public abstract class Unit
             addServerMessage(damage.MessageDealerKillingBlow, Integer.toString(damage.FinalDamage), victim.getName());
             victim.addServerMessage(damage.MessageVictimKillingBlow, this.getName(), Integer.toString(damage.FinalDamage));
 
-            this.position.send(this, victim, new ServerPacket(ServerOpcodes.ServerMessage).add(damage.MessagePositionKillingBlow).add(this.getName()).add(damage.FinalDamage).add(victim.getName()));
+            this.position.send(this, victim, new ServerPacket(ServerCommands.ServerMessage).add(damage.MessagePositionKillingBlow).add(this.getName()).add(damage.FinalDamage).add(victim.getName()));
 
             Corpse corpse = victim.die();
 
@@ -569,7 +569,7 @@ public abstract class Unit
 
             addServerMessage(damage.MessageDealerDamage, victim.getName(), Integer.toString(damage.FinalDamage));
             victim.addServerMessage(damage.MessageVictimDamage, getName(), Integer.toString(damage.FinalDamage));
-            this.position.send(this, victim, new ServerPacket(ServerOpcodes.ServerMessage).add(damage.MessagePositionDamage).add(this.getName()).add(victim.getName()).add(damage.FinalDamage));
+            this.position.send(this, victim, new ServerPacket(ServerCommands.ServerMessage).add(damage.MessagePositionDamage).add(this.getName()).add(victim.getName()).add(damage.FinalDamage));
         }
     }
 

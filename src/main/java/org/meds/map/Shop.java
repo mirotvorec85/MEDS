@@ -12,7 +12,7 @@ import org.meds.database.entity.ShopItem;
 import org.meds.enums.ItemClasses;
 import org.meds.enums.ShopTypes;
 import org.meds.logging.Logging;
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 
 public class Shop
@@ -80,7 +80,7 @@ public class Shop
 
     public ServerPacket getData()
     {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.ShopInfo);
+        ServerPacket packet = new ServerPacket(ServerCommands.ShopInfo);
         packet.add(this.items.size());
         packet.add(this.type);
         packet.add(0);

@@ -49,7 +49,7 @@ public class Session implements Runnable
      * Related Socket for this session.
      */
     private Socket socket;
-    private HashMap<ClientOpcodes, OpcodeHandler> opcodeHandlers;
+    private HashMap<ClientCommands, CommandHandler> commandHandlers;
 
     private Player player;
 
@@ -75,57 +75,57 @@ public class Session implements Runnable
 
         this.listeners = new HashSet<>();
 
-        this.opcodeHandlers = new HashMap<>();
-        this.opcodeHandlers.put(ClientOpcodes.Verification, new VerificationOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.Login, new LoginOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.Ready, new ReadyOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.Ping, new PingOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.Movement, new MovementOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.PutMoney, new PutMoneyOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.TakeMoney, new TakeMoneyOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.BankExchange, new BankExchangeOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.Attack, new AttackOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.UseMagic, new UseMagicOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.Relax, new RelaxOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.GuildLearn, new GuildLearnOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.GetGuildLevels, new GetGuildLevelsOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.Say, new SayOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.GetItemInfo, new GetItemInfoOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.SwapItem, new SwapItemsOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.LootCorpse, new LootCorpseOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.EnterShop, new EnterShopOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.SellItem, new SellItemOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.BuyItem, new BuyItemOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.SetAutoLoot, new SetAutoLootOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.GetInn, new GetInnOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.InnStore, new InnStoreOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.InnGet, new InnGetOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.Whisper, new WhisperOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.DestroyItem, new DestroyItemOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.UseItem, new UseItemOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.QuestListFilter, new QuestListFilterOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.GetQuestInfo, new GetQuestInfoOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.QuestInfoForAccept, new GetQuestInfoForAcceptOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.QuestAccept, new QuestAcceptOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.SetAutoSpell, new SetAutoSpellOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.EnterStar, new EnterStarOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.SetHome, new SetHomeOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.GetLocationInfo, new LocationInfoOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.RegionLocations, new RegionLocationsOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.GuildLessonsInfo, new GuildLessonsInfoOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.LearnGuildInfo, new LearnGuildInfoOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.GroupCreate, new GroupCreateOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.GroupSettingsChange, new GroupSettingsChangeOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.GroupJoin, new GroupJoinOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.GroupDisband, new GroupDisbandOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.GroupQuit, new GroupQuitOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.GroupKick, new GroupKickOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.GroupChangeLeader, new GroupChangeLeaderOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.GetTrade, new GetTradeOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.TradeUpdate, new TradeUpdateOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.TradeApply, new TradeApplyOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.TradeCancel, new TradeCancelOpcodeHandler());
-        this.opcodeHandlers.put(ClientOpcodes.SetAsceticism, new SetAsceticismOpcodeHandler());
+        this.commandHandlers = new HashMap<>();
+        this.commandHandlers.put(ClientCommands.Verification, new VerificationCommandHandler());
+        this.commandHandlers.put(ClientCommands.Login, new LoginCommandHandler());
+        this.commandHandlers.put(ClientCommands.Ready, new ReadyCommandHandler());
+        this.commandHandlers.put(ClientCommands.Ping, new PingCommandHandler());
+        this.commandHandlers.put(ClientCommands.Movement, new MovementCommandHandler());
+        this.commandHandlers.put(ClientCommands.PutMoney, new PutMoneyCommandHandler());
+        this.commandHandlers.put(ClientCommands.TakeMoney, new TakeMoneyCommandHandler());
+        this.commandHandlers.put(ClientCommands.BankExchange, new BankExchangeCommandHandler());
+        this.commandHandlers.put(ClientCommands.Attack, new AttackCommandHandler());
+        this.commandHandlers.put(ClientCommands.UseMagic, new UseMagicCommandHandler());
+        this.commandHandlers.put(ClientCommands.Relax, new RelaxCommandHandler());
+        this.commandHandlers.put(ClientCommands.GuildLearn, new GuildLearnCommandHandler());
+        this.commandHandlers.put(ClientCommands.GetGuildLevels, new GetGuildLevelsCommandHandler());
+        this.commandHandlers.put(ClientCommands.Say, new SayCommandHandler());
+        this.commandHandlers.put(ClientCommands.GetItemInfo, new GetItemInfoCommandHandler());
+        this.commandHandlers.put(ClientCommands.SwapItem, new SwapItemsCommandHandler());
+        this.commandHandlers.put(ClientCommands.LootCorpse, new LootCorpseCommandHandler());
+        this.commandHandlers.put(ClientCommands.EnterShop, new EnterShopCommandHandler());
+        this.commandHandlers.put(ClientCommands.SellItem, new SellItemCommandHandler());
+        this.commandHandlers.put(ClientCommands.BuyItem, new BuyItemCommandHandler());
+        this.commandHandlers.put(ClientCommands.SetAutoLoot, new SetAutoLootCommandHandler());
+        this.commandHandlers.put(ClientCommands.GetInn, new GetInnCommandHandler());
+        this.commandHandlers.put(ClientCommands.InnStore, new InnStoreCommandHandler());
+        this.commandHandlers.put(ClientCommands.InnGet, new InnGetCommandHandler());
+        this.commandHandlers.put(ClientCommands.Whisper, new WhisperCommandHandler());
+        this.commandHandlers.put(ClientCommands.DestroyItem, new DestroyItemCommandHandler());
+        this.commandHandlers.put(ClientCommands.UseItem, new UseItemCommandHandler());
+        this.commandHandlers.put(ClientCommands.QuestListFilter, new QuestListFilterCommandHandler());
+        this.commandHandlers.put(ClientCommands.GetQuestInfo, new GetQuestInfoCommandHandler());
+        this.commandHandlers.put(ClientCommands.QuestInfoForAccept, new GetQuestInfoForAcceptCommandHandler());
+        this.commandHandlers.put(ClientCommands.QuestAccept, new QuestAcceptCommandHandler());
+        this.commandHandlers.put(ClientCommands.SetAutoSpell, new SetAutoSpellCommandHandler());
+        this.commandHandlers.put(ClientCommands.EnterStar, new EnterStarCommandHandler());
+        this.commandHandlers.put(ClientCommands.SetHome, new SetHomeCommandHandler());
+        this.commandHandlers.put(ClientCommands.GetLocationInfo, new LocationInfoCommandHandler());
+        this.commandHandlers.put(ClientCommands.RegionLocations, new RegionLocationsCommandHandler());
+        this.commandHandlers.put(ClientCommands.GuildLessonsInfo, new GuildLessonsInfoCommandHandler());
+        this.commandHandlers.put(ClientCommands.LearnGuildInfo, new LearnGuildInfoCommandHandler());
+        this.commandHandlers.put(ClientCommands.GroupCreate, new GroupCreateCommandHandler());
+        this.commandHandlers.put(ClientCommands.GroupSettingsChange, new GroupSettingsChangeCommandHandler());
+        this.commandHandlers.put(ClientCommands.GroupJoin, new GroupJoinCommandHandler());
+        this.commandHandlers.put(ClientCommands.GroupDisband, new GroupDisbandCommandHandler());
+        this.commandHandlers.put(ClientCommands.GroupQuit, new GroupQuitCommandHandler());
+        this.commandHandlers.put(ClientCommands.GroupKick, new GroupKickCommandHandler());
+        this.commandHandlers.put(ClientCommands.GroupChangeLeader, new GroupChangeLeaderCommandHandler());
+        this.commandHandlers.put(ClientCommands.GetTrade, new GetTradeCommandHandler());
+        this.commandHandlers.put(ClientCommands.TradeUpdate, new TradeUpdateCommandHandler());
+        this.commandHandlers.put(ClientCommands.TradeApply, new TradeApplyCommandHandler());
+        this.commandHandlers.put(ClientCommands.TradeCancel, new TradeCancelCommandHandler());
+        this.commandHandlers.put(ClientCommands.SetAsceticism, new SetAsceticismCommandHandler());
 
         this.packetBuffer = new ServerPacket();
 
@@ -174,34 +174,34 @@ public class Session implements Runnable
 
                 ClientPacket packet = new ClientPacket(receivedString);
 
-                for (PacketOpcode opcode : packet.getPacketOpcodes())
+                for (PacketCommand command : packet.getPacketCommands())
                 {
-                    if (!opcode.isValid())
+                    if (!command.isValid())
                         continue;
-                    ClientOpcodes clientOpcode = ClientOpcodes.parse(opcode.getOpcode());
-                    if (clientOpcode == null)
+                    ClientCommands clientCommand = ClientCommands.parse(command.getCommand());
+                    if (clientCommand == null)
                     {
-                        Logging.Warn.log(toString() + "Received unknown opcode \"" + opcode.getOpcode() + "\".");
+                        Logging.Warn.log(toString() + "Received unknown command \"" + command.getCommand() + "\".");
                         continue;
                     }
 
-                    OpcodeHandler handler = this.opcodeHandlers.get(clientOpcode);
+                    CommandHandler handler = this.commandHandlers.get(clientCommand);
                     if (handler == null)
                     {
-                        Logging.Warn.log(toString() + "Handler for the opcode \"" + clientOpcode + "\" not found.");
+                        Logging.Warn.log(toString() + "Handler for the command \"" + clientCommand + "\" not found.");
                         continue;
                     }
                     if (!this.isAuthenticated && handler.isAuthenticatedOnly())
                     {
-                        Logging.Warn.log(toString() + "Attempt to handle the opcode \"" +
-                                clientOpcode + "\" with the not authenticated session.");
+                        Logging.Warn.log(toString() + "Attempt to handle the command \"" +
+                                clientCommand + "\" with the not authenticated session.");
                         continue;
                     }
 
-                    String[] data = opcode.getData();
+                    String[] data = command.getData();
                     if (handler.getMinDataLength() != -1 && data.length < handler.getMinDataLength())
                     {
-                        Logging.Warn.log(toString() + "Opcode \"" + clientOpcode + "\" has the length " + data.length +
+                        Logging.Warn.log(toString() + "Command \"" + clientCommand + "\" has the length " + data.length +
                                 ", but minimal is " + handler.getMinDataLength() + ". Handling aborted.");
                         continue;
                     }
@@ -212,8 +212,8 @@ public class Session implements Runnable
                     }
                     catch(Exception ex)
                     {
-                        Logging.Error.log( toString() + "An exception has occurred while handling the opcode " +
-                                clientOpcode.toString(), ex);
+                        Logging.Error.log( toString() + "An exception has occurred while handling the command " +
+                                clientCommand.toString(), ex);
                         continue;
                     }
                 }
@@ -273,7 +273,7 @@ public class Session implements Runnable
     }
 
     public Session sendServerMessage(int messageId, String... values) {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.ServerMessage).add(messageId);
+        ServerPacket packet = new ServerPacket(ServerCommands.ServerMessage).add(messageId);
         for (String string : values)
             packet.add(string);
         this.send(packet);
@@ -306,9 +306,9 @@ public class Session implements Runnable
         return this.sessionToString;
     }
 
-    private abstract class OpcodeHandler {
+    private abstract class CommandHandler {
         /**
-         *  Gets a minimal length that allows to handle an opcode
+         *  Gets a minimal length that allows to handle an command
          */
         public int getMinDataLength() {
             // No limit
@@ -316,7 +316,7 @@ public class Session implements Runnable
         }
 
         /**
-         * Indicates whether an opcode may be handled for only logged players.
+         * Indicates whether an command may be handled for only logged players.
          */
         public boolean isAuthenticatedOnly() {
             return true;
@@ -325,7 +325,7 @@ public class Session implements Runnable
         public abstract void handle(String[] data);
     }
 
-    private class VerificationOpcodeHandler extends OpcodeHandler
+    private class VerificationCommandHandler extends CommandHandler
     {
         @Override
         public boolean isAuthenticatedOnly()
@@ -336,7 +336,7 @@ public class Session implements Runnable
         @Override
         public void handle(String[] data)
         {
-            ServerPacket packet = new ServerPacket(ServerOpcodes.Version);
+            ServerPacket packet = new ServerPacket(ServerCommands.Version);
             // Checking Client version
             if (data.length == 0)
             {
@@ -359,7 +359,7 @@ public class Session implements Runnable
         }
     }
 
-    private class LoginOpcodeHandler extends OpcodeHandler
+    private class LoginCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -393,7 +393,7 @@ public class Session implements Runnable
              * */
 
             // Response packet starts with login_result
-            ServerPacket packet = new ServerPacket(ServerOpcodes.LoginResult);
+            ServerPacket packet = new ServerPacket(ServerCommands.LoginResult);
             String playerLogin = data[0].toLowerCase();
             Character character = DBStorage.findCharacter(playerLogin);
 
@@ -433,7 +433,7 @@ public class Session implements Runnable
             // Add New Messages
             if (DBStorage.NewMessageStore.size() != 0)
             {
-                packet.add(ServerOpcodes.MessageList);
+                packet.add(ServerCommands.MessageList);
                 for (NewMessage message : DBStorage.NewMessageStore.values())
                 {
                     packet.add(message.getId()).add(message.getTypeId()).add(message.getMessage());
@@ -441,10 +441,10 @@ public class Session implements Runnable
             }
 
             // Unknown "cs" values
-            packet.addData(ServerOpcodes._cs, "44", "0").addData(ServerOpcodes._cs, "45", "0").addData(ServerOpcodes._cs, "46", "0")
-                .addData(ServerOpcodes._cs, "47", "0").addData(ServerOpcodes._cs, "48", "0").addData(ServerOpcodes._cs, "49", "0");
+            packet.addData(ServerCommands._cs, "44", "0").addData(ServerCommands._cs, "45", "0").addData(ServerCommands._cs, "46", "0")
+                .addData(ServerCommands._cs, "47", "0").addData(ServerCommands._cs, "48", "0").addData(ServerCommands._cs, "49", "0");
 
-            packet.addData(ServerOpcodes.ClanInfo, "1", "1", "0", "Clan Name")
+            packet.addData(ServerCommands.ClanInfo, "1", "1", "0", "Clan Name")
                 .add(Session.this.player.getMagicData())
                 .add(Session.this.player.getSkillData())
                 .add(Session.this.player.getGuildData());
@@ -453,7 +453,7 @@ public class Session implements Runnable
 
             packet.add(Session.this.player.getCurrencyData())
                 .add(Session.this.player.getParametersData())
-                .addData(ServerOpcodes.BattleState, BattleStates.NoBattle.toString())
+                .addData(ServerCommands.BattleState, BattleStates.NoBattle.toString())
                 .add(Session.this.player.getHealthManaData())
                 .add(Session.this.player.getLevelData());
 
@@ -463,7 +463,7 @@ public class Session implements Runnable
             /*
              * No sharp data after 1.2.7.6
             // sharp "#"
-            packet.send(ServerOpcodes.Sharp, "0", "0");
+            packet.send(ServerCommands.Sharp, "0", "0");
              * */
 
             /*
@@ -473,7 +473,7 @@ public class Session implements Runnable
              * */
 
             // Empty Item info
-            packet.addData(ServerOpcodes.ItemInfo, "");
+            packet.addData(ServerCommands.ItemInfo, "");
 
             packet.add(Session.this.player.getInventory().getEquipmentData());
 
@@ -481,28 +481,28 @@ public class Session implements Runnable
             packet.add(Session.this.player.getParametersData());
 
             // BonusMagicParameters? Why?
-            packet.addData(ServerOpcodes.BonusMagicParameter, "10", "0")
-                .addData(ServerOpcodes.BonusMagicParameter, "15", "0")
-                .addData(ServerOpcodes.BonusMagicParameter, "16", "0")
-                .addData(ServerOpcodes.BonusMagicParameter, "17", "0");
+            packet.addData(ServerCommands.BonusMagicParameter, "10", "0")
+                .addData(ServerCommands.BonusMagicParameter, "15", "0")
+                .addData(ServerCommands.BonusMagicParameter, "16", "0")
+                .addData(ServerCommands.BonusMagicParameter, "17", "0");
 
             // TODO: add cm datas here (current available magic spells)
 
             packet.add(Session.this.player.getInventory().getInventoryData());
 
             // Unknown Datas
-            packet.addData(ServerOpcodes._wg, "84", "147"); // Weight
+            packet.addData(ServerCommands._wg, "84", "147"); // Weight
             // Possibly extended inventory price data
-            packet.addData(ServerOpcodes._invt, "0", "5 платины");
-            packet.addData(ServerOpcodes.AutoSpell, Integer.toString(Session.this.player.getAutoSpell())); // Default magic
-            packet.addData(ServerOpcodes._s0, "");
+            packet.addData(ServerCommands._invt, "0", "5 платины");
+            packet.addData(ServerCommands.AutoSpell, Integer.toString(Session.this.player.getAutoSpell())); // Default magic
+            packet.addData(ServerCommands._s0, "");
 
             if (Session.this.player.isRelax())
-                packet.add(ServerOpcodes.RelaxOn);
+                packet.add(ServerCommands.RelaxOn);
             else
-                packet.add(ServerOpcodes.RelaxOff);
+                packet.add(ServerCommands.RelaxOff);
 
-            packet.addData(ServerOpcodes._lh0, "");
+            packet.addData(ServerCommands._lh0, "");
 
             // TODO: add auras
             // TODO: add quest statuses
@@ -512,40 +512,40 @@ public class Session implements Runnable
             packet.add(Session.this.player.getAchievementData());
 
             // prot1 and prot2
-            packet.addData(ServerOpcodes._prot1, "0").addData(ServerOpcodes._prot2, "0");
+            packet.addData(ServerCommands._prot1, "0").addData(ServerCommands._prot2, "0");
 
             // Last corpse location (Skull icon at the cell with this location)
-            packet.addData(ServerOpcodes._tc, "1997");
+            packet.addData(ServerCommands._tc, "1997");
 
             // Unknown
-            packet.addData(ServerOpcodes._hs, "0");
+            packet.addData(ServerCommands._hs, "0");
 
             // TODO: implement Professions
-            packet.addData(ServerOpcodes.Professions, "10", "Земледелие", "0", "0", "Сбор Урожая", "0", "0", "Переработка", "0", "0", "Экстракция",
+            packet.addData(ServerCommands.Professions, "10", "Земледелие", "0", "0", "Сбор Урожая", "0", "0", "Переработка", "0", "0", "Экстракция",
                             "0", "0", "Горное Дело", "0", "0", "Воздухоплавание", "0", "0", "Травничество", "1", "69",
                             "Алхимия", "0", "26", "Охота", "0", "0", "Рыбная ловля", "0", "0", "Ловкость Рук", "0", "0");
 
             // Unknown
-            packet.addData(ServerOpcodes._omg, "7", "0", "0");
+            packet.addData(ServerCommands._omg, "7", "0", "0");
 
             // TODO: Implement notepad
-            packet.addData(ServerOpcodes._mem, "This is your notepad.");
+            packet.addData(ServerCommands._mem, "This is your notepad.");
 
             packet.add(World.getInstance().getDayTimeData());
 
             // "omg" again but different numbers
-            packet.addData(ServerOpcodes._omg, "9", "1", "0");
+            packet.addData(ServerCommands._omg, "9", "1", "0");
 
             // Possibly sleep mode
-            packet.addData(ServerOpcodes._zzz, "0");
+            packet.addData(ServerCommands._zzz, "0");
 
             // Unknown
-            packet.addData(ServerOpcodes._fpi, "0");
-            packet.addData(ServerOpcodes._swf, "0");
-            packet.addData(ServerOpcodes._fex, "0", "0");
+            packet.addData(ServerCommands._fpi, "0");
+            packet.addData(ServerCommands._swf, "0");
+            packet.addData(ServerCommands._fex, "0", "0");
 
             // "wg" ??? Again???
-            packet.addData(ServerOpcodes._wg, "84", "147");
+            packet.addData(ServerCommands._wg, "84", "147");
 
             packet.add(Session.this.player.getPosition().getData());
             packet.add(Session.this.player.getPosition().getCorpseData());
@@ -553,17 +553,17 @@ public class Session implements Runnable
 
             // Unknown
             // But here is my email and link to the official webshop page
-            packet.addData(ServerOpcodes._hoi, "http://ds-dealer.ru/dsrus/index.php?u=", "email@email.com", "0");
+            packet.addData(ServerCommands._hoi, "http://ds-dealer.ru/dsrus/index.php?u=", "email@email.com", "0");
 
             packet.add(World.getInstance().getOnlineData());
 
             /*
             // Mentor
-            packet.send(ServerOpcodes._mmy, "Mentor Name");
+            packet.send(ServerCommands._mmy, "Mentor Name");
              * */
 
             // Send the custom welcome message
-            packet.addData(ServerOpcodes.ServerMessage, "5001");
+            packet.addData(ServerCommands.ServerMessage, "5001");
 
             Session.this.isAuthenticated = true;
             send(packet);
@@ -573,7 +573,7 @@ public class Session implements Runnable
         }
     }
 
-    private class ReadyOpcodeHandler extends OpcodeHandler
+    private class ReadyCommandHandler extends CommandHandler
     {
         @Override
         public void handle(String[] data)
@@ -583,7 +583,7 @@ public class Session implements Runnable
         }
     }
 
-    private class PingOpcodeHandler extends OpcodeHandler {
+    private class PingCommandHandler extends CommandHandler {
 
         @Override
         public void handle(String[] data) {
@@ -591,7 +591,7 @@ public class Session implements Runnable
         }
     }
 
-    private class MovementOpcodeHandler extends OpcodeHandler
+    private class MovementCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -614,7 +614,7 @@ public class Session implements Runnable
         }
     }
 
-    private class PutMoneyOpcodeHandler extends OpcodeHandler
+    private class PutMoneyCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -634,7 +634,7 @@ public class Session implements Runnable
         }
     }
 
-    private class TakeMoneyOpcodeHandler extends OpcodeHandler
+    private class TakeMoneyCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -655,7 +655,7 @@ public class Session implements Runnable
         }
     }
 
-    private class BankExchangeOpcodeHandler extends OpcodeHandler
+    private class BankExchangeCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -673,7 +673,7 @@ public class Session implements Runnable
         }
     }
 
-    private class AttackOpcodeHandler extends OpcodeHandler
+    private class AttackCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -712,7 +712,7 @@ public class Session implements Runnable
         }
     }
 
-    private class UseMagicOpcodeHandler extends OpcodeHandler
+    private class UseMagicCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -729,7 +729,7 @@ public class Session implements Runnable
         }
     }
 
-    private class RelaxOpcodeHandler extends OpcodeHandler
+    private class RelaxCommandHandler extends CommandHandler
     {
         @Override
         public void handle(String[] data)
@@ -741,7 +741,7 @@ public class Session implements Runnable
         }
     }
 
-    private class GuildLearnOpcodeHandler extends OpcodeHandler
+    private class GuildLearnCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -760,7 +760,7 @@ public class Session implements Runnable
         }
     }
 
-    private class GetGuildLevelsOpcodeHandler extends OpcodeHandler
+    private class GetGuildLevelsCommandHandler extends CommandHandler
     {
         @Override
         public void handle(String[] data)
@@ -769,7 +769,7 @@ public class Session implements Runnable
         }
     }
 
-    private class SayOpcodeHandler extends OpcodeHandler
+    private class SayCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -784,7 +784,7 @@ public class Session implements Runnable
         }
     }
 
-    private class GetItemInfoOpcodeHandler extends OpcodeHandler
+    private class GetItemInfoCommandHandler extends CommandHandler
     {
         @Override
         public void handle(String[] data)
@@ -802,7 +802,7 @@ public class Session implements Runnable
         }
     }
 
-    private class SwapItemsOpcodeHandler extends OpcodeHandler
+    private class SwapItemsCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -821,7 +821,7 @@ public class Session implements Runnable
         }
     }
 
-    private class LootCorpseOpcodeHandler extends OpcodeHandler
+    private class LootCorpseCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -838,7 +838,7 @@ public class Session implements Runnable
             int itemDurability = SafeConvert.toInt32(data[2]);
 
             // Do not know why but always true
-            Session.this.send(new ServerPacket(ServerOpcodes.GetCorpse).add("true"));
+            Session.this.send(new ServerPacket(ServerCommands.GetCorpse).add("true"));
 
             // TODO: sound 26 on gold collect. Sound 27 on item collect
 
@@ -862,7 +862,7 @@ public class Session implements Runnable
                 if (Session.this.player.getInventory().tryStoreItem(item))
                 {
                     Session.this.sendServerMessage(1014, itemCount > 1 ? itemCount + " " : "", item.Template.getTitle());
-                    Session.this.player.getPosition().send(Session.this.player, new ServerPacket(ServerOpcodes.ServerMessage).add("1026").add(Session.this.player.getName()).add(itemCount > 1 ? itemCount + " " : "").add(item.Template.getTitle()));
+                    Session.this.player.getPosition().send(Session.this.player, new ServerPacket(ServerCommands.ServerMessage).add("1026").add(Session.this.player.getName()).add(itemCount > 1 ? itemCount + " " : "").add(item.Template.getTitle()));
                     if (item.getCount() == 0)
                         Session.this.player.getPosition().removeItem(item);
                 }
@@ -874,7 +874,7 @@ public class Session implements Runnable
         }
     }
 
-    private class EnterShopOpcodeHandler extends OpcodeHandler
+    private class EnterShopCommandHandler extends CommandHandler
     {
         @Override
         public void handle(String[] data)
@@ -891,7 +891,7 @@ public class Session implements Runnable
         }
     }
 
-    private class SellItemOpcodeHandler extends OpcodeHandler
+    private class SellItemCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -923,7 +923,7 @@ public class Session implements Runnable
         }
     }
 
-    private class BuyItemOpcodeHandler extends OpcodeHandler
+    private class BuyItemCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -955,7 +955,7 @@ public class Session implements Runnable
         }
     }
 
-    private class SetAutoLootOpcodeHandler extends OpcodeHandler
+    private class SetAutoLootCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -974,7 +974,7 @@ public class Session implements Runnable
         }
     }
 
-    private class GetInnOpcodeHandler extends OpcodeHandler
+    private class GetInnCommandHandler extends CommandHandler
     {
         @Override
         public void handle(String[] data)
@@ -983,7 +983,7 @@ public class Session implements Runnable
         }
     }
 
-    private class InnStoreOpcodeHandler extends OpcodeHandler
+    private class InnStoreCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -1004,7 +1004,7 @@ public class Session implements Runnable
         }
     }
 
-    private class InnGetOpcodeHandler extends OpcodeHandler
+    private class InnGetCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -1025,7 +1025,7 @@ public class Session implements Runnable
         }
     }
 
-    private class WhisperOpcodeHandler extends OpcodeHandler
+    private class WhisperCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -1040,7 +1040,7 @@ public class Session implements Runnable
         }
     }
 
-    private class DestroyItemOpcodeHandler extends OpcodeHandler
+    private class DestroyItemCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -1058,7 +1058,7 @@ public class Session implements Runnable
         }
     }
 
-    private class UseItemOpcodeHandler extends OpcodeHandler
+    private class UseItemCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -1077,7 +1077,7 @@ public class Session implements Runnable
         }
     }
 
-    private class QuestListFilterOpcodeHandler extends OpcodeHandler
+    private class QuestListFilterCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -1103,7 +1103,7 @@ public class Session implements Runnable
         }
     }
 
-    private class GetQuestInfoOpcodeHandler extends OpcodeHandler
+    private class GetQuestInfoCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -1121,7 +1121,7 @@ public class Session implements Runnable
         }
     }
 
-    private class GetQuestInfoForAcceptOpcodeHandler extends OpcodeHandler
+    private class GetQuestInfoForAcceptCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -1136,7 +1136,7 @@ public class Session implements Runnable
         }
     }
 
-    private class QuestAcceptOpcodeHandler extends OpcodeHandler
+    private class QuestAcceptCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -1157,7 +1157,7 @@ public class Session implements Runnable
         }
     }
 
-    private class SetAutoSpellOpcodeHandler extends OpcodeHandler
+    private class SetAutoSpellCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -1172,12 +1172,12 @@ public class Session implements Runnable
         }
     }
 
-    private class EnterStarOpcodeHandler extends OpcodeHandler
+    private class EnterStarCommandHandler extends CommandHandler
     {
         @Override
         public void handle(String[] data)
         {
-            send(new ServerPacket(ServerOpcodes.StarInfo).add(Session.this.player.getHome().getId()).add("0") // Corpse1 Location ID
+            send(new ServerPacket(ServerCommands.StarInfo).add(Session.this.player.getHome().getId()).add("0") // Corpse1 Location ID
                     .add("0") // Corpse2 Location ID
                     .add("0") // Corpse3 Location ID
                     .add("") // ???
@@ -1186,7 +1186,7 @@ public class Session implements Runnable
         }
     }
 
-    private class SetHomeOpcodeHandler extends OpcodeHandler
+    private class SetHomeCommandHandler extends CommandHandler
     {
         @Override
         public void handle(String[] data)
@@ -1195,7 +1195,7 @@ public class Session implements Runnable
         }
     }
 
-    private class LocationInfoOpcodeHandler extends OpcodeHandler
+    private class LocationInfoCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -1212,7 +1212,7 @@ public class Session implements Runnable
         }
     }
 
-    private class RegionLocationsOpcodeHandler extends OpcodeHandler
+    private class RegionLocationsCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -1229,7 +1229,7 @@ public class Session implements Runnable
         }
     }
 
-    private class GuildLessonsInfoOpcodeHandler extends OpcodeHandler
+    private class GuildLessonsInfoCommandHandler extends CommandHandler
     {
         @Override
         public int getMinDataLength()
@@ -1246,12 +1246,12 @@ public class Session implements Runnable
         }
     }
 
-    private class LearnGuildInfoOpcodeHandler extends OpcodeHandler
+    private class LearnGuildInfoCommandHandler extends CommandHandler
     {
         @Override
         public void handle(String[] data)
         {
-            ServerPacket packet = new ServerPacket(ServerOpcodes.LearnGuildInfo);
+            ServerPacket packet = new ServerPacket(ServerCommands.LearnGuildInfo);
             packet.add("0");  // Always 0
             int availableCount = Session.this.player.getLevel() - Session.this.player.getGuildLevel();
             packet.add(availableCount); // Available levels
@@ -1275,7 +1275,7 @@ public class Session implements Runnable
         }
     }
 
-    private class GroupCreateOpcodeHandler extends OpcodeHandler {
+    private class GroupCreateCommandHandler extends CommandHandler {
 
         @Override
         public void handle(String[] data) {
@@ -1283,7 +1283,7 @@ public class Session implements Runnable
         }
     }
 
-    private class GroupSettingsChangeOpcodeHandler extends OpcodeHandler {
+    private class GroupSettingsChangeCommandHandler extends CommandHandler {
 
         @Override
         public int getMinDataLength() {
@@ -1316,7 +1316,7 @@ public class Session implements Runnable
         }
     }
 
-    private class GroupDisbandOpcodeHandler extends OpcodeHandler {
+    private class GroupDisbandCommandHandler extends CommandHandler {
 
         @Override
         public void handle(String[] data) {
@@ -1330,7 +1330,7 @@ public class Session implements Runnable
         }
     }
 
-    private class GroupJoinOpcodeHandler extends OpcodeHandler {
+    private class GroupJoinCommandHandler extends CommandHandler {
 
         @Override
         public int getMinDataLength() {
@@ -1349,12 +1349,12 @@ public class Session implements Runnable
             } else {
                 leaderGuid = Session.this.player.getGroup().getLeader().getGuid();
             }
-            Session.this.send(new ServerPacket(ServerOpcodes.GroupCreated).add("0") // Not a leader
+            Session.this.send(new ServerPacket(ServerCommands.GroupCreated).add("0") // Not a leader
                     .add(leaderGuid));
         }
     }
 
-    private class GroupQuitOpcodeHandler extends OpcodeHandler {
+    private class GroupQuitCommandHandler extends CommandHandler {
 
         @Override
         public void handle(String[] data) {
@@ -1362,7 +1362,7 @@ public class Session implements Runnable
         }
     }
 
-    private class GroupKickOpcodeHandler extends  OpcodeHandler {
+    private class GroupKickCommandHandler extends CommandHandler {
 
         @Override
         public int getMinDataLength() {
@@ -1386,7 +1386,7 @@ public class Session implements Runnable
         }
     }
 
-    private class GroupChangeLeaderOpcodeHandler extends OpcodeHandler {
+    private class GroupChangeLeaderCommandHandler extends CommandHandler {
 
         @Override
         public int getMinDataLength() {
@@ -1404,7 +1404,7 @@ public class Session implements Runnable
         }
     }
 
-    private class GetTradeOpcodeHandler extends OpcodeHandler {
+    private class GetTradeCommandHandler extends CommandHandler {
 
         @Override
         public int getMinDataLength() {
@@ -1445,7 +1445,7 @@ public class Session implements Runnable
         }
     }
 
-    private class TradeUpdateOpcodeHandler extends OpcodeHandler {
+    private class TradeUpdateCommandHandler extends CommandHandler {
 
         @Override
         public int getMinDataLength() {
@@ -1500,7 +1500,7 @@ public class Session implements Runnable
         }
     }
 
-    private class TradeApplyOpcodeHandler extends OpcodeHandler {
+    private class TradeApplyCommandHandler extends CommandHandler {
 
         @Override
         public int getMinDataLength() {
@@ -1575,7 +1575,7 @@ public class Session implements Runnable
         }
     }
 
-    private class TradeCancelOpcodeHandler extends OpcodeHandler {
+    private class TradeCancelCommandHandler extends CommandHandler {
 
         @Override
         public void handle(String[] data) {
@@ -1586,7 +1586,7 @@ public class Session implements Runnable
         }
     }
 
-    private class SetAsceticismOpcodeHandler extends OpcodeHandler {
+    private class SetAsceticismCommandHandler extends CommandHandler {
 
         @Override
         public int getMinDataLength() {

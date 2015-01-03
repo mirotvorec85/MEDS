@@ -2,7 +2,7 @@ package org.meds.database.entity;
 
 import java.util.Map;
 
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.database.DBStorage;
 
@@ -62,7 +62,7 @@ public class Guild
     {
         if (this.lessonsData == null)
         {
-            this.lessonsData = new ServerPacket(ServerOpcodes.GuildLessonsInfo)
+            this.lessonsData = new ServerPacket(ServerCommands.GuildLessonsInfo)
                 .add(this.id)
                 .add(this.name);
             if (this.getLessons() != null)

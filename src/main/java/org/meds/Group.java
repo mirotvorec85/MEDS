@@ -1,6 +1,6 @@
 package org.meds;
 
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.ReadOnlyIterator;
 import org.meds.util.Valued;
@@ -162,13 +162,13 @@ public class Group implements Iterable<Player> {
 
         // Message to everyone about leader exchange
         // And current group relation
-        ServerPacket message = new ServerPacket(ServerOpcodes.ServerMessage).add(279).add(member.getName());
+        ServerPacket message = new ServerPacket(ServerCommands.ServerMessage).add(279).add(member.getName());
         ServerPacket packet;
         for (Player groupMember : this) {
             if (groupMember.getSession() == null)
                 continue;
             packet = new ServerPacket(
-                    ServerOpcodes.GroupCreated)
+                    ServerCommands.GroupCreated)
                     .add(groupMember == this.leader ? "1" : "0")
                     .add(this.leader.getGuid());
             // Send group settings to the new leader
@@ -322,7 +322,7 @@ public class Group implements Iterable<Player> {
         }
 
         // Notify the other members
-        ServerPacket packet = new ServerPacket(ServerOpcodes.ServerMessage).add(268).add(newMember.getName());
+        ServerPacket packet = new ServerPacket(ServerCommands.ServerMessage).add(268).add(newMember.getName());
         for (Player member : this) {
             if (member.getSession() != null) {
                 member.getSession().send(packet);
@@ -344,20 +344,20 @@ public class Group implements Iterable<Player> {
         // Send to the left member
         if (member.getSession() != null) {
             // You left the group
-            ServerPacket packet = new ServerPacket(ServerOpcodes.ServerMessage)
+            ServerPacket packet = new ServerPacket(ServerCommands.ServerMessage)
                     .add(1028)
                     // No group relation now
-                    .add(ServerOpcodes.GroupCreated)
+                    .add(ServerCommands.GroupCreated)
                     .add(0)
                     .add(0);
             member.getSession().send(packet);
         }
 
         // Send to remaining members
-        ServerPacket packet = new ServerPacket(ServerOpcodes.ServerMessage)
+        ServerPacket packet = new ServerPacket(ServerCommands.ServerMessage)
                 .add(269)
                 .add(member.getName());
-        // TODO: ServerOpcodes.GroupCreated is sent as well
+        // TODO: ServerCommands.GroupCreated is sent as well
         // when the player leaves by its own only (not kicked)
         for (Player groupMember : this) {
             if (groupMember.getSession() != null) {
@@ -371,8 +371,8 @@ public class Group implements Iterable<Player> {
     public void disband() {
         this.disbanded = true;
 
-        ServerPacket packet = new ServerPacket(ServerOpcodes.ServerMessage).add(280);
-        packet.add(ServerOpcodes.GroupCreated).add("0").add("0");
+        ServerPacket packet = new ServerPacket(ServerCommands.ServerMessage).add(280);
+        packet.add(ServerCommands.GroupCreated).add("0").add("0");
         for (Player member : this) {
             member.leaveGroup();
             if (member.getSession() != null) {
@@ -382,7 +382,7 @@ public class Group implements Iterable<Player> {
     }
 
     public ServerPacket getSettingsData() {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.GroupSettings);
+        ServerPacket packet = new ServerPacket(ServerCommands.GroupSettings);
         packet.add(this.leader.getGuid())
                 .add(this.minLevel)
                 .add(this.maxLevel)
@@ -398,7 +398,7 @@ public class Group implements Iterable<Player> {
     }
 
     public ServerPacket getTeamLootData() {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.TeamLoot);
+        ServerPacket packet = new ServerPacket(ServerCommands.TeamLoot);
         packet.add(this.teamLootMode);
         return packet;
     }

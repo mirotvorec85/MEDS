@@ -6,12 +6,13 @@ import org.meds.database.entity.QuestTemplate;
 import org.meds.enums.Currencies;
 import org.meds.enums.QuestStatuses;
 import org.meds.enums.QuestTypes;
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 
 import java.util.Date;
 
 public class Quest {
+
     private class KillingBlowHandler implements Unit.KillingBlowListener {
 
         @Override
@@ -29,7 +30,7 @@ public class Quest {
 
             if (quest.player.getSession() != null) {
                 quest.player.getSession().send(quest.getUpdateQuestData());
-                quest.player.getSession().send(new ServerPacket(ServerOpcodes.ServerMessage).add(337).add(quest.questTemplate.getTitle()).add(quest.getProgress()).add(quest.questTemplate.getRequiredCount()));
+                quest.player.getSession().send(new ServerPacket(ServerCommands.ServerMessage).add(337).add(quest.questTemplate.getTitle()).add(quest.getProgress()).add(quest.questTemplate.getRequiredCount()));
             }
 
             if (quest.getProgress() == quest.questTemplate.getRequiredCount()) {
@@ -117,7 +118,7 @@ public class Quest {
     }
 
     public ServerPacket getQuestData() {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.QuestListInfo);
+        ServerPacket packet = new ServerPacket(ServerCommands.QuestListInfo);
         packet.add(this.questTemplate.getId())
                 .add(this.questTemplate.getType())
                 .add(this.questTemplate.getTitle())
@@ -132,7 +133,7 @@ public class Quest {
     }
 
     public ServerPacket getUpdateQuestData() {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.UpdateQuest);
+        ServerPacket packet = new ServerPacket(ServerCommands.UpdateQuest);
         packet.add(this.questTemplate.getId())
                 .add(this.getProgress())
                 .add(this.questTemplate.getTime() == 0 ? "" : this.getTimer())
@@ -160,7 +161,7 @@ public class Quest {
     public void complete() {
         // Send Final Text
         if (this.player.getSession() != null) {
-            this.player.getSession().send(new ServerPacket(ServerOpcodes.QuestFinalText).add(this.questTemplate.getTitle()).add(this.questTemplate.getEndText()));
+            this.player.getSession().send(new ServerPacket(ServerCommands.QuestFinalText).add(this.questTemplate.getTitle()).add(this.questTemplate.getEndText()));
         }
 
         // Change quest status
@@ -173,7 +174,7 @@ public class Quest {
         // Reward
         if (this.questTemplate.getRewardGold() != 0) {
             if (this.player.getSession() != null) {
-                this.player.getSession().send(new ServerPacket(ServerOpcodes.ServerMessage).add(1096).add(this.questTemplate.getRewardGold()).add(DBStorage.CurrencyStore.get(Currencies.Gold.getValue()).getTitle()));
+                this.player.getSession().send(new ServerPacket(ServerCommands.ServerMessage).add(1096).add(this.questTemplate.getRewardGold()).add(DBStorage.CurrencyStore.get(Currencies.Gold.getValue()).getTitle()));
             }
             this.player.changeCurrency(Currencies.Gold, this.questTemplate.getRewardGold());
         }

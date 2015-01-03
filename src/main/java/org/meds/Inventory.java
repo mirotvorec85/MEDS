@@ -9,7 +9,7 @@ import org.meds.Item.Prototype;
 import org.meds.database.entity.CharacterInventoryItem;
 import org.meds.enums.ItemBonusParameters;
 import org.meds.enums.ItemClasses;
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.Valued;
 
@@ -238,7 +238,7 @@ public class Inventory
 
     public ServerPacket getInventoryData()
     {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.InventoryInfo);
+        ServerPacket packet = new ServerPacket(ServerCommands.InventoryInfo);
         packet.add(0); // Count of bought slots
         packet.add("5 platinum"); // Cost of new slots
         packet.add(25); // Current available count of slots
@@ -261,7 +261,7 @@ public class Inventory
 
     public ServerPacket getEquipmentData()
     {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.EquipmentInfo);
+        ServerPacket packet = new ServerPacket(ServerCommands.EquipmentInfo);
         for (int i = 0; i < EquipmentSlotCount; ++i)
         {
             if (this.inventorySlots[i] == null)
@@ -280,7 +280,7 @@ public class Inventory
 
     public ServerPacket getUpdatedSlotData(int slot)
     {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.InventoryUpdate);
+        ServerPacket packet = new ServerPacket(ServerCommands.InventoryUpdate);
         packet.add(slot);
         if (this.inventorySlots[slot] == null)
         {

@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.meds.enums.BattleStates;
 import org.meds.logging.Logging;
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.Random;
 
@@ -91,7 +91,7 @@ public class Battle
             return;
         Player player = (Player)unit;
         if (player.getSession() != null)
-            player.getSession().send(new ServerPacket(ServerOpcodes.BattleState).add(state));
+            player.getSession().send(new ServerPacket(ServerCommands.BattleState).add(state));
     }
 
     public void update(int time)

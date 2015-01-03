@@ -11,7 +11,7 @@ import org.meds.database.entity.*;
 import org.meds.enums.*;
 import org.meds.logging.Logging;
 import org.meds.map.Location;
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.spell.Aura;
 import org.meds.util.EnumFlags;
@@ -113,7 +113,7 @@ public class Player extends Unit
         }
 
         if (this.session != null)
-            this.session.send(new ServerPacket(ServerOpcodes.AutoSpell).add(spellId));
+            this.session.send(new ServerPacket(ServerCommands.AutoSpell).add(spellId));
     }
 
     public boolean isRelax()
@@ -318,7 +318,7 @@ public class Player extends Unit
 
     public ServerPacket getLevelData(boolean experienceOnly)
     {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.Experience);
+        ServerPacket packet = new ServerPacket(ServerCommands.Experience);
         packet.add(this.getExp());
         packet.add(this.getReligExp());
 
@@ -424,7 +424,7 @@ public class Player extends Unit
 
         this.group = new Group(this);
         if (this.session != null) {
-            this.session.send(new ServerPacket(ServerOpcodes.GroupCreated).add("1") // Created as leader
+            this.session.send(new ServerPacket(ServerCommands.GroupCreated).add("1") // Created as leader
                     .add(this.getGuid()) // Leader's GUID
             )
                     .send(this.group.getSettingsData())
@@ -641,7 +641,7 @@ public class Player extends Unit
 
     public ServerPacket getParametersData()
     {
-        return new ServerPacket(ServerOpcodes.PlayerInfo)
+        return new ServerPacket(ServerCommands.PlayerInfo)
             .add(this.guid)
             .add(this.getName())
             .add(this.getAvatar())
@@ -685,7 +685,7 @@ public class Player extends Unit
 
     public ServerPacket getGuildData()
     {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.GuildInfo);
+        ServerPacket packet = new ServerPacket(ServerCommands.GuildInfo);
         packet.add(DBStorage.GuildStore.size());
         for (Map.Entry<Integer, Guild> entry : DBStorage.GuildStore.entrySet())
         {
@@ -703,7 +703,7 @@ public class Player extends Unit
 
     public ServerPacket getMagicData()
     {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.MagicInfo);
+        ServerPacket packet = new ServerPacket(ServerCommands.MagicInfo);
         packet.add(DBStorage.SpellStore.size());
 
         for (Map.Entry<Integer, Spell> entry : DBStorage.SpellStore.entrySet())
@@ -722,7 +722,7 @@ public class Player extends Unit
 
     public ServerPacket getSkillData()
     {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.SkillInfo);
+        ServerPacket packet = new ServerPacket(ServerCommands.SkillInfo);
         packet.add(DBStorage.SkillStore.size());
 
         for (Map.Entry<Integer, Skill> entry : DBStorage.SkillStore.entrySet())
@@ -740,7 +740,7 @@ public class Player extends Unit
 
     public ServerPacket getGuildLevelData()
     {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.GuildLevels);
+        ServerPacket packet = new ServerPacket(ServerCommands.GuildLevels);
         packet.add(this.guildLevel);
         packet.add(this.info.getGuilds().size());
         Guild guildEntry;
@@ -831,7 +831,7 @@ public class Player extends Unit
     }
 
     public ServerPacket getAchievementData() {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.AchievementList);
+        ServerPacket packet = new ServerPacket(ServerCommands.AchievementList);
         packet.add(0); // List of all achievements
 
         for (Achievement achievement : DBStorage.AchievementStore.values()) {
@@ -858,7 +858,7 @@ public class Player extends Unit
 
     public ServerPacket getCurrencyData()
     {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.Currencies);
+        ServerPacket packet = new ServerPacket(ServerCommands.Currencies);
         for (Currency currency : DBStorage.CurrencyStore.values())
         {
             packet.add(currency.getId())
@@ -875,7 +875,7 @@ public class Player extends Unit
     @Override
     public ServerPacket getHealthManaData()
     {
-        return new ServerPacket(ServerOpcodes.Health).
+        return new ServerPacket(ServerCommands.Health).
                 add(this.health).
                 add(this.mana).
                 add("0"); // Unknown. Always is 0.
@@ -887,7 +887,7 @@ public class Player extends Unit
 
         // Partial Data change
         if (this.session != null)
-            this.session.send(new ServerPacket(ServerOpcodes.Currency).add(currencyId).add(getCurrencyAmount(currencyId)));
+            this.session.send(new ServerPacket(ServerCommands.Currency).add(currencyId).add(getCurrencyAmount(currencyId)));
     }
 
     @Override
@@ -901,8 +901,8 @@ public class Player extends Unit
         {
             // TODO: why do we send relax state?
             //player.Session.AddData("r0");
-            ServerPacket packet = new ServerPacket(ServerOpcodes._lh0).add("");
-            packet.add(ServerOpcodes.NoGo).add(this.getHome().getId());
+            ServerPacket packet = new ServerPacket(ServerCommands._lh0).add("");
+            packet.add(ServerCommands.NoGo).add(this.getHome().getId());
             this.session.send(packet);
         }
         this.setPosition(this.getHome());
@@ -920,7 +920,7 @@ public class Player extends Unit
             if (this.session != null)
                 this.session.sendServerMessage(998, corpse.getOwner().getName(), Integer.toString(corpse.getGold()), Locale.getString(2));
             this.position.send(this,
-                    new ServerPacket(ServerOpcodes.ServerMessage)
+                    new ServerPacket(ServerCommands.ServerMessage)
                             .add("999").add(this.getName())
                             .add(corpse.getOwner().getName())
                             .add(corpse.getGold())
@@ -936,7 +936,7 @@ public class Player extends Unit
                 if (this.session != null)
                 this.session.sendServerMessage(998, corpse.getOwner().getName(), item.getCount() > 1 ? item.getCount() + " " : "", item.Template.getTitle());
                 this.position.send(this,
-                        new ServerPacket(ServerOpcodes.ServerMessage)
+                        new ServerPacket(ServerCommands.ServerMessage)
                                 .add("999")
                                 .add(this.getName())
                                 .add(corpse.getOwner().getName())
@@ -990,7 +990,7 @@ public class Player extends Unit
                 }
 
                 // Prepare quest List data to send to the player. Then the player will choose the one.
-                ServerPacket packet = new ServerPacket(ServerOpcodes.NpcQuestList);
+                ServerPacket packet = new ServerPacket(ServerCommands.NpcQuestList);
                 int count = 0;
                 // Search through quest relations of the NPC
                 for(CreatureQuestRelation creatureQuest : creatureQuests.values()) {

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.meds.Player;
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.Unit;
 import org.meds.logging.Logging;
@@ -175,13 +175,13 @@ public class Aura
     protected void removeAura() {
         // If a player - send result
         if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null) {
-            this.ownerPlayer.getSession().send(new ServerPacket(ServerOpcodes.DeleteAura).add(this.spellEntry.getId()));
+            this.ownerPlayer.getSession().send(new ServerPacket(ServerCommands.DeleteAura).add(this.spellEntry.getId()));
         }
     }
 
     public ServerPacket getPacketData()
     {
-        return new ServerPacket(ServerOpcodes.Aura)
+        return new ServerPacket(ServerCommands.Aura)
             .add(this.spellEntry.getId())
             .add(this.level)
             .add(this.isPermanent ? "-1" : this.remainingTime / 1000);
@@ -193,7 +193,7 @@ public class Aura
     public void forceRemove() {
         // If the owner is a player => send result
         if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null) {
-            this.ownerPlayer.getSession().send(new ServerPacket(ServerOpcodes.DeleteAura).add(this.spellEntry.getId()));
+            this.ownerPlayer.getSession().send(new ServerPacket(ServerCommands.DeleteAura).add(this.spellEntry.getId()));
         }
     }
 

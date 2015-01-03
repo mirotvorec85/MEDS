@@ -13,7 +13,7 @@ public enum LocationKeeperTypes implements Valued
     /**
      * Inn
      */
-    Headwaither(3),
+    Headwaiter(3),
     /**
      * Jewelery and Artifact Jewelery Shops
      */

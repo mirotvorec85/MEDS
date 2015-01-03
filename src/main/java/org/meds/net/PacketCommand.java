@@ -2,13 +2,13 @@ package org.meds.net;
 
 import java.util.Arrays;
 
-public class PacketOpcode
+public class PacketCommand
 {
-    private String opcode;
+    private String command;
     private String[] data;
     private boolean isValid;
 
-    public PacketOpcode(String data)
+    public PacketCommand(String data)
     {
         if (data.isEmpty())
         {
@@ -17,26 +17,14 @@ public class PacketOpcode
         }
 
         this.data = data.split("\u0001");
-        this.opcode = this.data[0];
+        this.command = this.data[0];
         this.data = Arrays.copyOfRange(this.data, 1, this.data.length);
         this.isValid = true;
     }
 
-    public PacketOpcode(String[] data)
+    public String getCommand()
     {
-        if (data.length == 0)
-        {
-            this.isValid = false;
-            return;
-        }
-        this.opcode = data[0];
-        this.data = Arrays.copyOfRange(data, 1, data.length);
-        this.isValid = true;
-    }
-
-    public String getOpcode()
-    {
-        return this.opcode;
+        return this.command;
     }
 
     public String[] getData()

@@ -7,7 +7,7 @@ import org.meds.Item.Prototype;
 import org.meds.enums.MovementDirections;
 import org.meds.enums.Parameters;
 import org.meds.enums.SpecialLocationTypes;
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.Random;
 
@@ -340,13 +340,13 @@ public class Location
 
 
     /**
-     * Gets the shorter location info with ServerOpcodes.LocationInfo
+     * Gets the shorter location info with ServerCommands.LocationInfo
      */
     public ServerPacket getInfoData()
     {
         if (this.locationInfoData == null)
         {
-            this.locationInfoData =  new ServerPacket(ServerOpcodes.LocationInfo)
+            this.locationInfoData =  new ServerPacket(ServerCommands.LocationInfo)
                 .add(this.id)
                 .add(this.title)
                 .add(this.topId)
@@ -391,7 +391,7 @@ public class Location
     {
         if (this.locationData == null)
         {
-            this.locationData = new ServerPacket(ServerOpcodes.Location)
+            this.locationData = new ServerPacket(ServerCommands.Location)
                 .add(this.id)
                 .add(this.title)
                 .add(this.topId)
@@ -514,7 +514,7 @@ public class Location
         // Will be updated already
         else
         {
-            // updatable == true AND updatedUnit == null means that pss opcode should be sent to all units
+            // updatable == true AND updatedUnit == null means that "pss" command should be sent to all units
             if (this.updatedUnit == null)
                 return;
 
@@ -556,7 +556,7 @@ public class Location
 
     public ServerPacket getCorpseData()
     {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.CorpseList);
+        ServerPacket packet = new ServerPacket(ServerCommands.CorpseList);
         packet.add(this.corpses.size() + this.items.size());
         // Corpses
         for (Corpse corpse : this.corpses.values())
@@ -619,7 +619,7 @@ public class Location
                 continue;
             if (player.getSession() == null)
                 continue;
-            ServerPacket pss = new ServerPacket(ServerOpcodes.PositionUnitList);
+            ServerPacket pss = new ServerPacket(ServerCommands.PositionUnitList);
             pss.add(this.units.size() - 1); // exclude itself
 
             for (Unit _unit : this.units)

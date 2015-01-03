@@ -30,10 +30,10 @@ public class ServerPacket implements Cloneable
         this.packetEnd = PacketEnds.InterPacket;
     }
 
-    public ServerPacket(ServerOpcodes opcode)
+    public ServerPacket(ServerCommands command)
     {
         this();
-        add(opcode);
+        add(command);
     }
 
     public ServerPacket(ServerPacket packet)
@@ -53,11 +53,11 @@ public class ServerPacket implements Cloneable
         return this.data.length() == 0;
     }
 
-    public ServerPacket add(ServerOpcodes opcode)
+    public ServerPacket add(ServerCommands command)
     {
         if (this.packetEnd != PacketEnds.InterPacket)
             this.data.append("\u0000");
-        this.data.append(opcode.toString()).append("\u0001");
+        this.data.append(command.toString()).append("\u0001");
         this.packetEnd = PacketEnds.InterValue;
         return this;
     }
@@ -96,12 +96,12 @@ public class ServerPacket implements Cloneable
     }
 
     /**
-     * Appends the specified packet as an opcode and an array of strings..
+     * Appends the specified packet as an command and an array of strings..
      * @return A reference to this instance after addition operation has completed.
      */
-    public ServerPacket addData(ServerOpcodes opcode, String... data)
+    public ServerPacket addData(ServerCommands command, String... data)
     {
-        add(opcode);
+        add(command);
 
         if (data.length != 0)
         {

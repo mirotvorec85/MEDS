@@ -1,7 +1,7 @@
 package org.meds.database.entity;
 
 import org.meds.Locale;
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.database.DBStorage;
 import org.meds.enums.QuestTypes;
@@ -273,7 +273,7 @@ public class QuestTemplate
     // TODO: Remove this method from this class
     public ServerPacket getQuestInfoData(boolean isForAccept)
     {
-        ServerPacket packet = new ServerPacket(isForAccept ? ServerOpcodes.QuestInfoForAccept : ServerOpcodes.QuestInfo);
+        ServerPacket packet = new ServerPacket(isForAccept ? ServerCommands.QuestInfoForAccept : ServerCommands.QuestInfo);
 
         packet.add(this.id)
             .add(this.title)

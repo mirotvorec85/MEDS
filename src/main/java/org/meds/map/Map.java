@@ -13,7 +13,7 @@ import org.meds.enums.MovementDirections;
 import org.meds.logging.Logging;
 
 import org.hibernate.Session;
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 
 public class Map
@@ -178,7 +178,7 @@ public class Map
                     mover.setPosition(location);
                 }
 
-                ServerPacket packet = new ServerPacket(ServerOpcodes.ServerMessage);
+                ServerPacket packet = new ServerPacket(ServerCommands.ServerMessage);
                 switch (entry.getValue())
                 {
                     case Up:

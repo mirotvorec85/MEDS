@@ -10,7 +10,7 @@ import org.meds.logging.Logging;
 import org.meds.map.Location;
 import org.meds.map.Map;
 import org.meds.map.Region;
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.SafeConvert;
 
@@ -39,7 +39,7 @@ public final class ChatHandler
         if (player == null || player.getSession() == null || message == null || message.length() == 0)
             return;
 
-        ServerPacket packet = new ServerPacket(ServerOpcodes.ChatMessage);
+        ServerPacket packet = new ServerPacket(ServerCommands.ChatMessage);
         StringBuilder text = new StringBuilder();
         text.append(Separator).append(SystemChar).append(message);
         packet.add(text);
@@ -51,7 +51,7 @@ public final class ChatHandler
         if (message == null || message.length() == 0)
             return;
 
-        ServerPacket packet = new ServerPacket(ServerOpcodes.ChatMessage);
+        ServerPacket packet = new ServerPacket(ServerCommands.ChatMessage);
         StringBuilder text = new StringBuilder();
         text.append(Separator).append(SystemChar).append(message);
         packet.add(text);
@@ -95,7 +95,7 @@ public final class ChatHandler
         }
 
         // Say this message
-        ServerPacket packet = new ServerPacket(ServerOpcodes.ChatMessage);
+        ServerPacket packet = new ServerPacket(ServerCommands.ChatMessage);
         StringBuilder response = new StringBuilder();
         response.append(Separator).append(SayChar).append("[").append(player.getName()).append("]: ")
         .append(Separator).append(MessageSeparator).append(message);

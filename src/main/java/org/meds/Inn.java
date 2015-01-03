@@ -6,7 +6,7 @@ import java.util.Map;
 import org.meds.Item.Prototype;
 import org.meds.database.entity.CharacterInnItem;
 import org.meds.enums.InnFilters;
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 
 public class Inn
@@ -101,7 +101,7 @@ public class Inn
 
     public ServerPacket getInnData(InnFilters filter)
     {
-        ServerPacket packet = new ServerPacket(ServerOpcodes.Inn);
+        ServerPacket packet = new ServerPacket(ServerCommands.Inn);
         packet.add(this.items.size())
             .add(this.slotCapacity)
             .add(this.count)

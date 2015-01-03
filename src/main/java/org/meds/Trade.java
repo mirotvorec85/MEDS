@@ -1,7 +1,7 @@
 package org.meds;
 
 import org.meds.enums.Currencies;
-import org.meds.net.ServerOpcodes;
+import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.Valued;
 
@@ -67,7 +67,7 @@ public class Trade {
         }
 
         public ServerPacket getSupplyData() {
-            ServerPacket packet = new ServerPacket(ServerOpcodes.TradeUpdate);
+            ServerPacket packet = new ServerPacket(ServerCommands.TradeUpdate);
             packet.add(Trade.this.player.getGuid());
             for (int i = 0; i < ITEM_SLOTS_COUNT; ++i) {
                 if (this.items[i] == null) {
@@ -141,7 +141,7 @@ public class Trade {
         side2.setTrade(this.otherSide);
 
         if (side2.getSession() != null) {
-            side2.getSession().send(new ServerPacket(ServerOpcodes.GetTrade).add(side1.getGuid()));
+            side2.getSession().send(new ServerPacket(ServerCommands.GetTrade).add(side1.getGuid()));
         }
     }
 
@@ -177,7 +177,7 @@ public class Trade {
         this.player.setTrade(null);
         this.otherSide.player.setTrade(null);
         // Send Trade result
-        ServerPacket packet = new ServerPacket(ServerOpcodes.TradeResult).add(result).add("0").add("0");
+        ServerPacket packet = new ServerPacket(ServerCommands.TradeResult).add(result).add("0").add("0");
         if (this.player.getSession() != null) {
             this.player.getSession().send(packet);
         }
