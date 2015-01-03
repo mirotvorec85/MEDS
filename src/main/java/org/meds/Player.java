@@ -792,7 +792,10 @@ public class Player extends Unit
         if (this.session != null) {
             session.sendServerMessage(498);
             // TODO: Implement sound sending (Sound 31 here)
-            session.send(new ServerPacket().add(this.getMagicData()).add(this.getParametersData()).add(this.getGuildLevelData()));
+            session.send(new ServerPacket()
+                    .add(this.getMagicData())
+                    .add(this.getParametersData())
+                    .add(this.getGuildLevelData()));
         }
     }
 
@@ -825,6 +828,74 @@ public class Player extends Unit
                         characterSpell.getLevel());
                 // TODO: Message about new level with spell
                 // TODO: Set AutoSpell if not set
+                break;
+            default: break;
+        }
+    }
+
+    public void removeGuildLesson(Guild guild) {
+        if (guild == null)
+            return;
+
+        CharacterGuild charGuild = this.info.getGuilds().get(guild.getId());
+        // The player has no levels at this guild
+        if (charGuild == null || charGuild.getLevel() == 0)
+            return;
+
+        // This guild is fully learned
+        if (charGuild.getLevel() == 15) {
+            // The next guild should not be started at learning
+            CharacterGuild charNextGuild = this.info.getGuilds().get(guild.getNextId());
+            if (charNextGuild != null && charNextGuild.getLevel() > 0)
+                return;
+            // TODO: Should be checked all guilds where 'prevId' is this guild
+        }
+
+        GuildLesson lesson = DBStorage.GuildLessonStore.get(guild.getId()).get(charGuild.getLevel());
+
+        this.cancelGuildImprovement(lesson.getImprovementType1(), lesson.getId1(), lesson.getCount1());
+        this.cancelGuildImprovement(lesson.getImprovementType2(), lesson.getId2(), lesson.getCount2());
+
+        charGuild.setLevel(charGuild.getLevel() - 1);
+        if (charGuild.getLevel() == 0) {
+            this.info.getGuilds().remove(guild.getId());
+        }
+        --this.guildLevel;
+
+        if (this.session != null) {
+            session.send(new ServerPacket()
+                    .add(this.getMagicData())
+                    .add(this.getParametersData())
+                    .add(this.getGuildLevelData()));
+        }
+    }
+
+    private void cancelGuildImprovement(GuildLesson.ImprovementTypes type, int id, int count) {
+        switch(type) {
+            case Parameter:
+                this.parameters.guild().change(Parameters.parse(id), -count);
+                break;
+            case Skill:
+                CharacterSkill characterSkill = this.info.getSkills().get(id);
+                if (characterSkill == null)
+                    break;
+                characterSkill.setLevel(characterSkill.getLevel() - count);
+                if (characterSkill.getLevel() < 1) {
+                    this.info.getSkills().remove(id);
+                }
+                Logging.Debug.log(this + " has removed level of a skill id " + id + " and the current level is " +
+                        characterSkill.getLevel());
+                break;
+            case Spell:
+                CharacterSpell characterSpell = this.info.getSpells().get(id);
+                if (characterSpell == null)
+                    break;
+                characterSpell.setLevel(characterSpell.getLevel() - count);
+                if (characterSpell.getLevel() < 1) {
+                    this.info.getSpells().remove(id);
+                }
+                Logging.Debug.log(this + " has removed level of a spell id " + id + " and the current level is " +
+                        characterSpell.getLevel());
                 break;
             default: break;
         }

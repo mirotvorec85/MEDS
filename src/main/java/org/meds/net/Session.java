@@ -88,6 +88,7 @@ public class Session implements Runnable
         this.commandHandlers.put(ClientCommands.UseMagic, new UseMagicCommandHandler());
         this.commandHandlers.put(ClientCommands.Relax, new RelaxCommandHandler());
         this.commandHandlers.put(ClientCommands.GuildLearn, new GuildLearnCommandHandler());
+        this.commandHandlers.put(ClientCommands.RemoveLevel, new RemoveLevelCommandHandler());
         this.commandHandlers.put(ClientCommands.GetGuildLevels, new GetGuildLevelsCommandHandler());
         this.commandHandlers.put(ClientCommands.Say, new SayCommandHandler());
         this.commandHandlers.put(ClientCommands.GetItemInfo, new GetItemInfoCommandHandler());
@@ -757,6 +758,23 @@ public class Session implements Runnable
                 return;
 
             Session.this.player.learnGuildLesson(DBStorage.GuildStore.get(SafeConvert.toInt32(data[0])));
+        }
+    }
+
+    private class RemoveLevelCommandHandler extends CommandHandler {
+
+        @Override
+        public int getMinDataLength() {
+            return 1;
+        }
+
+        @Override
+        public void handle(String[] data) {
+            // Inside a guild location only
+            if (Session.this.player.getPosition().getSpecialLocationType() != SpecialLocationTypes.MagicSchool)
+                return;
+
+            Session.this.player.removeGuildLesson(DBStorage.GuildStore.get(SafeConvert.toInt32(data[0])));
         }
     }
 

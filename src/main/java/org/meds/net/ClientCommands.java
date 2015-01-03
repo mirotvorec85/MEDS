@@ -48,6 +48,7 @@ public enum ClientCommands
     QuestInfoForAccept("qre"),
     RegionLocations("r"),
     SwapItem("ri"),
+    RemoveLevel("rlvl"),
     Relax("rx"),
     SetAutoLoot("sal"),
     Say("say"),
