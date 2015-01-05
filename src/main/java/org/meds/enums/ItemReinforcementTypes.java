@@ -17,8 +17,9 @@ public enum ItemReinforcementTypes implements Valued
             ItemReinforcementTypes.values[type.value] = type;
     }
 
-    public static ItemReinforcementTypes parse(int value)
-    {
+    public static ItemReinforcementTypes parse(int value) {
+        if (value < 0 || value >= values.length)
+            return null;
         return ItemReinforcementTypes.values[value];
     }
 

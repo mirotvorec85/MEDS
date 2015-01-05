@@ -879,14 +879,18 @@ public class Session implements Runnable
                 int itemCount = item.getCount();
                 if (Session.this.player.getInventory().tryStoreItem(item))
                 {
-                    Session.this.sendServerMessage(1014, itemCount > 1 ? itemCount + " " : "", item.Template.getTitle());
-                    Session.this.player.getPosition().send(Session.this.player, new ServerPacket(ServerCommands.ServerMessage).add("1026").add(Session.this.player.getName()).add(itemCount > 1 ? itemCount + " " : "").add(item.Template.getTitle()));
+                    Session.this.sendServerMessage(1014, itemCount > 1 ? itemCount + " " : "", item.getTitle());
+                    Session.this.player.getPosition().send(Session.this.player,
+                            new ServerPacket(ServerCommands.ServerMessage)
+                                    .add("1026").add(Session.this.player.getName())
+                                    .add(itemCount > 1 ? itemCount + " " : "")
+                                    .add(item.getTitle()));
                     if (item.getCount() == 0)
                         Session.this.player.getPosition().removeItem(item);
                 }
                 else
                 {
-                    Session.this.sendServerMessage(1001, item.Template.getTitle());
+                    Session.this.sendServerMessage(1001, item.getTitle());
                 }
             }
         }

@@ -4,75 +4,75 @@ import org.meds.util.Valued;
 
 public enum ItemTotemicTypes implements Valued
 {
-    None(0),
+    None(0, 0),
     /**
      * Bonus Constitution
      */
-    Mammoth(1),
+    Mammoth(1, 5),
     /**
      * Bonus Strength
      */
-    Tiger(2),
+    Tiger(2, 6),
     /**
      * Bonus Dexterity
      */
-    Cat(3),
+    Cat(3, 7),
     /**
      * Bonus Mind
      */
-    Owl(4),
+    Owl(4, 8),
     /**
      * Bonus Damage
      */
-    Bear(5),
+    Bear(5, 9),
     /**
      * Bonus Protection
      */
-    Turtle(6),
+    Turtle(6, 10),
     /**
      * Bonus Chance To Hit
      */
-    Hawk(7),
+    Hawk(7, 11),
     /**
      * Bonus Armour
      */
-    Monkey(8),
+    Monkey(8, 12),
     /**
      * Bonus Chance To Cast
      */
-    Octopus(9),
+    Octopus(9, 13),
     /**
      * Bonus Magic Damage
      */
-    Spider(10),
+    Spider(10, 14),
     /**
      * Bonus Health
      */
-    Whale(11),
+    Whale(11, 15),
     /**
      * Bonus Mana
      */
-    Dragon(12),
+    Dragon(12, 16),
     /**
      * Bonus Health Recovery
      */
-    Reptile(13),
+    Reptile(13, 17),
     /**
      * Bonus Mana Recovery
      */
-    And(14),
+    Ant(14, 18),
     /**
      * Bonus Fire Resistance
      */
-    Scorpion(15),
+    Scorpion(15, 19),
     /**
      * Bonus Cold Resistance
      */
-    Penguin(16),
+    Penguin(16, 20),
     /**
      * Bonus Lightning Resistance
      */
-    Eel(17);
+    Eel(17, 21);
 
     private static final ItemTotemicTypes[] values = new ItemTotemicTypes[18];
 
@@ -82,16 +82,22 @@ public enum ItemTotemicTypes implements Valued
             ItemTotemicTypes.values[type.value] = type;
     }
 
-    public static ItemTotemicTypes parse(int value)
-    {
+    public static ItemTotemicTypes parse(int value) {
+        if (value < 0 || value >= values.length)
+            return null;
         return ItemTotemicTypes.values[value];
     }
 
     private final int value;
+    private final int titleStringId;
 
-    private ItemTotemicTypes(int value)
-    {
+    private ItemTotemicTypes(int value, int titleStringId) {
         this.value = value;
+        this.titleStringId = titleStringId;
+    }
+
+    public int getTitleStringId() {
+        return titleStringId;
     }
 
     @Override

@@ -655,7 +655,7 @@ public class Inventory
             item = item.unstackItem(count);
 
         // Send Message
-        this.owner.getSession().sendServerMessage(1016, count > 1 ? Integer.toString(count) + " " : "", item.Template.getTitle());
+        this.owner.getSession().sendServerMessage(1016, count > 1 ? Integer.toString(count) + " " : "", item.getTitle());
         // TODO: Implement Location items
         //this.owner.getPosition.addItem(item);
 

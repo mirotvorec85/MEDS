@@ -206,7 +206,7 @@ public class Spell {
         // Message by item
         if (item != null)
         {
-            SendMessage(this.target, 4, item.Template.getTitle());
+            SendMessage(this.target, 4, item.getTitle());
             return;
         }
 

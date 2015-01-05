@@ -1005,14 +1005,14 @@ public class Player extends Unit
             for (Item item : items)
             {
                 if (this.session != null)
-                this.session.sendServerMessage(998, corpse.getOwner().getName(), item.getCount() > 1 ? item.getCount() + " " : "", item.Template.getTitle());
+                this.session.sendServerMessage(998, corpse.getOwner().getName(), item.getCount() > 1 ? item.getCount() + " " : "", item.getTitle());
                 this.position.send(this,
                         new ServerPacket(ServerCommands.ServerMessage)
                                 .add("999")
                                 .add(this.getName())
                                 .add(corpse.getOwner().getName())
                                 .add(item.getCount() > 1 ? item.getCount() + " " : "")
-                                .add(item.Template.getTitle()));
+                                .add(item.getTitle()));
                 this.inventory.tryStoreItem(item);
                 // TODO: leave corpse if a player didn't take all the loot
             }

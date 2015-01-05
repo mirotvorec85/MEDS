@@ -7,15 +7,11 @@ import java.util.Map;
 
 import org.meds.database.DBStorage;
 import org.meds.database.entity.ItemTemplate;
-import org.meds.enums.ItemBonusParameters;
-import org.meds.enums.ItemEssenceLevels;
-import org.meds.enums.ItemEssenceTypes;
-import org.meds.enums.ItemReinforcementTypes;
-import org.meds.enums.ItemTotemicTypes;
-import org.meds.enums.Parameters;
+import org.meds.enums.*;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.spell.Spell;
+import org.meds.util.Random;
 import org.meds.util.Valued;
 
 public class Item {
@@ -101,7 +97,7 @@ public class Item {
         }
     }
 
-    public static class Modification implements Valued {
+    public class Modification implements Valued {
 
         private int value;
 
@@ -114,27 +110,151 @@ public class Item {
          * Private constructor that is only used for cloning.
          */
         private Modification() {
-
+            this.totem = ItemTotemicTypes.None;
+            this.essenceLevel = ItemEssenceLevels.None;
+            this.essenceType = ItemEssenceTypes.None;
+            this.reinforcement = ItemReinforcementTypes.None;
         }
 
-        public Modification(int value)
-        {
-            this.value = value;
-            this.totem = ItemTotemicTypes.parse(value & 0xFF);
-            this.essenceLevel = ItemEssenceLevels.parse(value & 0xFF00);
-            this.essenceType = ItemEssenceTypes.parse(value & 0xFF0000);
-            this.reinforcement = ItemReinforcementTypes.parse(value & 0xFF000000);
+        public Modification(int value) {
+            this();
+            setTotem(ItemTotemicTypes.parse((value & 0xFF000000) >> 24));
+            this.essenceLevel = ItemEssenceLevels.parse((value & 0xFF0000) >> 16);
+            this.essenceType = ItemEssenceTypes.parse((value & 0xFF00) >> 8);
+            this.reinforcement = ItemReinforcementTypes.parse(value & 0xFF);
         }
 
-        public ItemTotemicTypes getTotem()
-        {
+        public ItemTotemicTypes getTotem() {
             return totem;
         }
-        public void setTotem(ItemTotemicTypes totem)
-        {
+
+        private void setTotem(ItemTotemicTypes totem) {
+            if (totem == null)
+                totem = ItemTotemicTypes.None;
+
             this.totem = totem;
             recalculateValue();
+
+            if (totem == ItemTotemicTypes.None)
+                return;
+
+            // Parameters Bonus
+            ItemBonusParameters parameter;
+            double protectionRatio;
+            double armorRatio;
+            switch (totem) {
+                case Mammoth:
+                    parameter = ItemBonusParameters.BonusConstitution;
+                    protectionRatio = 1d;
+                    armorRatio = 0.33d;
+                    break;
+                case Tiger:
+                    parameter = ItemBonusParameters.BonusStrength;
+                    protectionRatio = 1d;
+                    armorRatio = 0.33d;
+                    break;
+                case Cat:
+                    parameter = ItemBonusParameters.BonusDexterity;
+                    protectionRatio = 1d;
+                    armorRatio = 0.33d;
+                    break;
+                case Owl:
+                    parameter = ItemBonusParameters.BonusIntelligence;
+                    protectionRatio = 1d;
+                    armorRatio = 0.33d;
+                    break;
+                case Bear:
+                    parameter = ItemBonusParameters.BonusDamage;
+                    protectionRatio = 1d;
+                    armorRatio = 0.33d;
+                    break;
+                case Turtle:
+                    parameter = ItemBonusParameters.BonusProtection;
+                    protectionRatio = 1d;
+                    armorRatio = 0.33d;
+                    break;
+                case Hawk:
+                    parameter = ItemBonusParameters.BonusChanceToHit;
+                    protectionRatio = 1d;
+                    armorRatio = 0.33d;
+                    break;
+                case Monkey:
+                    parameter = ItemBonusParameters.BonusArmour;
+                    protectionRatio = 3d;
+                    armorRatio = 1d;
+                    break;
+                case Octopus:
+                    parameter = ItemBonusParameters.BonusChanceToCast;
+                    protectionRatio = 1d;
+                    armorRatio = 0.33d;
+                    break;
+                case Spider:
+                    parameter = ItemBonusParameters.BonusMagicDamage;
+                    protectionRatio = 1d;
+                    armorRatio = 0.33d;
+                    break;
+                case Whale:
+                    parameter = ItemBonusParameters.BonusHealth;
+                    protectionRatio = 12d;
+                    armorRatio = 4d;
+                    break;
+                case Dragon:
+                    parameter = ItemBonusParameters.BonusMana;
+                    protectionRatio = 9d;
+                    armorRatio = 3d;
+                    break;
+                case Reptile:
+                    parameter = ItemBonusParameters.BonusHealthRegeneration;
+                    protectionRatio = 0.33d;
+                    armorRatio = 0.11d;
+                    break;
+                case Ant:
+                    parameter = ItemBonusParameters.BonusManaRegeneration;
+                    protectionRatio = 0.33d;
+                    armorRatio = 0.11d;
+                    break;
+                case Scorpion:
+                    parameter = ItemBonusParameters.BonusFireResistance;
+                    protectionRatio = 1d;
+                    armorRatio = 0.33d;
+                    break;
+                case Penguin:
+                    parameter = ItemBonusParameters.BonusFrostResistance;
+                    protectionRatio = 1d;
+                    armorRatio = 0.33d;
+                    break;
+                case Eel:
+                    parameter = ItemBonusParameters.BonusLightningResistance;
+                    protectionRatio = 1d;
+                    armorRatio = 0.33d;
+                    break;
+                default:
+                    return;
+            }
+
+            int value = 0;
+            // Uses a half of given base protection and armour item parameters
+            if (Item.this.bonusParameters.containsKey(ItemBonusParameters.BaseProtection)) {
+                int protection = Item.this.bonusParameters.get(ItemBonusParameters.BaseProtection);
+                protection /= 2;
+                Item.this.bonusParameters.put(ItemBonusParameters.BonusProtection, protection);
+                value += protection * protectionRatio;
+            }
+            if (Item.this.bonusParameters.containsKey(ItemBonusParameters.BaseArmour)) {
+                int armour = Item.this.bonusParameters.get(ItemBonusParameters.BaseArmour);
+                armour /= 2;
+                Item.this.bonusParameters.put(ItemBonusParameters.BaseArmour, armour);
+                value += armour * armorRatio;
+            }
+
+            Integer currentValue = Item.this.bonusParameters.get(parameter);
+            if (currentValue == null) {
+                currentValue = 0;
+            }
+            currentValue += value;
+            Item.this.bonusParameters.put(parameter, currentValue);
         }
+
         public ItemEssenceLevels getEssenceLevel()
         {
             return essenceLevel;
@@ -163,12 +283,19 @@ public class Item {
             recalculateValue();
         }
 
-        private void recalculateValue()
-        {
+        private void recalculateValue() {
             this.value = (this.totem.getValue() << 24) +
                     (this.essenceLevel.getValue() << 16) +
                     (this.essenceType.getValue() << 8) +
                     this.reinforcement.getValue();
+        }
+
+        public void generateTotemicType() {
+            // Weapon do not have totemic bonus
+            if (Item.this.Template.getItemClass() == ItemClasses.Weapon)
+                return;
+            setTotem(ItemTotemicTypes.parse(
+                    Random.nextInt(ItemTotemicTypes.Mammoth.getValue(), ItemTotemicTypes.Eel.getValue() + 1)));
         }
 
         @Override
@@ -274,34 +401,29 @@ public class Item {
         }
     }
 
-    public static ServerPacket getItemInfo(int templateId, int modification, ServerPacket packet)
-    {
-        ItemTemplate template = DBStorage.ItemTemplateStore.get(templateId);
-        if (template == null)
+    public static ServerPacket getItemInfo(int templateId, int modification, ServerPacket packet) {
+        Prototype prototype = new Prototype(templateId, modification, 0);
+        Item item = new Item(prototype);
+        if (item.Template == null)
             return packet;
 
-        packet.add(ServerCommands.ItemInfo);
-        packet.add(template.getId())
-            // TODO: additional bonuses of the modification value
-            .add(modification);
+        packet.add(ServerCommands.ItemInfo)
+                .add(item.Template.getId())
+                .add(item.getModification())
+                .add(item.getFullTitle())
+                .add(item.Template.getImageId())
+                .add(item.Template.getItemClass())
+                .add(item.Template.getLevel())
+                .add(item.Template.getCost())
+                .add(item.Template.getCurrencyId())
+                .add("1187244746") // Image (or even Item itself) date
+                .add(getMaxDurability(item.Template))
+                .add(getWeight(item.Template));
 
-        if (template.getDescription().isEmpty())
-            packet.add(template.getTitle());
-        else
-            packet.add(template.getTitle() + "\r\n" + template.getDescription());
-
-        packet.add(template.getImageId())
-            .add(template.getItemClass())
-            .add(template.getLevel())
-            .add(template.getCost())
-            .add(template.getCurrencyId())
-            .add("1187244746") // Image (or even Item itself) date
-            .add(getMaxDurability(template))
-            .add(getWeight(template));
-
-        for (Map.Entry<ItemBonusParameters, Integer> entry : template.getBonusParameters().entrySet())
-            packet.add(entry.getKey()).add(entry.getValue());
-
+        for (Map.Entry<ItemBonusParameters, Integer> entry : item.bonusParameters.entrySet()) {
+            packet.add(entry.getKey());
+            packet.add(entry.getValue());
+        }
         return packet;
     }
 
@@ -319,22 +441,18 @@ public class Item {
 
     private Map<ItemBonusParameters, Integer> bonusParameters;
 
-    public Item(ItemTemplate template)
-    {
+    public Item(ItemTemplate template) {
         this.Template = template;
-        this.modification = new Modification(0);
         this.MaxDurability = this.durability = Item.getMaxDurability(template);
         this.Weight = Item.getWeight(template);
-        if (this.Template == null)
-        {
+        if (this.Template == null) {
             this.bonusParameters = new HashMap<>();
             this.count = 0;
-        }
-        else
-        {
+        } else {
             this.bonusParameters = new HashMap<>(this.Template.getBonusParameters());
             this.count = 1;
         }
+        this.modification = new Modification(0);
     }
 
     public Item(ItemTemplate template, int count)
@@ -387,9 +505,27 @@ public class Item {
     /**
      * Gets the item current durability value.
      */
-    public int getDurability()
-    {
+    public int getDurability() {
         return this.durability;
+    }
+
+    public String getTitle() {
+        String title = this.Template.getTitle();
+        if (this.modification.getTotem() != ItemTotemicTypes.None) {
+            title += Locale.getString(4) + Locale.getString(this.modification.getTotem().getTitleStringId());
+        }
+        return title;
+    }
+
+    /**
+     * Gets the title and description.
+     */
+    public String getFullTitle() {
+        String title = getTitle();
+        if (!this.Template.getDescription().isEmpty()) {
+            title += "\r\n" + this.Template.getDescription();
+        }
+        return title;
     }
 
     /**

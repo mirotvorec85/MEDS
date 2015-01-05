@@ -115,8 +115,9 @@ public enum ItemEssenceTypes implements Valued
             ItemEssenceTypes.values[type.value] = type;
     }
 
-    public static ItemEssenceTypes parse(int value)
-    {
+    public static ItemEssenceTypes parse(int value) {
+        if (value < 0 || value >= values.length)
+            return null;
         return ItemEssenceTypes.values[value];
     }
 

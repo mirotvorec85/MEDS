@@ -20,8 +20,7 @@ public enum ItemEssenceLevels implements Valued
             ItemEssenceLevels.values[type.value] = type;
     }
 
-    public static ItemEssenceLevels parse(int value)
-    {
+    public static ItemEssenceLevels parse(int value) {
         if (value < 0 || value >= values.length)
             return null;
         return ItemEssenceLevels.values[value];

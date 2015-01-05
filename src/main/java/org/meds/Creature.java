@@ -267,13 +267,13 @@ public class Creature extends Unit
         // Add Loot
         this.loot.clear();
         Map<Integer, CreatureLoot> loot = DBStorage.CreatureLootStore.get(this.templateId);
-        if (loot != null)
-        {
-            for(CreatureLoot creatureLoot : loot.values())
-            {
+        if (loot != null) {
+            for(CreatureLoot creatureLoot : loot.values()) {
                 if (Random.nextDouble() * 100 > creatureLoot.getChance())
                     continue;
-                this.loot.add(new Item(creatureLoot.getItemTemplateId(), creatureLoot.getCount()));
+                Item item = new Item(creatureLoot.getItemTemplateId(), creatureLoot.getCount());
+                item.getModification().generateTotemicType();
+                this.loot.add(item);
             }
         }
 
