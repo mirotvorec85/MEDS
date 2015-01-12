@@ -279,7 +279,7 @@ public class Creature extends Unit
 
         // Money
         if (!this.template.hasFlag(CreatureFlags.Beast))
-            this.gold = Random.nextInt(this.getLevel() / 2, this.getLevel() + 1) * 10;
+            this.gold = Random.nextInt(this.getLevel() / 2, this.getLevel() + 1);
     }
 
     @Override
