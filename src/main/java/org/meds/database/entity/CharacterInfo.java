@@ -51,6 +51,7 @@ public class CharacterInfo
     private Map<Integer, CharacterCurrency> currencies = new HashMap<>();
     private Map<Prototype, CharacterInnItem> innItems = new HashMap<>();
     private Map<Integer, CharacterInventoryItem> inventoryItems = new HashMap<>();
+    private Map<Integer, CharacterProfession> professions = new HashMap<>();
     private Map<Integer, CharacterQuest> quests = new HashMap<>();
     private Map<Integer, CharacterSkill> skills = new HashMap<>();
     private Map<Integer, CharacterSpell> spells = new HashMap<>();
@@ -402,6 +403,12 @@ public class CharacterInfo
             Map<Integer, CharacterInventoryItem> inventoryItems)
     {
         this.inventoryItems = inventoryItems;
+    }
+    public Map<Integer, CharacterProfession> getProfessions() {
+        return professions;
+    }
+    public void setProfessions(Map<Integer, CharacterProfession> professions) {
+        this.professions = professions;
     }
     public Map<Integer, CharacterQuest> getQuests()
     {

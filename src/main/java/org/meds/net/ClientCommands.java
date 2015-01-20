@@ -24,7 +24,8 @@ public enum ClientCommands
     GuildLearn("gl"),
     GuildLessonsInfo("gni"), // Appeared in 2.0.0.0 after new guild system.
     Movement("go"),
-    GetGuildLevels("glvl"),
+    GetGuildLevels("lvl"),
+    GetProfessions("gproff"),
     GroupCreate("grc"),
     GroupJoin("grj"),
     GroupKick("grk"),

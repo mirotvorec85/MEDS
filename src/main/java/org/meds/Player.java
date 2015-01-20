@@ -13,6 +13,7 @@ import org.meds.logging.Logging;
 import org.meds.map.Location;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
+import org.meds.profession.Profession;
 import org.meds.spell.Aura;
 import org.meds.util.EnumFlags;
 
@@ -49,6 +50,8 @@ public class Player extends Unit
     private CharacterInfo info;
 
     private Map<Integer, Quest> quests;
+
+    private Profession[] professions;
 
     private int guildLevel;
 
@@ -202,6 +205,10 @@ public class Player extends Unit
 
     public AchievementManager getAchievementManager() {
         return this.achievementManager;
+    }
+
+    public Profession getProfession(Professions profession) {
+        return this.professions[profession.getValue() - 1];
     }
 
     public int getGuildLevel()
@@ -543,6 +550,20 @@ public class Player extends Unit
             quest.accept();
             this.quests.put(quest.getQuestTemplate().getId(), quest);
         }
+
+        // Create profession handlers
+        this.professions = new Profession[Professions.values().length];
+        for (Professions professions : Professions.values()) {
+            CharacterProfession charProf = this.info.getProfessions().get(professions.getValue());
+            if (charProf == null) {
+                charProf = new CharacterProfession();
+                charProf.setCharacterId(this.guid);
+                charProf.setProfessionId(professions.getValue());
+                this.info.getProfessions().put(professions.getValue(), charProf);
+            }
+            this.professions[professions.getValue() - 1] = Profession.createProfession(professions, charProf, this);
+        }
+
 
         // Unit fields
         this.race = Races.parse(this.info.getRace());
@@ -939,6 +960,17 @@ public class Player extends Unit
                 .add(currency.getUnk5())
                 .add(currency.isDisabled() ? "1" : "0")
                 .add(getCurrencyAmount(currency.getId()));
+        }
+        return packet;
+    }
+
+    public ServerPacket getProfessionData() {
+        ServerPacket packet = new ServerPacket(ServerCommands.Professions);
+        packet.add(this.professions.length);
+        for (Profession profession : this.professions) {
+            packet.add(profession.getProfession().getTitle())
+                    .add(profession.getLevel())
+                    .add(profession.getExperience());
         }
         return packet;
     }

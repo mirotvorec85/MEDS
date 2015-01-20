@@ -227,6 +227,11 @@
             <map-key column="`slot`" type="int" />
             <one-to-many class="CharacterInventoryItem" />
         </map>
+        <map name="professions" fetch="select" lazy="true" inverse="true" cascade="all-delete-orphan">
+            <key column="`character_id`" />
+            <map-key column="`profession_id`" type="int" />
+            <one-to-many class="CharacterProfession" />
+        </map>
         <map name="quests" fetch="select" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="`character_id`" />
             <map-key column="`quest_template_id`" type="int" />
@@ -253,6 +258,19 @@
         </composite-id>
         <property name="count" type="int">
             <column name="`count`" />
+        </property>
+    </class>
+
+    <class name="CharacterProfession" table="character_profession">
+        <composite-id>
+            <key-property name="characterId" type="int"><column name="character_id" /></key-property>
+            <key-property name="professionId" type="int"><column name="profession_id" /></key-property>
+        </composite-id>
+        <property name="level" type="int">
+            <column name="`level`" />
+        </property>
+        <property name="experience" type="double">
+            <column name="`experience`" />
         </property>
     </class>
 

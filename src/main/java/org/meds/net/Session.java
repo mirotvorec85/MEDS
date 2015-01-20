@@ -127,6 +127,7 @@ public class Session implements Runnable
         this.commandHandlers.put(ClientCommands.TradeApply, new TradeApplyCommandHandler());
         this.commandHandlers.put(ClientCommands.TradeCancel, new TradeCancelCommandHandler());
         this.commandHandlers.put(ClientCommands.SetAsceticism, new SetAsceticismCommandHandler());
+        this.commandHandlers.put(ClientCommands.GetProfessions, new GetProfessionsCommandHandler());
 
         this.packetBuffer = new ServerPacket();
 
@@ -522,9 +523,7 @@ public class Session implements Runnable
             packet.addData(ServerCommands._hs, "0");
 
             // TODO: implement Professions
-            packet.addData(ServerCommands.Professions, "10", "Земледелие", "0", "0", "Сбор Урожая", "0", "0", "Переработка", "0", "0", "Экстракция",
-                            "0", "0", "Горное Дело", "0", "0", "Воздухоплавание", "0", "0", "Травничество", "1", "69",
-                            "Алхимия", "0", "26", "Охота", "0", "0", "Рыбная ловля", "0", "0", "Ловкость Рук", "0", "0");
+            packet.add(Session.this.player.getProfessionData());
 
             // Unknown
             packet.addData(ServerCommands._omg, "7", "0", "0");
@@ -1627,6 +1626,14 @@ public class Session implements Runnable
             }
 
             Session.this.send(Session.this.player.getParametersData());
+        }
+    }
+
+    private class GetProfessionsCommandHandler extends CommandHandler {
+
+        @Override
+        public void handle(String[] data) {
+            Session.this.send(Session.this.player.getProfessionData());
         }
     }
 }
