@@ -1,0 +1,281 @@
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+
+
+DROP TABLE IF EXISTS `achievement`;
+CREATE TABLE `achievement` (
+  `id` INT UNSIGNED NOT NULL,
+  `title` VARCHAR(128) NOT NULL,
+  `description` VARCHAR(128) NOT NULL,
+  `count` INT UNSIGNED NOT NULL DEFAULT 1,
+  `points` INT UNSIGNED NOT NULL DEFAULT 0,
+  `category_id` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `achievement_criteria`;
+CREATE TABLE `achievement_criteria` (
+  `achievement_id` INT UNSIGNED NOT NULL,
+  `index` TINYINT UNSIGNED NOT NULL,
+  `criteria_type_id` INT UNSIGNED NOT NULL,
+  `requirement` INT UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (`achievement_id`, `index`),
+  FOREIGN KEY (`achievement_id`) REFERENCES `achievement` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `currency`;
+CREATE TABLE `currency` (
+  `id` INT UNSIGNED NOT NULL,
+  `unk2` INT NOT NULL DEFAULT '0',
+  `title` VARCHAR(128) NOT NULL,
+  `description` VARCHAR(512) NOT NULL,
+  `unk5` INT UNSIGNED NOT NULL DEFAULT '0',
+  `disabled` TINYINT NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `guild`;
+CREATE TABLE `guild` (
+  `id` INT UNSIGNED NOT NULL,
+  `name` CHAR(255) NOT NULL,
+  `prev_id` INT UNSIGNED DEFAULT '0',
+  `next_id` INT UNSIGNED DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `guild_lesson`;
+CREATE TABLE `guild_lesson` (
+  `guild_id` INT UNSIGNED NOT NULL,
+  `level` TINYINT UNSIGNED NOT NULL,
+  `description` VARCHAR(255) NOT NULL,
+  `type1` TINYINT UNSIGNED NOT NULL DEFAULT '0',
+  `id1` TINYINT UNSIGNED NOT NULL DEFAULT '0',
+  `count1` INT NOT NULL DEFAULT '0',
+  `type2` TINYINT UNSIGNED NOT NULL DEFAULT '0',
+  `id2` TINYINT UNSIGNED NOT NULL DEFAULT '0',
+  `count2` INT NOT NULL DEFAULT '0',
+  PRIMARY KEY (`guild_id`,`level`),
+  FOREIGN KEY (`guild_id`) REFERENCES `guild` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `item_template`;
+CREATE TABLE `item_template` (
+  `id` INT UNSIGNED NOT NULL,
+  `title` VARCHAR(128) NOT NULL,
+  `description` text,
+  `image_id` INT UNSIGNED NOT NULL,
+  `class` TINYINT UNSIGNED NOT NULL,
+  `level` SMALLINT UNSIGNED NOT NULL DEFAULT '0',
+  `cost` INT UNSIGNED NOT NULL DEFAULT '0',
+  `currency_id` INT UNSIGNED NOT NULL DEFAULT '0',
+  `subclass` TINYINT UNSIGNED NOT NULL DEFAULT '0',
+  `item_flags` INT UNSIGNED NOT NULL DEFAULT '0',
+  `bonuses` VARCHAR(128) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`currency_id`) REFERENCES `currency` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `kingdom`;
+CREATE TABLE `kingdom` (
+  `id` INT UNSIGNED NOT NULL,
+  `name` VARCHAR(64) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `level_cost`;
+CREATE TABLE `level_cost` (
+  `level` INT UNSIGNED NOT NULL,
+  `experience` INT UNSIGNED NOT NULL,
+  `gold` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`level`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `region`;
+CREATE TABLE `region` (
+  `id` INT UNSIGNED NOT NULL,
+  `name` VARCHAR(64) NOT NULL,
+  `kingdom_id` INT UNSIGNED NOT NULL,
+  `is_road` TINYINT(1) NOT NULL DEFAULT '0',
+  `min_level` SMALLINT NOT NULL DEFAULT '0',
+  `max_level` SMALLINT NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`kingdom_id`) REFERENCES `kingdom` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `location`;
+CREATE TABLE `location` (
+  `id` INT UNSIGNED NOT NULL,
+  `titile` VARCHAR(64) NOT NULL,
+  `top_id` INT UNSIGNED DEFAULT '0',
+  `bottom_id` INT UNSIGNED DEFAULT '0',
+  `north_id` INT UNSIGNED DEFAULT '0',
+  `south_id` INT UNSIGNED DEFAULT '0',
+  `west_id` INT UNSIGNED DEFAULT '0',
+  `east_id` INT UNSIGNED DEFAULT '0',
+  `x_coord` INT NOT NULL,
+  `y_coord` INT NOT NULL,
+  `z_coord` INT NOT NULL,
+  `region_id` INT UNSIGNED NOT NULL,
+  `special_location_type` SMALLINT UNSIGNED NOT NULL DEFAULT '0',
+  `safe_zone` TINYINT NOT NULL DEFAULT '0',
+  `keeper_type` SMALLINT NOT NULL DEFAULT '0',
+  `keeper_name` VARCHAR(64) DEFAULT NULL,
+  `special_location_id` INT DEFAULT NULL,
+  `picture_id` INT NOT NULL,
+  `is_square` TINYINT NOT NULL DEFAULT '0',
+  `safe_region` TINYINT NOT NULL DEFAULT '0',
+  `picture_time` INT NOT NULL DEFAULT '0',
+  `keeper_time` INT NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`region_id`) REFERENCES `region` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `creature_template`;
+CREATE TABLE `creature_template` (
+  `template_id` INT UNSIGNED NOT NULL,
+  `name` CHAR(255) NOT NULL,
+  `level` SMALLINT UNSIGNED NOT NULL,
+  `region_id` INT UNSIGNED NOT NULL,
+  `avatar_id` INT UNSIGNED NOT NULL,
+  `flags` INT UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (`template_id`),
+  FOREIGN KEY (`region_id`) REFERENCES `region` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `creature`;
+CREATE TABLE `creature` (
+  `guid` INT NOT NULL,
+  `template_id` INT UNSIGNED NOT NULL,
+  `location_id` INT UNSIGNED DEFAULT NULL,
+  PRIMARY KEY (`guid`),
+  FOREIGN KEY (`location_id`) REFERENCES `location` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  FOREIGN KEY (`template_id`) REFERENCES `creature_template` (`template_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `creature_loot`;
+CREATE TABLE `creature_loot` (
+  `creature_template_id` INT UNSIGNED NOT NULL,
+  `item_template_id` INT UNSIGNED NOT NULL,
+  `chance` TINYINT NOT NULL,
+  `count` TINYINT NOT NULL DEFAULT '1',
+  PRIMARY KEY (`creature_template_id`,`item_template_id`),
+  FOREIGN KEY (`item_template_id`) REFERENCES `item_template` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  FOREIGN KEY (`creature_template_id`) REFERENCES `creature_template` (`template_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `new_message`;
+CREATE TABLE `new_message` (
+  `id` INT UNSIGNED NOT NULL,
+  `type` TINYINT UNSIGNED NOT NULL,
+  `message` VARCHAR(512) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `locale_string`;
+CREATE TABLE `locale_string` (
+  `id` INT UNSIGNED NOT NULL,
+  `string` VARCHAR(256) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `skill`;
+CREATE TABLE `skill` (
+  `id` INT UNSIGNED NOT NULL,
+  `name` VARCHAR(64) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `spell`;
+CREATE TABLE `spell` (
+  `id` INT UNSIGNED NOT NULL,
+  `type` TINYINT UNSIGNED NOT NULL,
+  `name` VARCHAR(64) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `shop`;
+CREATE TABLE `shop` (
+  `id` INT UNSIGNED NOT NULL,
+  `type` INT UNSIGNED NOT NULL,
+  `currency_id` INT UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`currency_id`) REFERENCES `currency` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `shop_item`;
+CREATE TABLE `shop_item` (
+  `shop_id` INT UNSIGNED NOT NULL,
+  `item_template_id` INT UNSIGNED NOT NULL,
+  `count` INT NOT NULL DEFAULT '-1',
+  PRIMARY KEY (`shop_id`,`item_template_id`),
+  FOREIGN KEY (`shop_id`) REFERENCES `shop` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`item_template_id`) REFERENCES `item_template` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `quest_template`;
+CREATE TABLE `quest_template` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `type` TINYINT UNSIGNED NOT NULL,
+  `title` VARCHAR(128) NOT NULL,
+  `description` TEXT NOT NULL,
+  `begin_text` TEXT NOT NULL,
+  `end_text` TEXT NOT NULL,
+  `level` INT UNSIGNED NOT NULL DEFAULT 0,
+  `next_quest_id` INT UNSIGNED DEFAULT NULL,
+  `prev_quest_id` INT UNSIGNED DEFAULT NULL,
+  `source_item_id` INT UNSIGNED DEFAULT NULL,
+  `source_item_count` INT UNSIGNED NOT NULL DEFAULT 0,
+  `required_count` INT UNSIGNED NOT NULL DEFAULT 0,
+  `required_creature_id` INT UNSIGNED DEFAULT NULL,
+  `required_item_id` INT UNSIGNED DEFAULT NULL,
+  `time` INT UNSIGNED NOT NULL DEFAULT 0,
+  `reward_exp` INT UNSIGNED NOT NULL DEFAULT 0,
+  `reward_gold` INT UNSIGNED NOT NULL DEFAULT 0,
+  `reward_item1_id` INT UNSIGNED DEFAULT NULL,
+  `reward_item1_count` INT UNSIGNED NOT NULL DEFAULT 0,
+  `reward_item2_id` INT UNSIGNED DEFAULT NULL,
+  `reward_item2_count` INT UNSIGNED NOT NULL DEFAULT 0,
+  `tracking` INT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `creature_quest_relation`;
+CREATE TABLE `creature_quest_relation` (
+  `creature_template_id` INT UNSIGNED NOT NULL,
+  `quest_template_id` INT UNSIGNED NOT NULL,
+  `relation` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (`creature_template_id`, `quest_template_id`),
+  FOREIGN KEY (`creature_template_id`) REFERENCES `creature_template` (`template_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`quest_template_id`) REFERENCES `quest_template` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
