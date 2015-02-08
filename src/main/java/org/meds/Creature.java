@@ -34,6 +34,8 @@ public class Creature extends Unit
     private int locationId;
     private int autoSpell;
 
+    private String fullName;
+
     private Map<Integer, Integer> spells;
     private Map<Integer, Integer> skills;
 
@@ -85,9 +87,8 @@ public class Creature extends Unit
     }
 
     @Override
-    public String getName()
-    {
-        return this.template.getName();
+    public String getName() {
+        return this.fullName;
     }
 
     @Override
@@ -228,6 +229,8 @@ public class Creature extends Unit
         this.health = this.parameters.value(Parameters.Health);
         this.mana = this.parameters.value(Parameters.Mana);
 
+        this.constructName();
+
         World.getInstance().unitCreated(this);
 
         return this.guid;
@@ -298,6 +301,13 @@ public class Creature extends Unit
 
         this.setPosition(null);
         return corpse;
+    }
+
+    private void constructName() {
+        this.fullName = this.template.getName();
+        if (this.template.hasFlag(CreatureFlags.Unique)) {
+            this.fullName += "(" + Locale.getString(33) + ")";
+        }
     }
 
     @Override
