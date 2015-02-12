@@ -45,6 +45,7 @@ public class CharacterInfo
     private Integer autoSpellId;
     private int settings;
     private int statuses;
+    private double practiseValue;
 
     private Map<Integer, CharacterAchievement> achievements = new HashMap<>();
     private Map<Integer, CharacterGuild> guilds = new HashMap<>();
@@ -361,6 +362,14 @@ public class CharacterInfo
     public void setStatuses(int statuses)
     {
         this.statuses = statuses;
+    }
+
+    public double getPractiseValue() {
+        return practiseValue;
+    }
+
+    public void setPractiseValue(double practiseValue) {
+        this.practiseValue = practiseValue;
     }
 
     public Map<Integer, CharacterAchievement> getAchievements() {

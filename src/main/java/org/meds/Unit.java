@@ -540,23 +540,6 @@ public abstract class Unit
             {
                 Player player = (Player)this;
 
-                // Reward exp
-                if (!player.getSettings().has(PlayerSettings.Asceticism)) {
-                    int victimLevel = victim.getLevel();
-                    int killerLevel = this.getLevel();
-                    int exp = (victimLevel * victimLevel * victimLevel + 1) / (killerLevel * killerLevel + 1) + 1;
-
-                    // HACK: the limit (or even its existence) is unknown
-                    // Cannot get exp more than a half of the next level requirement
-                    int nextLevelEpx = LevelCost.getExp(killerLevel + 1);
-                    if (exp > nextLevelEpx / 2) exp = nextLevelEpx / 2;
-
-                    if (exp > 0) {
-                        player.addExp(exp);
-                        player.getSession().sendServerMessage(1038, Integer.toString(exp)); // You gain experience
-                    }
-                }
-
                 // AutoLoot
                 if (corpse != null && player.getSettings().has(PlayerSettings.AutoLoot))
                     player.lootCorpse(corpse);

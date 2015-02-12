@@ -75,7 +75,9 @@ public class Spell {
                 break;
             // Examine
             case 38:
-                handleSpellExamine();
+                if (this.caster.getUnitType() == UnitTypes.Player) {
+                    ((Player) this.caster).examine(this.target);
+                }
                 break;
                 // First Aid
                 case 54:
@@ -94,50 +96,6 @@ public class Spell {
         }
 
         return true;
-    }
-
-    private void handleSpellExamine()
-    {
-        if (!this.caster.isPlayer())
-            return;
-        Player player = (Player)this.caster;
-        if (player.getSession() == null)
-            return;
-
-        if (this.target == null)
-            this.target = this.caster;
-
-        ServerPacket packet = new ServerPacket();
-        packet.add(ServerCommands.ServerMessage)
-            .add("1261")
-            .add(this.target.getName())
-            .add(this.target.getName())
-            .add(ServerCommands.ServerMessage)
-            .add("1265")
-            .add(this.target.getHealth() + "/" + this.target.getParameters().value(Parameters.Health))
-            .add(this.target.getMana()).add(this.target.getParameters().value(Parameters.Mana))
-            .add(this.target.getParameters().value(Parameters.Damage) + "/" + this.target.getParameters().value(Parameters.MaxDamage))
-            .add(this.target.getParameters().value(Parameters.MagicDamage))
-            .add(ServerCommands.ServerMessage)
-            .add("1266")
-            .add(this.target.getParameters().value(Parameters.Protection))
-            .add(this.target.getParameters().value(Parameters.HealthRegeneration))
-            .add(this.target.getParameters().value(Parameters.ManaRegeneration))
-            .add(this.target.getParameters().value(Parameters.ChanceToHit))
-            .add(this.target.getParameters().value(Parameters.ChanceToCast))
-            .add(ServerCommands.ServerMessage)
-            .add("1267")
-            .add(this.target.getParameters().value(Parameters.Armour))
-            .add(this.target.getParameters().value(Parameters.FireResistance))
-            .add(this.target.getParameters().value(Parameters.FrostResistance))
-            .add(this.target.getParameters().value(Parameters.LightningResistance))
-            .add(ServerCommands.ServerMessage)
-            .add("1271")
-            .add(this.target.getParameters().value(Parameters.Strength))
-            .add(this.target.getParameters().value(Parameters.Dexterity))
-            .add(this.target.getParameters().value(Parameters.Intelligence))
-            .add(this.target.getParameters().value(Parameters.Constitution));
-        player.getSession().send(packet);
     }
 
     private void handleSpellFirstAid()

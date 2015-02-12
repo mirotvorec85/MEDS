@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.annotations.common.util.impl.Log;
 import org.meds.database.DBStorage;
 import org.meds.database.Hibernate;
 import org.meds.database.entity.*;
@@ -29,6 +30,37 @@ public class Player extends Unit
         {
             // TODO; Implement timer to logout the hanging player
             Player.this.session = null;
+        }
+    }
+
+    private class KillingBlowHandler implements KillingBlowListener {
+
+        @Override
+        public void handleEvent(DamageEvent e) {
+
+            // The victim is a creature
+            if (e.getVictim().getUnitType() == UnitTypes.Creature) {
+
+                // Add practise value
+                Player.this.info.setPractiseValue(Player.this.info.getPractiseValue() + e.getVictim().getLevel());
+
+                // Reward exp
+                if (!Player.this.getSettings().has(PlayerSettings.Asceticism)) {
+                    int victimLevel = e.getVictim().getLevel();
+                    int killerLevel = Player.this.getLevel();
+                    int exp = (victimLevel * victimLevel * victimLevel + 1) / (killerLevel * killerLevel + 1) + 1;
+
+                    // HACK: the limit (or even its existence) is unknown
+                    // Cannot get exp more than a half of the next level requirement
+                    int nextLevelEpx = LevelCost.getExp(killerLevel + 1);
+                    if (exp > nextLevelEpx / 2) exp = nextLevelEpx / 2;
+
+                    if (exp > 0) {
+                        Player.this.addExp(exp);
+                        Player.this.getSession().sendServerMessage(1038, Integer.toString(exp)); // You gain experience
+                    }
+                }
+            }
         }
     }
 
@@ -79,6 +111,7 @@ public class Player extends Unit
         this.syncTimer = SyncTime;
 
         this.disconnector = new SessionDisconnect();
+        this.addKillingBlowListener(new KillingBlowHandler());
     }
 
     @Override
@@ -1051,6 +1084,178 @@ public class Player extends Unit
         }
 
         this.position.removeCorpse(corpse);
+    }
+
+    public void examine(Unit target) {
+        // Nothing to output without a session
+        if (this.session == null)
+            return;
+
+        // Examine self
+        if (target == null || target == this) {
+
+            // TODO: Implement
+        }
+        // Examine another player
+        else if (target.getUnitType() == UnitTypes.Player) {
+
+            // TODO: Implement
+        }
+        // Examine a creature
+        else if (target.getUnitType() == UnitTypes.Creature) {
+            Creature creature = (Creature) target;
+            ServerPacket packet = null;
+
+            int lineIteration = 1;
+            // The first parameter can be seen after 50 creatures of this level;
+            double practise = this.info.getPractiseValue() / creature.getLevel() / 50;
+            do {
+                switch (lineIteration) {
+                    // Health, Mana, Damage, Magic Damage
+                    case 1: // 50 pcs
+                        packet = new ServerPacket(ServerCommands.ServerMessage).add(1265);
+                        packet.add(creature.getHealth() + "/" + creature.getParameters().value(Parameters.Health));
+                        packet.add(creature.getMana());
+                        packet.add(creature.getParameters().value(Parameters.Mana));
+                        // Physical and Magic Damage
+                        practise /= 2; // 100 pcs
+                        if (practise < 1) {
+                            packet.add("?/?");
+                            packet.add("?");
+                        } else {
+                            packet.add(creature.getParameters().value(Parameters.Damage) + "/" +
+                                    creature.getParameters().value(Parameters.MaxDamage));
+                            packet.add(creature.getParameters().value(Parameters.MagicDamage));
+                        }
+                        break;
+                    // Protection, Health and Mana Regeneration, Chances to Hit and Cast
+                    case 2: // 200 pcs
+                        packet.add(ServerCommands.ServerMessage).add(1266);
+                        //Protection
+                        packet.add(creature.getParameters().value(Parameters.Protection));
+
+                        // Health and Mana Regeneration
+                        practise /= 2; // 400 pcs
+                        if (practise < 1d) {
+                            packet.add("?").add("?");
+                        } else {
+                            packet.add(creature.getParameters().value(Parameters.HealthRegeneration));
+                            packet.add(creature.getParameters().value(Parameters.ManaRegeneration));
+                        }
+
+                        // Chance to Hit and Chance to Cast
+                        practise /= 2; // 800 pcs
+                        if (practise < 1d) {
+                            packet.add("?").add("?");
+                        } else {
+                            packet.add(creature.getParameters().value(Parameters.ChanceToHit));
+                            packet.add(creature.getParameters().value(Parameters.ChanceToCast));
+                        }
+                        break;
+                    // Armour, Resists
+                    case 3: // 1600 pcs
+                        packet.add(ServerCommands.ServerMessage).add(1267);
+                        packet.add(creature.getParameters().value(Parameters.Armour));
+
+                        // Resists
+                        practise /= 2; //3200 pcs
+                        if (practise < 1d) {
+                            packet.add("?").add("?").add("?");
+                        } else {
+                            packet.add(creature.getParameters().value(Parameters.FireResistance));
+                            packet.add(creature.getParameters().value(Parameters.FrostResistance));
+                            packet.add(creature.getParameters().value(Parameters.LightningResistance));
+                        }
+                        break;
+                    // Stats
+                    case 4: // 6400 pcs
+                        packet.add(ServerCommands.ServerMessage).add("1271");
+                        packet.add(creature.getParameters().value(Parameters.Strength));
+                        packet.add(creature.getParameters().value(Parameters.Dexterity));
+                        packet.add(creature.getParameters().value(Parameters.Intelligence));
+                        packet.add(creature.getParameters().value(Parameters.Constitution));
+                        break;
+                    // Current loot
+                    case 5: // 12800 pcs
+                        Iterator<Item> lootIterator = creature.getLootIterator();
+                        while (lootIterator.hasNext()) {
+                            Item item = lootIterator.next();
+                            packet.add(ServerCommands.ServerMessage).add(1268).add(creature.getTemplate().getName());
+                            if (item.getCount() == 1) {
+                                packet.add(item.getTitle());
+                            } else {
+                                packet.add(item.getCount() + " " + item.getTitle());
+                            }
+                        }
+                        break;
+                    // Creature max gold
+                    case 6: // 25600 pcs
+                        // Humanoids only
+                        if (creature.getTemplate().hasFlag(CreatureFlags.Beast))
+                            break;
+                        packet.add(ServerCommands.ServerMessage).add(1269)
+                                .add(creature.getTemplate().getName()).add(creature.getMaxGoldValue());
+                        break;
+                    // Creature current gold tip
+                    case 7: // 51,200 pcs
+                        // Humanoids only
+                        if (creature.getTemplate().hasFlag(CreatureFlags.Beast))
+                            break;
+                        packet.add(ServerCommands.ServerMessage);
+                        double goldLoad = 1d * creature.getCashGold() / creature.getMaxGoldValue();
+
+                        // Almost nothing
+                        if (creature.getCashGold() < creature.getMinGoldValue()) {
+                            packet.add(1307);
+                        }
+                        // a little
+                        else if (goldLoad <= 0.25) {
+                            packet.add(1306);
+                        }
+                        // medium
+                        else if (goldLoad <= 0.75) {
+                            packet.add(1305);
+                        }
+                        // Much (loading over 75%)
+                        else {
+                            packet.add(1304);
+                        }
+                        break;
+                    // Loot chances
+                    case 8: // 102,400 pcs
+                        /*
+                        TODO:
+                        1270
+                        CreatureName
+                        ItemName
+                        ChancePercentage
+                         */
+                    default:
+                        break;
+                }
+                lineIteration++;
+                practise /= 2;
+            } while (lineIteration < 9 && practise >= 1d);
+
+            String typeTitle;
+            if (creature.getTemplate().hasFlag(CreatureFlags.Unique)) {
+                typeTitle = Locale.getString(33);
+            } else {
+                typeTitle = Locale.getString(34);
+            }
+
+            ServerPacket total = new ServerPacket(ServerCommands.ServerMessage);
+            if (packet == null) {
+                total.add(1260);
+            } else {
+                total.add(1261);
+            }
+            total.add(creature.getTemplate().getName());
+            total.add(creature.getTemplate().getName());
+            total.add(typeTitle);
+            total.add(packet);
+            this.session.send(total);
+        }
     }
 
     public void interact(Unit unit) {

@@ -1,9 +1,6 @@
 package org.meds;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.meds.database.DBStorage;
 import org.meds.database.entity.CreatureLoot;
@@ -23,7 +20,7 @@ public class Creature extends Unit
     public final static int RespawnTime = 60000; // TODO: Determine the exact values of respawn timer
 
     private Set<Item> loot;
-    private int gold;
+    private int cashGold;
 
     private int respawnTimer;
 
@@ -35,6 +32,9 @@ public class Creature extends Unit
     private int autoSpell;
 
     private String fullName;
+
+    private int maxGoldValue;
+    private int minGoldValue;
 
     private Map<Integer, Integer> spells;
     private Map<Integer, Integer> skills;
@@ -133,6 +133,18 @@ public class Creature extends Unit
         return level;
     }
 
+    public int getCashGold() {
+        return this.cashGold;
+    }
+
+    public int getMaxGoldValue() {
+        return this.maxGoldValue;
+    }
+
+    public int getMinGoldValue() {
+        return this.minGoldValue;
+    }
+
     public boolean locationBound()
     {
         return this.spawnLocation != null;
@@ -229,6 +241,9 @@ public class Creature extends Unit
         this.health = this.parameters.value(Parameters.Health);
         this.mana = this.parameters.value(Parameters.Mana);
 
+        this.minGoldValue = this.getLevel() / 2; // 50% of the creature level
+        this.maxGoldValue = (this.getLevel() + 1) * 3 / 2; // 150% of the creature level
+
         this.constructName();
 
         World.getInstance().unitCreated(this);
@@ -282,7 +297,7 @@ public class Creature extends Unit
 
         // Money
         if (!this.template.hasFlag(CreatureFlags.Beast))
-            this.gold = Random.nextInt(this.getLevel() / 2, this.getLevel() + 1);
+            this.cashGold = Random.nextInt(this.minGoldValue, this.maxGoldValue);
     }
 
     @Override
@@ -291,12 +306,12 @@ public class Creature extends Unit
         Corpse corpse;
         this.deathState = DeathStates.Dead;
         this.respawnTimer = RespawnTime;
-        if (this.gold == 0 && this.loot.size() == 0)
+        if (this.cashGold == 0 && this.loot.size() == 0)
             corpse = null;
         else
         {
             corpse = new Corpse(this);
-            corpse.fillWithLoot(this.loot, this.gold);
+            corpse.fillWithLoot(this.loot, this.cashGold);
         }
 
         this.setPosition(null);
@@ -308,6 +323,10 @@ public class Creature extends Unit
         if (this.template.hasFlag(CreatureFlags.Unique)) {
             this.fullName += "(" + Locale.getString(33) + ")";
         }
+    }
+
+    public Iterator<Item> getLootIterator() {
+        return this.loot.iterator();
     }
 
     @Override

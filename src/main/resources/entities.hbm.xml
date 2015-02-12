@@ -198,6 +198,9 @@
         <property name="statuses" type="int">
             <column name="`statuses`" />
         </property>
+        <property name="practiseValue" type="double">
+            <column name="`practise_value`" />
+        </property>
         <map name="achievements" fetch="select" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="`character_id`" />
             <map-key column="`achievement_id`" type="int" />
