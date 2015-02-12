@@ -291,9 +291,10 @@ public class Item {
         }
 
         public void generateTotemicType() {
-            // Weapon do not have totemic bonus
-            if (Item.this.Template.getItemClass() == ItemClasses.Weapon)
+            // Equipment only (but Weapon does not have totemic bonus)
+            if (!Item.this.isEquipment() || Item.this.Template.getItemClass() == ItemClasses.Weapon)
                 return;
+
             setTotem(ItemTotemicTypes.parse(
                     Random.nextInt(ItemTotemicTypes.Mammoth.getValue(), ItemTotemicTypes.Eel.getValue() + 1)));
         }
