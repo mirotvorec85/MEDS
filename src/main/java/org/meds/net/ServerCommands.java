@@ -65,6 +65,7 @@ public enum ServerCommands
     QuestInfo("q"),
     QuestFinalText("qft"),
     NpcQuestList("qli"),
+    QuestListRegion("qlr"),
     RegionLocations("r"),
     RelaxOff("r0"),
     RelaxOn("r1"),

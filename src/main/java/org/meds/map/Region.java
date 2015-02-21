@@ -16,6 +16,10 @@ public class Region
             Region newRegion = event.getNewLocation().getRegion();
             Player player = (Player)event.getSource();
 
+            // Send Region quests
+            if (player.getSession() != null)
+                player.getSession().send(newRegion.getQuestListData());
+
             // Region changed
             if (!newRegion.equals(Region.this)) {
                 // Relocate a player
@@ -197,6 +201,15 @@ public class Region
         }
 
         return this.locationListData;
+    }
+
+    public ServerPacket getQuestListData() {
+        // TODO: Implement Region quests
+        ServerPacket packet = new ServerPacket(ServerCommands.QuestListRegion);
+        packet.add(0); // Quest giver icon
+        packet.add(0); // Quest count
+
+        return packet;
     }
 
     @Override
