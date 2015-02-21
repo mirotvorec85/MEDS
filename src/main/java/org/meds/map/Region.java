@@ -30,14 +30,15 @@ public class Region
                 if (player.getSession() != null) {
                     player.getSession().sendServerMessage(10, Region.this.getName());
 
-                    ServerPacket arrivalMessage = new ServerPacket(ServerCommands.ServerMessage);
-                    arrivalMessage.add(11);
-                    arrivalMessage.add(newRegion.getName());
+                    // Arrival message is not for a road
                     if (!newRegion.isRoad()) {
+                        ServerPacket arrivalMessage = new ServerPacket(ServerCommands.ServerMessage);
+                        arrivalMessage.add(11);
+                        arrivalMessage.add(newRegion.getName());
                         arrivalMessage.add(newRegion.getMinLevel());
                         arrivalMessage.add(newRegion.getMaxLevel());
+                        player.getSession().send(arrivalMessage);
                     }
-                    player.getSession().send(arrivalMessage);
                 }
 
             // Otherwise just notify everyone about location changed
