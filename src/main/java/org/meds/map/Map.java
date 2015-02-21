@@ -139,8 +139,10 @@ public class Map
                 Unit mover = entry.getKey();
 
                 // Current position doesn't exist
-                if (mover.getPosition() == null)
-                    return;
+                if (mover.getPosition() == null) {
+                    Logging.Warn.log(mover + " tries to move but the current position is not set.");
+                    continue;
+                }
 
                 // While fighting cancel the moving by putting at the same location
                 if (mover.isInCombat())
