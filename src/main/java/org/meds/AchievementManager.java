@@ -143,9 +143,8 @@ public class AchievementManager {
                 this.player.changeCurrency(Currencies.Achievement, achievement.getPoints());
                 sendAchievementComplete(achievement, charAchieve);
                 iterator.remove();
-                Logging.Info.log(String.format("Player %s (%d) complete achievement %d (%s)",
-                        this.player.getName(), this.player.getGuid(),
-                        achievement.getId(), achievement.getTitle()));
+                Logging.Info.log(String.format("%s completes the achievement %d (%s)",
+                        this.player, achievement.getId(), achievement.getTitle()));
             }
             // Update Achievement
             else {

@@ -68,7 +68,7 @@ public final class ChatHandler
 
         // Player is located nowhere
         if (player.getPosition() == null) {
-            Logging.Error.log("Player " + player.getName() + " says to chat" +
+            Logging.Error.log(player + " says to chat" +
                     ", but he is not on the map (no location specified)");
             return;
         }
@@ -129,7 +129,7 @@ public final class ChatHandler
         if (chatCommand.getMinArgsCount() != -1 && chatCommand.getMinArgsCount() > args.length)
         return;
         chatCommand.handle(player, args);
-        Logging.Info.log("Executing command \"%s\" for Player \"%s\"", command, player.getName());
+        Logging.Info.log("Executing command \"%s\" for %s", command, player);
     }
 
     private static abstract class ChatCommand

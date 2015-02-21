@@ -243,7 +243,7 @@ public abstract class Unit
         if (location != null)
             location.unitEntered(this);
         else
-            Logging.Debug.log("Unit %s has new NULL position", this.getName());
+            Logging.Debug.log("%s has new NULL position", toString());
 
         if (this.positionChangedListeners.size() > 0) {
             PositionEvent event = new PositionEvent(this, prevLocation, location);
@@ -438,8 +438,10 @@ public abstract class Unit
         }
 
         /* Physical Hit */
-        Logging.Debug.log("Unit \"%s\" random damage from %d up to %d", this.getName(), this.parameters.value(Parameters.Damage), this.parameters.value(Parameters.MaxDamage));
-        int initialDamage = Random.nextInt(this.parameters.value(Parameters.Damage), this.parameters.value(Parameters.MaxDamage));
+        Logging.Debug.log("%s random damage from %d up to %d", this.toString(),
+                this.parameters.value(Parameters.Damage), this.parameters.value(Parameters.MaxDamage));
+        int initialDamage = Random.nextInt(
+                this.parameters.value(Parameters.Damage), this.parameters.value(Parameters.MaxDamage));
 
         Damage damage = new Damage(initialDamage, this.target);
         damage.IsAutoAttack = true;
@@ -502,7 +504,7 @@ public abstract class Unit
 
         this.calculateFinalDamage(damage);
 
-        Logging.Debug.log("\"%s\"(%d) deals %d to \"%s\"(%d). Victim's health: %d", this.getName(), this.getGuid(), damage.FinalDamage, victim.getName(), victim.getGuid(), victim.getHealth());
+        Logging.Debug.log("%s deals %d damages to %s. Victim's health: %d", this, damage.FinalDamage, victim, victim.getHealth());
 
         // No damage
         if (damage.FinalDamage <= 0)
@@ -752,5 +754,10 @@ public abstract class Unit
     @Override
     public int hashCode() {
         return this.guid;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s \"%s\" (GUID: %d)", this.unitType.toString(), this.getName(), this.getGuid());
     }
 }

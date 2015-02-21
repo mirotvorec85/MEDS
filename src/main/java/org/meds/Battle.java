@@ -42,7 +42,7 @@ public class Battle
             {
                 this.participants.add(unit);
             }
-            Logging.Debug.log(String.format("Unit \"%s\"(%d) entered battle.", unit.getName(), unit.getGuid()));
+            Logging.Debug.log(unit + " has entered a battle.");
             sendBattleState(unit, BattleStates.EnterBattle);
             // This unit may be left already
             // but another participant has involved him again.
@@ -52,7 +52,7 @@ public class Battle
 
     public void leaveBattle(Unit unit)
     {
-        Logging.Debug.log(String.format("Unit \"%s\"(%d) left battle.", unit.getName(), unit.getGuid()));
+        Logging.Debug.log(unit + " has left a battle.");
         sendBattleState(unit, BattleStates.NoBattle);
         // Add to the list of left units
         // These units will be remove from the battle after the next Battle.Update cycle.

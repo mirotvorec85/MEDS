@@ -277,7 +277,7 @@ public class Creature extends Unit
 
         if (location == null)
         {
-            Logging.Error.log("Creature %d(%s, Entry=%d) was not spawned. Location not found or not specified.", this.guid, this.getName(), this.templateId);
+            Logging.Error.log("%s (Entry=%d) was not spawned. Location not found or not specified.", toString(), this.templateId);
             return;
         }
 

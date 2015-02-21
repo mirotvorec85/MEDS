@@ -569,7 +569,7 @@ public class Session implements Runnable
             send(packet);
 
             // Change String representation of the Session
-            Session.this.sessionToString = "Session [" + Session.this.player.getName() + "]: ";
+            Session.this.sessionToString = "Session [" + Session.this.player + "]: ";
         }
     }
 

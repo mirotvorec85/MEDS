@@ -88,7 +88,7 @@ public class World implements Runnable
 
         this.players.put(player.getGuid(), player);
         this.units.put(player.getGuid(), player);
-        Logging.Debug.log("World adds a new player: " + player.getGuid() + "-" + player.getName());
+        Logging.Debug.log("World adds a new " + player);
         this.addPlayersPacket.add(ServerCommands.PlayersListAdd)
             .add(player.getGuid())
             .add(player.getName())
@@ -108,7 +108,7 @@ public class World implements Runnable
         this.units.remove(player.getGuid());
         this.players.remove(player.getGuid());
         this.deletePlayersPacket.add(ServerCommands.PlayersListDelete).add(player.getGuid());
-        Logging.Debug.log("Player \"" + player.getName() + "\" just logged out.");
+        Logging.Debug.log(player + "\" just logged out.");
     }
 
     public void playerUpdated(Player player)

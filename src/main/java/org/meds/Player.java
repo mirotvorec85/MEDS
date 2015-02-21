@@ -542,7 +542,7 @@ public class Player extends Unit
     {
         if (this.session != null)
         {
-            Logging.Warn.log ("Player %d assigns a new session with existing one.");
+            Logging.Warn.log(toString() + " assigns a new session with existing one.");
             this.session.removeDisconnectListener(this.disconnector);
         }
         this.session = session;
@@ -1338,7 +1338,7 @@ public class Player extends Unit
     public boolean tryAcceptQuest(int questId) {
         QuestTemplate template = DBStorage.QuestTemplateStore.get(questId);
         if (template == null) {
-            Logging.Warn.log("{Player %s (%d) tries to accept not existing quest template %d", getName(), getGuid(), questId);
+            Logging.Warn.log("%s tries to accept not existing quest template %d", toString(), questId);
             return false;
         }
 

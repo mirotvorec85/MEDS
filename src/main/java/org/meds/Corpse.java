@@ -17,7 +17,7 @@ public class Corpse
 
     public Corpse(Unit owner)
     {
-        Logging.Debug.log("Create corpse for " + owner.getName());
+        Logging.Debug.log("Create corpse for " + owner);
         this.owner = owner;
         this.guid = Map.getInstance().getNextCorpseGuid();
         setPosition(owner.getPosition());
