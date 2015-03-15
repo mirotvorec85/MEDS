@@ -11,34 +11,15 @@ public class Configuration
     public enum Keys
     {
         ServerIP,
-        Port,
+        Port;
 
-        DebugLog,
-        InfoLog,
-        WarnLog,
-        ErrorLog,
-
-        Connection;
-
-        public static Keys parseKey(String string)
-        {
+        public static Keys parseKey(String string) {
             string = string.toUpperCase();
-            switch (string)
-            {
+            switch (string) {
                 case "IP":
                     return ServerIP;
                 case "PORT":
                     return Port;
-                case "DEBUGLOG":
-                    return DebugLog;
-                case "INFOLOG":
-                    return InfoLog;
-                case "WARNLOG":
-                    return WarnLog;
-                case "ERRORLOG":
-                    return ErrorLog;
-                case "CONNECTION":
-                    return Connection;
                 default:
                     return null;
             }
@@ -150,48 +131,6 @@ public class Configuration
             pw.println("IP=\"127.0.0.1\"");
             pw.println("Port=7777");
             pw.println();
-            pw.println("##################################");
-            pw.println("# LOGGING SYSTEM");
-            pw.println("#");
-            pw.println("#    DebugLog - messages about any intermediate state or value");
-            pw.println("#        that helps to define how the code is really working.");
-            pw.println("#");
-            pw.println("#");
-            pw.println("#    InfoLog - messages about any significant event");
-            pw.println("#        which presence would like to store.");
-            pw.println("#");
-            pw.println("#");
-            pw.println("#    WarnLog - messages about any discrepancy inside program datas");
-            pw.println("#        which can be solved by canceling its further execution.");
-            pw.println("#");
-            pw.println("#");
-            pw.println("#    ErrorLog - messages about internal code errors");
-            pw.println("#        which can not be handled and generally cause the server shutdown.");
-            pw.println("#");
-            pw.println("#");
-            pw.println("#    Possible values:");
-            pw.println("#        0 - Disabled (by default)");
-            pw.println("#        1 - Log into the file only");
-            pw.println("#        2 - Log into the file and console");
-            pw.println("#");
-            pw.println("##################################");
-            pw.println();
-            pw.println("DebugLog=0");
-            pw.println("InfoLog=1");
-            pw.println("WarnLog=2");
-            pw.println("ErrorLog=2");
-            pw.println();
-            pw.println("##################################");
-            pw.println("# DATABASE");
-            pw.println("#");
-            pw.println("#    Connection - the string that represents all required information");
-            pw.println("#        to establish connection with MySQL Database.");
-            pw.println("#        String Format: \"DB_HOST;DB_USERNAME;DB_PASSWORD;DB_NAME\"");
-            pw.println("#        Default: \"localhost;root;root;medsdb\"");
-            pw.println("#");
-            pw.println("##################################");
-            pw.println();
-            pw.println("Connection=\"localhost;root;root;medsdb\"");
             pw.close();
             System.out.println("Config file" + distFile + " just created.");
 
