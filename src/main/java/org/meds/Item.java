@@ -139,100 +139,13 @@ public class Item {
                 return;
 
             // Parameters Bonus
-            ItemBonusParameters parameter;
-            double protectionRatio;
-            double armorRatio;
-            switch (totem) {
-                case Mammoth:
-                    parameter = ItemBonusParameters.BonusConstitution;
-                    protectionRatio = 1d;
-                    armorRatio = 0.33d;
-                    break;
-                case Tiger:
-                    parameter = ItemBonusParameters.BonusStrength;
-                    protectionRatio = 1d;
-                    armorRatio = 0.33d;
-                    break;
-                case Cat:
-                    parameter = ItemBonusParameters.BonusDexterity;
-                    protectionRatio = 1d;
-                    armorRatio = 0.33d;
-                    break;
-                case Owl:
-                    parameter = ItemBonusParameters.BonusIntelligence;
-                    protectionRatio = 1d;
-                    armorRatio = 0.33d;
-                    break;
-                case Bear:
-                    parameter = ItemBonusParameters.BonusDamage;
-                    protectionRatio = 1d;
-                    armorRatio = 0.33d;
-                    break;
-                case Turtle:
-                    parameter = ItemBonusParameters.BonusProtection;
-                    protectionRatio = 1d;
-                    armorRatio = 0.33d;
-                    break;
-                case Hawk:
-                    parameter = ItemBonusParameters.BonusChanceToHit;
-                    protectionRatio = 1d;
-                    armorRatio = 0.33d;
-                    break;
-                case Monkey:
-                    parameter = ItemBonusParameters.BonusArmour;
-                    protectionRatio = 3d;
-                    armorRatio = 1d;
-                    break;
-                case Octopus:
-                    parameter = ItemBonusParameters.BonusChanceToCast;
-                    protectionRatio = 1d;
-                    armorRatio = 0.33d;
-                    break;
-                case Spider:
-                    parameter = ItemBonusParameters.BonusMagicDamage;
-                    protectionRatio = 1d;
-                    armorRatio = 0.33d;
-                    break;
-                case Whale:
-                    parameter = ItemBonusParameters.BonusHealth;
-                    protectionRatio = 12d;
-                    armorRatio = 4d;
-                    break;
-                case Dragon:
-                    parameter = ItemBonusParameters.BonusMana;
-                    protectionRatio = 9d;
-                    armorRatio = 3d;
-                    break;
-                case Reptile:
-                    parameter = ItemBonusParameters.BonusHealthRegeneration;
-                    protectionRatio = 0.33d;
-                    armorRatio = 0.11d;
-                    break;
-                case Ant:
-                    parameter = ItemBonusParameters.BonusManaRegeneration;
-                    protectionRatio = 0.33d;
-                    armorRatio = 0.11d;
-                    break;
-                case Scorpion:
-                    parameter = ItemBonusParameters.BonusFireResistance;
-                    protectionRatio = 1d;
-                    armorRatio = 0.33d;
-                    break;
-                case Penguin:
-                    parameter = ItemBonusParameters.BonusFrostResistance;
-                    protectionRatio = 1d;
-                    armorRatio = 0.33d;
-                    break;
-                case Eel:
-                    parameter = ItemBonusParameters.BonusLightningResistance;
-                    protectionRatio = 1d;
-                    armorRatio = 0.33d;
-                    break;
-                default:
-                    return;
-            }
-
+            ItemBonusParameters parameter = totem.getParameter();
+            // Protection gets the full ratio value
+            // Armour gets a third part
+            double protectionRatio = totem.getRatio();
+            double armorRatio = totem.getRatio() / 3;
             int value = 0;
+
             // Uses a half of given base protection and armour item parameters
             if (Item.this.bonusParameters.containsKey(ItemBonusParameters.BaseProtection)) {
                 int protection = Item.this.bonusParameters.get(ItemBonusParameters.BaseProtection);
@@ -245,6 +158,10 @@ public class Item {
                 armour /= 2;
                 Item.this.bonusParameters.put(ItemBonusParameters.BaseArmour, armour);
                 value += armour * armorRatio;
+            }
+            // The value should be positive (1 at least)
+            if (value == 0) {
+                value = 1;
             }
 
             Integer currentValue = Item.this.bonusParameters.get(parameter);
