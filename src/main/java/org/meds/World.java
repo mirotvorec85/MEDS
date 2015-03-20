@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.meds.database.DBStorage;
+import org.meds.database.entity.CreatureTemplate;
+import org.meds.enums.CreatureTypes;
 import org.meds.map.Map;
 import org.meds.net.Server;
 import org.meds.net.Server.StopListener;
@@ -43,6 +46,8 @@ public class World implements Runnable
     private List<Battle> battles;
     private LinkedList<Battle> newBattles;
     private LinkedList<Battle> expiredBattles;
+
+    private HashMap<Integer, CreatureTypes> creatureTypes;
 
     /**
      * Indicating whether the world is in stopping process
@@ -158,6 +163,14 @@ public class World implements Runnable
         return this.units.get(guid);
     }
 
+    public CreatureTypes getCreatureType(int creatureTemplateId) {
+        CreatureTypes type = this.creatureTypes.get(creatureTemplateId);
+        if (type == null)
+            return CreatureTypes.Normal;
+
+        return type;
+    }
+
     public void addBattle(Battle battle)
     {
         this.newBattles.add(battle);
@@ -190,8 +203,19 @@ public class World implements Runnable
     }
 
     @SuppressWarnings("unchecked")
-    public void createCreatures()
-    {
+    public void createCreatures() {
+
+        // Generate CreatureTypes
+        this.creatureTypes = new HashMap<>(DBStorage.CreatureTemplateStore.size());
+        for (CreatureTemplate creatureTemplate : DBStorage.CreatureTemplateStore.values()) {
+            // Level 30 and higher
+            if (creatureTemplate.getLevel() < 30)
+                continue;
+
+            this.creatureTypes.put(creatureTemplate.getTemplateId(), CreatureTypes.getRandomType());
+        }
+
+
         // Load and spawn all the Creatures
         Session session = Hibernate.getSessionFactory().openSession();
         List<Creature> creatures = session.createCriteria(Creature.class).list();

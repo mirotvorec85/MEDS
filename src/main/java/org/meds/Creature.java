@@ -6,6 +6,7 @@ import org.meds.database.DBStorage;
 import org.meds.database.entity.CreatureLoot;
 import org.meds.database.entity.CreatureTemplate;
 import org.meds.enums.CreatureFlags;
+import org.meds.enums.CreatureTypes;
 import org.meds.enums.MovementDirections;
 import org.meds.enums.Parameters;
 import org.meds.logging.Logging;
@@ -244,6 +245,8 @@ public class Creature extends Unit
         this.minGoldValue = this.getLevel() / 2; // 50% of the creature level
         this.maxGoldValue = (this.getLevel() + 1) * 3 / 2; // 150% of the creature level
 
+        // TODO: additional parameters, spells and skills according to the creature current type
+
         this.constructName();
 
         World.getInstance().unitCreated(this);
@@ -320,6 +323,9 @@ public class Creature extends Unit
 
     private void constructName() {
         this.fullName = this.template.getName();
+        CreatureTypes type = World.getInstance().getCreatureType(this.templateId);
+        if (type != CreatureTypes.Normal)
+            this.fullName += "(" + Locale.getString(type.getTitleStringId()) + ")";
         if (this.template.hasFlag(CreatureFlags.Unique)) {
             this.fullName += "(" + Locale.getString(33) + ")";
         }
