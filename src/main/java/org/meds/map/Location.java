@@ -635,7 +635,7 @@ public class Location
                 pss.add(_unit.getReligion());
                 pss.add(_unit.getReligLevel());
                 if (!_unit.isPlayer() || ((Player)_unit).getGroup() == null) {
-                    pss.add("0"); // Is Group Leader
+                    pss.add("0"); // Is a Group Leader
                     pss.add("0"); // Group leader GUID
                 } else {
                     Group group = ((Player)_unit).getGroup();
@@ -651,8 +651,13 @@ public class Location
                 pss.add("0"); // is Out of law
                 pss.add("1"); // Gender
                 pss.add("0"); // Title
-                pss.add("0"); // is Pet
-                pss.add("0"); // Boss type
+                pss.add("0"); // is a Pet
+                // Boss Type
+                if (_unit.getUnitType() == UnitTypes.Creature) {
+                    pss.add(((Creature)_unit).getBossType());
+                } else {
+                    pss.add("0");
+                }
             }
 
             player.getSession().send(pss);

@@ -5,16 +5,12 @@ import java.util.*;
 import org.meds.database.DBStorage;
 import org.meds.database.entity.CreatureLoot;
 import org.meds.database.entity.CreatureTemplate;
-import org.meds.enums.CreatureFlags;
-import org.meds.enums.CreatureTypes;
-import org.meds.enums.MovementDirections;
-import org.meds.enums.Parameters;
+import org.meds.enums.*;
 import org.meds.logging.Logging;
 import org.meds.map.Location;
 import org.meds.util.Random;
 
-public class Creature extends Unit
-{
+public class Creature extends Unit {
     /**
      * Creature Respawn time after death. In milliseconds.
      */
@@ -34,19 +30,21 @@ public class Creature extends Unit
 
     private String fullName;
 
+    private CreatureBossTypes bossType;
+
     private int maxGoldValue;
     private int minGoldValue;
 
     private Map<Integer, Integer> spells;
     private Map<Integer, Integer> skills;
 
-    public Creature()
-    {
+    public Creature() {
         super();
         this.unitType = UnitTypes.Creature;
         this.spells = new HashMap<>();
         this.skills = new HashMap<>();
         this.loot = new HashSet<>();
+        this.bossType = CreatureBossTypes.Normal;
     }
 
     @SuppressWarnings("unused")
@@ -76,12 +74,10 @@ public class Creature extends Unit
     }
 
     @SuppressWarnings("unused")
-    private void setLocationId(Integer locationId)
-    {
-        if (locationId == null)
+    private void setLocationId(Integer locationId) {
+        if (locationId == null) {
             this.locationId = 0;
-        else
-        {
+        } else {
             this.locationId = locationId;
             this.spawnLocation = org.meds.map.Map.getInstance().getLocation(locationId);
         }
@@ -134,6 +130,10 @@ public class Creature extends Unit
         return level;
     }
 
+    public CreatureBossTypes getBossType() {
+        return bossType;
+    }
+
     public int getCashGold() {
         return this.cashGold;
     }
@@ -151,15 +151,35 @@ public class Creature extends Unit
         return this.spawnLocation != null;
     }
 
+    public CreatureTypes getCreatureType() {
+        return World.getInstance().getCreatureType(this.templateId);
+    }
+
     @Override
-    public int create()
-    {
+    public int create() {
         this.template = DBStorage.CreatureTemplateStore.get(this.templateId);
 
         if (this.template == null)
             return 0;
 
-        /*
+        calculateParameters();
+        calculateCashRange();
+
+        this.health = this.parameters.value(Parameters.Health);
+        this.mana = this.parameters.value(Parameters.Mana);
+
+        // TODO: additional parameters, spells and skills according to the creature current type
+
+        this.constructName();
+
+        World.getInstance().unitCreated(this);
+
+        return this.guid;
+    }
+
+    private void calculateParameters() {
+
+         /*
          * CREATURE STATS:
          *
          * Base stats (Constitution, Strength, Dexterity, Intelligence):
@@ -173,8 +193,8 @@ public class Creature extends Unit
          * Level * Level * Level * 0.000105 + Level * Level * 0.025 + Level * 0.3 + 40
          *
          * Health Regeneration: ???
-         * Level * Level *0.012 + Level * 0.1 + 4 => Floor (Under 70 Level)
-         * Level * Level *0.016 + Level * 0.1 + 4 => Floor (Under 70 Level)
+         * Level * Level *0.012 + Level * 0.1 + 4 => Floor (Below level 70)
+         * Level * Level *0.016 + Level * 0.1 + 4 => Floor (Above level 70)
          *
          * Mana Regeneration ????
          * Level * Level * Level * 0.000013 + Level * Level * 0.002 + Level * 0.1 + 7
@@ -218,14 +238,42 @@ public class Creature extends Unit
          * */
 
         int level = getLevel();
+        this.parameters = new UnitParameters(this);
 
         this.parameters.base().value(Parameters.Constitution, 8 + level / 6);
         this.parameters.base().value(Parameters.Strength, 8 + level / 6);
         this.parameters.base().value(Parameters.Dexterity, 8 + level / 6);
         this.parameters.base().value(Parameters.Intelligence, 8 + level / 6);
 
+        int bossMultiplier = 1;
+        if (this.template.hasFlag(CreatureFlags.Unique)) {
+            bossMultiplier = 11;
+        }
+        switch (this.bossType) {
+            case DeathAura:
+            case Freeze:
+            case AbsorbAura:
+            case Vampire:
+                bossMultiplier = 2;
+                break;
+            case Champion:
+                bossMultiplier = 4;
+                break;
+            case Possessed:
+                bossMultiplier = 11;
+                break;
+        }
+        int bonusHp;
+        if (level < 71) {
+            bonusHp = level * level / 4;
+        } else {
+            bonusHp = level * level / 3;
+        }
+        if (bossMultiplier > 1) {
+            bonusHp = (bonusHp + this.parameters.base().value(Parameters.Health)) * bossMultiplier;
+        }
+        this.parameters.guild().value(Parameters.Health, bonusHp);
 
-        this.parameters.guild().value(Parameters.Health, level * level / 4); // level:95 = level /3
         this.parameters.guild().value(Parameters.Mana, (int)(level * level * level * 0.000105 + level * level * 0.025 + level * 0.3 + 40));
         this.parameters.guild().value(Parameters.HealthRegeneration, (int)(level * level  * 0.012 + level * 0.1 + 4));
         this.parameters.guild().value(Parameters.ManaRegeneration, (int)(level * level * level * 0.000013 + level * level * 0.002 + level * 0.1 + 7));
@@ -238,48 +286,106 @@ public class Creature extends Unit
         this.parameters.guild().value(Parameters.ChanceToCast, (int)(level * level * 0.0075 + level * 0.75));
         this.parameters.guild().value(Parameters.AllResistance, (int)(level * level * 0.03 + level * 3));
         // TODO: estimate and add the other parameters coeffs
+    }
 
-        this.health = this.parameters.value(Parameters.Health);
-        this.mana = this.parameters.value(Parameters.Mana);
+    private void calculateCashRange() {
 
-        this.minGoldValue = this.getLevel() / 2; // 50% of the creature level
-        this.maxGoldValue = (this.getLevel() + 1) * 3 / 2; // 150% of the creature level
+        double bossMultiplier = 1d;
+        if (this.template.hasFlag(CreatureFlags.Unique)) {
+            bossMultiplier = 10d;
+        }
+        switch (this.bossType) {
+            case Champion:
+            case Vampire:
+            case AbsorbAura:
+            case Freeze:
+                bossMultiplier = 1.2d;
+                break;
+            case Spectral:
+            case DeathAura:
+                bossMultiplier = 1.3d;
+            // TODO: Determine other multipliers
+        }
 
-        // TODO: additional parameters, spells and skills according to the creature current type
+        // TODO: Chaos Zone and something else affect the gold amount
+        this.minGoldValue = (int) (bossMultiplier * this.getLevel() / 2); // 50% of the creature level * multiplier
+        this.maxGoldValue = (int) (bossMultiplier * (this.getLevel() + 1) * 3 / 2); // 150% of the creature level * multiplier
+    }
 
-        this.constructName();
+    private void generateBossType() {
 
-        World.getInstance().unitCreated(this);
+        // Creatures above level 50 (Not sure)
+        if (this.getLevel() < 50)
+            return;
 
-        return this.guid;
+        // Except Unique Creatures
+        if (this.template.hasFlag(CreatureFlags.Unique))
+            return;
+
+        // 5% chance to be a boss
+        if (Random.nextInt(100) >= 5) {
+            this.bossType = CreatureBossTypes.Normal;
+            return;
+        }
+
+        // According to its type
+        List<CreatureBossTypes> possibleTypes = new ArrayList<>(CreatureBossTypes.values().length);
+
+        // Can be anyone
+        possibleTypes.add(CreatureBossTypes.DeathAura);
+        possibleTypes.add(CreatureBossTypes.Possessed);
+        possibleTypes.add(CreatureBossTypes.Spectral);
+        possibleTypes.add(CreatureBossTypes.AbsorbAura);
+        possibleTypes.add(CreatureBossTypes.Freeze);
+
+        // Religion Cultists
+        CreatureTypes creatureType = this.getCreatureType();
+        if (creatureType == CreatureTypes.MoonCultist ||
+                creatureType == CreatureTypes.SunCultist ||
+                creatureType == CreatureTypes.OrderAdept ||
+                creatureType == CreatureTypes.ChaosAdept) {
+            possibleTypes.add(CreatureBossTypes.Fanatic);
+        }
+
+        // Mages
+        if (creatureType == CreatureTypes.FireAdept ||
+                creatureType == CreatureTypes.ColdAdept ||
+                creatureType == CreatureTypes.LightningAdept) {
+            possibleTypes.add(CreatureBossTypes.Elementalist);
+        }
+        // Not mages
+        else {
+            possibleTypes.add(CreatureBossTypes.Champion);
+        }
+
+        this.bossType = possibleTypes.get(Random.nextInt(possibleTypes.size()));
     }
 
     /**
      * Spawn the creature at its location(bound or random) with random loot and money account.
      */
-    public void spawn()
-    {
-        // Spawn from death
-        if (this.deathState == DeathStates.Dead)
-        {
-            this.health = this.parameters.value(Parameters.Health);
-            this.mana = this.parameters.value(Parameters.Mana);
-            this.deathState = DeathStates.Alive;
+    public void spawn() {
+        this.deathState = DeathStates.Alive;
+
+        CreatureBossTypes oldType = this.bossType;
+        generateBossType();
+        // New Boss Type
+        if (oldType != this.bossType) {
+            calculateParameters();
+            calculateCashRange();
+            constructName();
         }
 
         Location location;
-        if (this.locationBound())
-        {
+        if (this.locationBound()) {
             location = this.spawnLocation;
         }
-        else
-        {
+        else {
             // Find random location at creature's region
             location = org.meds.map.Map.getInstance().getRegion(this.template.getRegionId()).getRandomLocation(false);
         }
 
-        if (location == null)
-        {
+        if (location == null) {
             Logging.Error.log("%s (Entry=%d) was not spawned. Location not found or not specified.", toString(), this.templateId);
             return;
         }
@@ -298,9 +404,11 @@ public class Creature extends Unit
             }
         }
 
-        // Money
         if (!this.template.hasFlag(CreatureFlags.Beast))
             this.cashGold = Random.nextInt(this.minGoldValue, this.maxGoldValue);
+
+        this.health = this.parameters.value(Parameters.Health);
+        this.mana = this.parameters.value(Parameters.Mana);
     }
 
     @Override
@@ -322,13 +430,17 @@ public class Creature extends Unit
     }
 
     private void constructName() {
-        this.fullName = this.template.getName();
-        CreatureTypes type = World.getInstance().getCreatureType(this.templateId);
+        StringBuilder nameBuilder = new StringBuilder(this.template.getName());
+        CreatureTypes type = getCreatureType();
         if (type != CreatureTypes.Normal)
-            this.fullName += "(" + Locale.getString(type.getTitleStringId()) + ")";
+            nameBuilder.append("(").append(Locale.getString(type.getTitleStringId())).append(")");
         if (this.template.hasFlag(CreatureFlags.Unique)) {
-            this.fullName += "(" + Locale.getString(33) + ")";
+            nameBuilder.append("(").append(Locale.getString(33)).append(")");
         }
+        if (this.bossType != CreatureBossTypes.Normal) {
+            nameBuilder.append("(").append(Locale.getString(this.bossType.getTitleStringId())).append(")");
+        }
+        this.fullName = nameBuilder.toString();
     }
 
     public Iterator<Item> getLootIterator() {
