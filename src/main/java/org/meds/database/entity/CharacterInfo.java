@@ -46,6 +46,7 @@ public class CharacterInfo
     private int settings;
     private int statuses;
     private double practiseValue;
+    private String notepad;
 
     private Map<Integer, CharacterAchievement> achievements = new HashMap<>();
     private Map<Integer, CharacterGuild> guilds = new HashMap<>();
@@ -370,6 +371,14 @@ public class CharacterInfo
 
     public void setPractiseValue(double practiseValue) {
         this.practiseValue = practiseValue;
+    }
+
+    public String getNotepad() {
+        return notepad;
+    }
+
+    public void setNotepad(String notepad) {
+        this.notepad = notepad;
     }
 
     public Map<Integer, CharacterAchievement> getAchievements() {

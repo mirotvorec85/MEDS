@@ -3,6 +3,7 @@ package org.meds.net;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.util.*;
 
@@ -128,6 +129,7 @@ public class Session implements Runnable
         this.commandHandlers.put(ClientCommands.TradeCancel, new TradeCancelCommandHandler());
         this.commandHandlers.put(ClientCommands.SetAsceticism, new SetAsceticismCommandHandler());
         this.commandHandlers.put(ClientCommands.GetProfessions, new GetProfessionsCommandHandler());
+        this.commandHandlers.put(ClientCommands.SaveNotepad, new SaveNotepadCommandHandler());
 
         this.packetBuffer = new ServerPacket();
 
@@ -528,8 +530,8 @@ public class Session implements Runnable
             // Unknown
             packet.addData(ServerCommands._omg, "7", "0", "0");
 
-            // TODO: Implement notepad
-            packet.addData(ServerCommands._mem, "This is your notepad.");
+            // Notepad notes
+            packet.addData(ServerCommands.Notepad, Session.this.player.getNotepadNotes());
 
             packet.add(World.getInstance().getDayTimeData());
 
@@ -1634,6 +1636,26 @@ public class Session implements Runnable
         @Override
         public void handle(String[] data) {
             Session.this.send(Session.this.player.getProfessionData());
+        }
+    }
+
+    private class SaveNotepadCommandHandler extends CommandHandler {
+
+        @Override
+        public int getMinDataLength() {
+            return 1;
+        }
+
+        @Override
+        public void handle(String[] data) {
+            // Decode from URL string
+            try {
+                // Cp1251 Encoding because there can be cyrillic signs
+                String notes = java.net.URLDecoder.decode(data[0], "Cp1251");
+                Session.this.player.setNotepadNotes(notes);
+            } catch (UnsupportedEncodingException e) {
+                Logging.Error.log(Session.this.toString() + " saving notepad: URLDecoder", e);
+            }
         }
     }
 }

@@ -89,6 +89,7 @@ CREATE TABLE `character_info` (
   `settings` INT UNSIGNED NOT NULL DEFAULT '0',
   `statuses` INT UNSIGNED NOT NULL DEFAULT '0',
   `practise_value` DOUBLE NOT NULL DEFAULT '0',
+  `notepad` TEXT NOT NULL,
   PRIMARY KEY (`character_id`),
   FOREIGN KEY (`character_id`) REFERENCES `character` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (`location_id`) REFERENCES `location` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT

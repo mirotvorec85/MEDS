@@ -48,7 +48,7 @@ public enum ServerCommands
     PlayersListUpdate("lu"),
     GuildLevels("lvl"),
     AutoSpell("mb"),
-    _mem("mem"), // Character Notes
+    Notepad("mem"),
     ServerMessage("mes"),
     MagicInfo("mi"),
     ChatMessage("msg"),

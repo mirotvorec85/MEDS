@@ -190,6 +190,8 @@ public class ServerCommandHandler implements Runnable
             // Location - Seastone Star
             characterInfo.setLocationId(3);
             characterInfo.setHomeId(3);
+            // Notepad notes
+            characterInfo.setNotepad("This is your notepad.");
 
             characterInfo.getSpells().put(38, new CharacterSpell(characterId, 38, 1)); // Examine
             characterInfo.getSpells().put(54, new CharacterSpell(characterId, 54, 1)); // First Aid

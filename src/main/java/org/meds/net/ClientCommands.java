@@ -56,6 +56,7 @@ public enum ClientCommands
     EnterStar("scity"),
     SellItem("sell"),
     SetAutoSpell("seta"),
+    SaveNotepad("smem"),
     TakeMoney("tm"),
     UseMagic("um"),
     UseItem("use"),

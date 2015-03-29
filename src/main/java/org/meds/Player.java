@@ -351,6 +351,14 @@ public class Player extends Unit
             this.session.send(this.getLevelData());
     }
 
+    public String getNotepadNotes() {
+        return this.info.getNotepad();
+    }
+
+    public void setNotepadNotes(String notes) {
+        this.info.setNotepad(notes);
+    }
+
     public ServerPacket getLevelData()
     {
         return this.getLevelData(false);
