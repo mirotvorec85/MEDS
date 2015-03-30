@@ -616,19 +616,16 @@ public class Session implements Runnable
         }
     }
 
-    private class PutMoneyCommandHandler extends CommandHandler
-    {
-        @Override
-        public int getMinDataLength()
-        {
-            return 1;
-        }
+    private class PutMoneyCommandHandler extends CommandHandler {
 
         @Override
-        public void handle(String[] data)
-        {
-            int amount = SafeConvert.toInt32(data[0], -1);
-            // Absent amount means depositting all the gold
+        public void handle(String[] data) {
+            int amount = -1;
+            if (data.length > 0) {
+                amount = SafeConvert.toInt32(data[0], -1);
+            }
+
+            // Absent amount means to deposit all the gold
             if (amount == -1)
                 amount = Session.this.player.getCurrencyAmount(Currencies.Gold);
 
@@ -636,18 +633,14 @@ public class Session implements Runnable
         }
     }
 
-    private class TakeMoneyCommandHandler extends CommandHandler
-    {
-        @Override
-        public int getMinDataLength()
-        {
-            return 1;
-        }
+    private class TakeMoneyCommandHandler extends CommandHandler {
 
         @Override
-        public void handle(String[] data)
-        {
-            int amount = SafeConvert.toInt32(data[0], -1);
+        public void handle(String[] data) {
+            int amount = -1;
+            if (data.length > 0) {
+                amount = SafeConvert.toInt32(data[0], -1);
+            }
 
             // Absent amount means withdrawing all the gold
             if (amount == -1)
