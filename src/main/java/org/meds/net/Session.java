@@ -124,8 +124,8 @@ public class Session implements Runnable
         this.commandHandlers.put(ClientCommands.GroupKick, new GroupKickCommandHandler());
         this.commandHandlers.put(ClientCommands.GroupChangeLeader, new GroupChangeLeaderCommandHandler());
         this.commandHandlers.put(ClientCommands.GetTrade, new GetTradeCommandHandler());
-        this.commandHandlers.put(ClientCommands.TradeUpdate, new TradeUpdateCommandHandler());
-        this.commandHandlers.put(ClientCommands.TradeApply, new TradeApplyCommandHandler());
+        this.commandHandlers.put(ClientCommands.TradeUpdate, new TradeUpdateCommandHandler(false));
+        this.commandHandlers.put(ClientCommands.TradeApply, new TradeUpdateCommandHandler(true));
         this.commandHandlers.put(ClientCommands.TradeCancel, new TradeCancelCommandHandler());
         this.commandHandlers.put(ClientCommands.SetAsceticism, new SetAsceticismCommandHandler());
         this.commandHandlers.put(ClientCommands.GetProfessions, new GetProfessionsCommandHandler());
@@ -1463,9 +1463,19 @@ public class Session implements Runnable
 
     private class TradeUpdateCommandHandler extends CommandHandler {
 
+        private boolean isApply;
+
+        private TradeUpdateCommandHandler(boolean isApply) {
+            this.isApply = isApply;
+        }
+
         @Override
         public int getMinDataLength() {
-            return 15;
+            if (this.isApply) {
+                return 29;
+            } else {
+                return 15;
+            }
         }
 
         @Override
@@ -1487,8 +1497,10 @@ public class Session implements Runnable
                         SafeConvert.toInt32(data[counter++]),
                         SafeConvert.toInt32(data[counter++])),
                         SafeConvert.toInt32(data[counter++]));
+                // An item has not been constructed right
                 if (item.Template == null || item.getCount() == 0)
                     continue;
+
                 if (!Session.this.player.getInventory().hasItem(item)) {
                     Logging.Warn.log("Trade: " + Session.this.player.toString() + "places item " +
                             item.getPrototype().toString() + "but he has no this item in the inventory");
@@ -1499,95 +1511,50 @@ public class Session implements Runnable
 
             int gold = SafeConvert.toInt32(data[counter++]);
             int platinum = SafeConvert.toInt32(data[counter++]);
-            if (gold > 0) {
-                if (gold > Session.this.player.getCurrencyAmount(Currencies.Gold)) {
-                    gold = Session.this.player.getCurrencyAmount(Currencies.Gold);
-                }
-                supply.setGold(gold);
-            }
-            if (platinum > 0) {
-                if (platinum > Session.this.player.getCurrencyAmount(Currencies.Platinum)) {
-                    platinum = Session.this.player.getCurrencyAmount(Currencies.Platinum);
-                }
-                supply.setPlatinum(platinum);
-            }
-
-            trade.setCurrentSupply(supply);
-        }
-    }
-
-    private class TradeApplyCommandHandler extends CommandHandler {
-
-        @Override
-        public int getMinDataLength() {
-            return 29;
-        }
-
-        @Override
-        public void handle(String[] data) {
-            Trade trade = Session.this.player.getTrade();
-            if (trade == null)
-                return;
-            Player trader = World.getInstance().getPlayer(SafeConvert.toInt32(data[0]));
-            // The real trader and the new supply trader do not match
-            if (trader != trade.getOtherSide().getPlayer()) {
-                return;
-            }
-
-            Trade.Supply supply = trade.new Supply();
-            int counter = 1;
-            for (int i = 0; i < 3; ++i) {
-                Item item = new Item(new Prototype(
-                            SafeConvert.toInt32(data[counter++]),
-                            SafeConvert.toInt32(data[counter++]),
-                            SafeConvert.toInt32(data[counter++])),
-                        SafeConvert.toInt32(data[counter++]));
-                if (item.Template == null || item.getCount() == 0)
-                    continue;
-                if (!Session.this.player.getInventory().hasItem(item)) {
-                    Logging.Warn.log("Trade: " + Session.this.player.toString() + "places item " +
-                            item.getPrototype().toString() + "but he has no this item in the inventory");
-                    continue;
-                }
-                supply.setItem(i, item);
-            }
-
-            int gold = SafeConvert.toInt32(data[counter++]);
-            int platinum = SafeConvert.toInt32(data[counter++]);
-            if (gold > Session.this.player.getCurrencyAmount(Currencies.Gold)) {
+            if (gold <= 0) {
+                gold = 0;
+            } else if (gold > Session.this.player.getCurrencyAmount(Currencies.Gold)) {
                 gold = Session.this.player.getCurrencyAmount(Currencies.Gold);
             }
-            if (platinum > Session.this.player.getCurrencyAmount(Currencies.Platinum)) {
+            if (platinum <= 0) {
+                platinum = 0;
+            } else if (platinum > Session.this.player.getCurrencyAmount(Currencies.Platinum)) {
                 platinum = Session.this.player.getCurrencyAmount(Currencies.Platinum);
             }
             supply.setGold(gold);
             supply.setPlatinum(platinum);
 
-            if (!trade.getCurrentSupply().equals(supply)) {
-                Logging.Warn.log("Trade: " + Session.this.player.toString() + " agreed to a trade, but his own" +
-                        "supply does not match. The current supply is updated");
+            if (this.isApply) {
+                if (!trade.getCurrentSupply().equals(supply)) {
+                    Logging.Warn.log("Trade: " + Session.this.player.toString() + " agreed to a trade, but his own" +
+                            "supply does not match. The current supply is updated");
+                    trade.setCurrentSupply(supply);
+                }
+
+                Trade.Supply demand = trade.new Supply();
+                for (int i = 0; i < 3; ++i) {
+                    Item item = new Item(new Prototype(
+                            SafeConvert.toInt32(data[counter++]),
+                            SafeConvert.toInt32(data[counter++]),
+                            SafeConvert.toInt32(data[counter++])),
+                            SafeConvert.toInt32(data[counter++]));
+                    if (item.Template == null || item.getCount() == 0)
+                        continue;
+                    demand.setItem(i, item);
+                }
+
+                gold = SafeConvert.toInt32(data[counter++]);
+                platinum = SafeConvert.toInt32(data[counter++]);
+
+                demand.setGold(gold);
+                demand.setPlatinum(platinum);
+
+                trade.agree(demand);
+            }
+            // Trade update
+            else {
                 trade.setCurrentSupply(supply);
             }
-
-            Trade.Supply demand = trade.new Supply();
-            for (int i = 0; i < 3; ++i) {
-                Item item = new Item(new Prototype(
-                        SafeConvert.toInt32(data[counter++]),
-                        SafeConvert.toInt32(data[counter++]),
-                        SafeConvert.toInt32(data[counter++])),
-                        SafeConvert.toInt32(data[counter++]));
-                if (item.Template == null || item.getCount() == 0)
-                    continue;
-                demand.setItem(i, item);
-            }
-
-            gold = SafeConvert.toInt32(data[counter++]);
-            platinum = SafeConvert.toInt32(data[counter++]);
-
-            demand.setGold(gold);
-            demand.setPlatinum(platinum);
-
-            trade.agree(demand);
         }
     }
 
