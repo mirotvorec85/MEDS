@@ -451,15 +451,14 @@ public class Location
         return this.corpses.get(corpseGuid);
     }
 
-    public void addItem(Item item)
-    {
+    public void addItem(Item item) {
         Item _item = this.items.get(item.getPrototype());
-        if (_item != null)
-        {
+        if (_item != null) {
             _item.tryStackItem(item);
         }
         else
             this.items.put(item.getPrototype(), item);
+        // Synchronize Items/Corpses data
         send(getCorpseData());
     }
 

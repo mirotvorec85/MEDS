@@ -642,13 +642,11 @@ public class Inventory
         return item;
     }
 
-    public boolean destroyItem(int slot, int count)
-    {
+    public boolean destroyItem(int slot, int count) {
         Item item = this.inventorySlots[slot];
         if (item == null)
             return false;
-        if (count >= item.getCount())
-        {
+        if (count >= item.getCount()) {
             this.inventorySlots[slot] = null;
         }
         else
@@ -656,8 +654,8 @@ public class Inventory
 
         // Send Message
         this.owner.getSession().sendServerMessage(1016, count > 1 ? Integer.toString(count) + " " : "", item.getTitle());
-        // TODO: Implement Location items
-        //this.owner.getPosition.addItem(item);
+
+        this.owner.getPosition().addItem(item);
 
         if (isEquipmentSlot(slot))
             onEquipmentChanged();
