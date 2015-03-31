@@ -40,7 +40,7 @@ public class Server
 
     public static final int Build = 33554443; // 2.0.0.11
 
-    public static final int MaxAllowedBuild = 33554447; // 2.0.0.15
+    public static final int MaxAllowedBuild = 33555200; // 2.0.3.0
 
     private static int startTimeMillis;
     private static Server instance;
