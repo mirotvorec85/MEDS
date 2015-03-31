@@ -1500,6 +1500,8 @@ public class Session implements Runnable
                 // An item has not been constructed right
                 if (item.Template == null || item.getCount() == 0)
                     continue;
+                if (item.Template.hasFlag(ItemFlags.IsPersonal))
+                    continue;
 
                 if (!Session.this.player.getInventory().hasItem(item)) {
                     Logging.Warn.log("Trade: " + Session.this.player.toString() + "places item " +

@@ -9,6 +9,7 @@ import org.meds.Item.Prototype;
 import org.meds.database.entity.CharacterInventoryItem;
 import org.meds.enums.ItemBonusParameters;
 import org.meds.enums.ItemClasses;
+import org.meds.enums.ItemFlags;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.Valued;
@@ -655,7 +656,11 @@ public class Inventory
         // Send Message
         this.owner.getSession().sendServerMessage(1016, count > 1 ? Integer.toString(count) + " " : "", item.getTitle());
 
-        this.owner.getPosition().addItem(item);
+        // Personal items are destroyed completely
+        // Others are thrown to the ground
+        if (!item.Template.hasFlag(ItemFlags.IsPersonal)) {
+            this.owner.getPosition().addItem(item);
+        }
 
         if (isEquipmentSlot(slot))
             onEquipmentChanged();
