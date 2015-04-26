@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
     <Properties>
-        <Property name="filename">logs/org.meds.log</Property>
+        <Property name="filename">logs/server.log</Property>
+        <Property name="filePattern">%d %-5p :: %m%n</Property>
       </Properties>
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <!-- <PatternLayout pattern="%d %-5p [%t] %C{1} (%F:%L) - %m%n"/> -->
             <PatternLayout pattern="%d %-5p :: %m%n"/>
         </Console>
-        <File name="File" fileName="${filename}">
-            <PatternLayout pattern="%d %-5p :: %m%n"/>
-        </File>
+        <RollingFile name="File" fileName="${filename}" filePattern="logs/server-%d{dd-MM-yyyy}-%i.log">
+            <Policies>
+                <OnStartupTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="20 MB" />
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+            <PatternLayout pattern="${filePattern}"/>
+        </RollingFile>
     </Appenders>
     <Loggers>
         <Logger name="Debug" level="debug">
