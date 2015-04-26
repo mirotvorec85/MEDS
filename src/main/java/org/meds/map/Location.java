@@ -56,8 +56,7 @@ public class Location
      */
     private Unit updatedUnit;
 
-    public Location()
-    {
+    public Location() {
         this.units = new HashSet<>();
         this.unitsView = Collections.unmodifiableSet(this.units);
         this.corpses = new HashMap<>();
@@ -425,13 +424,11 @@ public class Location
     /**
      * Gets a value indicating whether this location doesn't contain any units.
      */
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return this.units.isEmpty();
     }
 
-    public Set<Unit> getUnits()
-    {
+    public Set<Unit> getUnits() {
         return this.unitsView;
     }
 
@@ -479,14 +476,13 @@ public class Location
             send(getCorpseData());
     }
 
-    public void unitEntered(Unit unit)
-    {
-        this.units.add(unit);
-        if (unit.getUnitType() == UnitTypes.Player)
-        {
+    public void unitEntered(Unit unit) {
+        synchronized (this.units) {
+            this.units.add(unit);
+        }
+        if (unit.getUnitType() == UnitTypes.Player) {
             Player player = (Player)unit;
-            if (player.getSession() != null)
-            {
+            if (player.getSession() != null) {
                 player.getSession().send(getData());
                 player.getSession().send(getNeighborsInfoData());
                 player.getSession().send(getCorpseData());
@@ -496,10 +492,12 @@ public class Location
         setUpdatable(true);
     }
 
-    public void unitLeft(Unit unit)
-    {
-        if (!this.units.remove(unit))
-            return;
+    public void unitLeft(Unit unit) {
+        synchronized (this.units) {
+            if (!this.units.remove(unit)) {
+                return;
+            }
+        }
         setUpdatable(true);
     }
 
@@ -574,6 +572,17 @@ public class Location
         return packet;
     }
 
+    public List<Player> getPlayers() {
+        List<Player> players = new ArrayList<>(this.units.size());
+        synchronized (this.units) {
+            for (Unit unit : this.units) {
+                if (unit.getUnitType() == UnitTypes.Player)
+                    players.add((Player) unit);
+            }
+        }
+        return players;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -593,75 +602,68 @@ public class Location
         return this.id;
     }
 
-    public void update(int time)
-    {
+    public void update(int time) {
         this.updatable = false;
 
-        if (this.units.size() == 0)
-        {
+        if (this.units.size() == 0) {
             this.updatedUnit = null;
             return;
         }
 
-        for (Unit unit : this.units)
-        {
-            // The next part is for players only
-            if (unit.getUnitType() != UnitTypes.Player)
-                continue;
+        synchronized (this.units) {
+            for (Unit unit : this.units) {
+                // The next part is for players only
+                if (unit.getUnitType() != UnitTypes.Player) continue;
 
-            Player player = (Player)unit;
+                Player player = (Player) unit;
 
-            // Send new Units list
-            // At least 1 unit should be changed
-            // and this unit should not be an updatable unit
-            if (this.updatedUnit == player)
-                continue;
-            if (player.getSession() == null)
-                continue;
-            ServerPacket pss = new ServerPacket(ServerCommands.PositionUnitList);
-            pss.add(this.units.size() - 1); // exclude itself
+                // Send new Units list
+                // At least 1 unit should be changed
+                // and this unit should not be an updatable unit
+                if (this.updatedUnit == player) continue;
+                if (player.getSession() == null) continue;
+                ServerPacket pss = new ServerPacket(ServerCommands.PositionUnitList);
+                pss.add(this.units.size() - 1); // exclude itself
 
-            for (Unit _unit : this.units)
-            {
-                if (_unit == unit)
-                    continue;
+                for (Unit _unit : this.units) {
+                    if (_unit == unit) continue;
 
-                pss.add(_unit.getName());
-                pss.add(_unit.getGuid());
-                pss.add(_unit.getAvatar());
-                pss.add((int)(73d *_unit.getHealth() / _unit.getParameters().value(Parameters.Health)));
-                pss.add(_unit.getLevel());
-                pss.add(_unit.getReligion());
-                pss.add(_unit.getReligLevel());
-                if (!_unit.isPlayer() || ((Player)_unit).getGroup() == null) {
-                    pss.add("0"); // Is a Group Leader
-                    pss.add("0"); // Group leader GUID
-                } else {
-                    Group group = ((Player)_unit).getGroup();
-                    pss.add(group.getLeader() == _unit ? "1" : "0");
-                    pss.add(group.getLeader().getGuid());
+                    pss.add(_unit.getName());
+                    pss.add(_unit.getGuid());
+                    pss.add(_unit.getAvatar());
+                    pss.add((int) (73d * _unit.getHealth() / _unit.getParameters().value(Parameters.Health)));
+                    pss.add(_unit.getLevel());
+                    pss.add(_unit.getReligion());
+                    pss.add(_unit.getReligLevel());
+                    if (!_unit.isPlayer() || ((Player) _unit).getGroup() == null) {
+                        pss.add("0"); // Is a Group Leader
+                        pss.add("0"); // Group leader GUID
+                    } else {
+                        Group group = ((Player) _unit).getGroup();
+                        pss.add(group.getLeader() == _unit ? "1" : "0");
+                        pss.add(group.getLeader().getGuid());
+                    }
+                    pss.add(_unit.getTarget() == null ? 0 : _unit.getTarget().getGuid());
+                    pss.add("1212413397"); // Avatar Time?
+                    pss.add((int) (73d * _unit.getMana() / _unit.getParameters().value(Parameters.Mana)));
+                    pss.add("0"); // Clan ID
+                    pss.add("0"); // Clan Status
+                    pss.add("0"); // is hidden
+                    pss.add("0"); // is Out of law
+                    pss.add("1"); // Gender
+                    pss.add("0"); // Title
+                    pss.add("0"); // is a Pet
+                    // Boss Type
+                    if (_unit.getUnitType() == UnitTypes.Creature) {
+                        pss.add(((Creature) _unit).getBossType());
+                    } else {
+                        pss.add("0");
+                    }
                 }
-                pss.add(_unit.getTarget() == null ? 0 : _unit.getTarget().getGuid());
-                pss.add("1212413397"); // Avatar Time?
-                pss.add((int)(73d *_unit.getMana() / _unit.getParameters().value(Parameters.Mana)));
-                pss.add("0"); // Clan ID
-                pss.add("0"); // Clan Status
-                pss.add("0"); // is hidden
-                pss.add("0"); // is Out of law
-                pss.add("1"); // Gender
-                pss.add("0"); // Title
-                pss.add("0"); // is a Pet
-                // Boss Type
-                if (_unit.getUnitType() == UnitTypes.Creature) {
-                    pss.add(((Creature)_unit).getBossType());
-                } else {
-                    pss.add("0");
-                }
+
+                player.getSession().send(pss);
             }
-
-            player.getSession().send(pss);
         }
-
 
         this.updatedUnit = null;
     }
