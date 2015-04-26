@@ -48,6 +48,12 @@
         <property name="passwordHash" type="string">
             <column name="`password_hash`" />
         </property>
+        <property name="lastLoginIp" type="string">
+            <column name="`last_login_ip`" />
+        </property>
+        <property name="lastLoginDate" type="int">
+            <column name="`last_login_date`" />
+        </property>
     </class>
 
     <class name="CharacterAchievement" table="character_achievement">

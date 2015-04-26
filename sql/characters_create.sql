@@ -13,6 +13,8 @@ CREATE TABLE `character` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `login` VARCHAR(16) NOT NULL,
   `password_hash` VARCHAR(32) NOT NULL,
+  `last_login_ip` VARCHAR(16) NOT NULL DEFAULT '-',
+  `last_login_date` INT UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY (`login`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

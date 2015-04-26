@@ -1,6 +1,7 @@
 package org.meds;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -11,8 +12,10 @@ import org.meds.logging.Logging;
 import org.meds.map.Location;
 import org.meds.map.Map;
 import org.meds.map.Region;
+import org.meds.net.Server;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
+import org.meds.util.DateFormatter;
 import org.meds.util.SafeConvert;
 
 public final class ChatHandler
@@ -24,16 +27,59 @@ public final class ChatHandler
 
     private static final HashMap<String, ChatCommand> chatCommands = new HashMap<>();
 
-    static
-    {
+    private static final ServerPacket helpChatCommandResult = new ServerPacket();
+
+    static {
+
+        ChatHandler.helpChatCommandResult.add(constructSystemMessage("=============== GENERAL ==============="))
+                .add(constructSystemMessage("\\info"))
+                .add(constructSystemMessage("\\who"))
+                .add(constructSystemMessage("\\relax"))
+                .add(constructSystemMessage("\\notell"))
+                .add(constructSystemMessage("\\locborn"))
+                .add(constructSystemMessage("\\observe"))
+                .add(constructSystemMessage("\\scan"))
+                .add(constructSystemMessage("\\nomelee"))
+                .add(constructSystemMessage("\\balance"))
+                .add(constructSystemMessage("\\mail"))
+                .add(constructSystemMessage("\\powerup"))
+                .add(constructSystemMessage("\\replay"))
+                .add(constructSystemMessage("\\skills"))
+                .add(constructSystemMessage("\\noprotect"))
+                .add(constructSystemMessage("\\total_filter"))
+                // TODO: add tips for the next commands (cost, format, etc.)
+                .add(constructSystemMessage("\\gra"))
+                .add(constructSystemMessage("\\invisible"))
+                .add(constructSystemMessage("\\doppel"))
+                .add(constructSystemMessage("\\hide_eq"))
+                .add(constructSystemMessage("\\compose"))
+                .add(constructSystemMessage("\\wimpy"))
+                .add(constructSystemMessage("\\sendpt"))
+                .add(constructSystemMessage("\\sendgold"))
+                .add(constructSystemMessage("\\roll"))
+                .add(constructSystemMessage("\\return"))
+                .add(constructSystemMessage("\\?"));
+
         chatCommands.put("teleport", new TeleportChatCommand());
         chatCommands.put("set_level", new SetLevelChatCommand());
         chatCommands.put("announce", new AnnounceChatCommand());
-        chatCommands.put("inspect_region", new InspectRegionChatCommand());
         chatCommands.put("tlffa", new TeamLootChatCommand(Group.TeamLootModes.Regular));
         chatCommands.put("tlrandom", new TeamLootChatCommand(Group.TeamLootModes.Random));
         chatCommands.put("tlleader", new TeamLootChatCommand(Group.TeamLootModes.Leader));
         chatCommands.put("parameters", new ParametersChatCommand());
+
+        chatCommands.put("?", new HelpChatCommand());
+        chatCommands.put("info", new InfoChatCommand());
+        chatCommands.put("locborn", new LocBornChatCommand());
+        chatCommands.put("who", new WhoChatCommand());
+    }
+
+    public static ServerPacket constructSystemMessage(String message) {
+        ServerPacket packet = new ServerPacket(ServerCommands.ChatMessage);
+        StringBuilder text = new StringBuilder();
+        text.append(Separator).append(SystemChar).append(message);
+        packet.add(text);
+        return packet;
     }
 
     public static void sendSystemMessage(Player player, String message)
@@ -41,11 +87,7 @@ public final class ChatHandler
         if (player == null || player.getSession() == null || message == null || message.length() == 0)
             return;
 
-        ServerPacket packet = new ServerPacket(ServerCommands.ChatMessage);
-        StringBuilder text = new StringBuilder();
-        text.append(Separator).append(SystemChar).append(message);
-        packet.add(text);
-        player.getSession().send(packet);
+        player.getSession().send(constructSystemMessage(message));
     }
 
     public static void sendSystemMessage(String message)
@@ -53,11 +95,7 @@ public final class ChatHandler
         if (message == null || message.length() == 0)
             return;
 
-        ServerPacket packet = new ServerPacket(ServerCommands.ChatMessage);
-        StringBuilder text = new StringBuilder();
-        text.append(Separator).append(SystemChar).append(message);
-        packet.add(text);
-        World.getInstance().send(packet);
+        World.getInstance().send(constructSystemMessage(message));
     }
 
     public static void handleSay(Player player, String message)
@@ -193,25 +231,6 @@ public final class ChatHandler
         }
     }
 
-    private static class InspectRegionChatCommand extends ChatCommand
-    {
-        @Override
-        public void handle(Player player, String[] args)
-        {
-            Region region = player.getPosition().getRegion();
-            List<Location> locations = region.getLocations();
-            for (Location location : locations)
-            {
-                if (location.isEmpty())
-                    continue;
-                sendSystemMessage(player, location.getId() + ". " + location.getTitle() + ":");
-                for (Unit unit : location.getUnits())
-                    sendSystemMessage(player, new StringBuilder().append("    [").append(unit.getGuid()).append("]")
-                    .append(" ").append(unit.getName()).toString());
-            }
-        }
-    }
-
     private static class TeamLootChatCommand extends ChatCommand {
 
         private Group.TeamLootModes mode;
@@ -273,6 +292,61 @@ public final class ChatHandler
                     sendSystemMessage(player, value.name() + " = " + parameter.value(value));
                 }
             }
+        }
+    }
+
+    private static class InfoChatCommand extends ChatCommand {
+
+        @Override
+        public void handle(Player player, String[] args) {
+
+            if (player.getSession() == null)
+                return;
+
+            player.getSession().sendServerMessage(1173, DateFormatter.format(new Date()))
+                .sendServerMessage(1174, Server.getServerStartTime())
+                .sendServerMessage(1175, player.getSession().getLastLoginDate())
+                .sendServerMessage(1176, player.getSession().getLastLoginIp())
+                .sendServerMessage(1177, player.getSession().getCurrentIp());
+        }
+    }
+
+    private static class HelpChatCommand extends ChatCommand {
+
+        @Override
+        public void handle(Player player, String[] args) {
+            if (player.getSession() != null) {
+                player.getSession().sendServerMessage(1128).send(ChatHandler.helpChatCommandResult);
+            }
+        }
+    }
+
+    private static class WhoChatCommand extends ChatCommand {
+
+        @Override
+        public void handle(Player player, String[] args) {
+            if (player.getSession() == null || player.getPosition() == null)
+                return;
+
+            player.getSession().send(constructSystemMessage(player.getPosition().getTitle()));
+
+            List<Player> players = player.getPosition().getPlayers();
+            for (Player pl : players) {
+                player.getSession().send(constructSystemMessage(pl.getName()));
+            }
+
+            player.getSession().send(constructSystemMessage("Total: " + players.size()));
+        }
+    }
+
+    private static class LocBornChatCommand extends ChatCommand {
+
+        @Override
+        public void handle(Player player, String[] args) {
+            if (player.getSession() == null)
+                return;
+
+            player.getSession().send(constructSystemMessage(player.getHome().getTitle()));
         }
     }
 }

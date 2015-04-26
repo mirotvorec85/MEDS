@@ -5,12 +5,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
+import org.hibernate.Transaction;
 import org.meds.*;
 import org.meds.Item.Prototype;
 import org.meds.Locale;
 import org.meds.database.DBStorage;
+import org.meds.database.Hibernate;
 import org.meds.database.entity.*;
 import org.meds.database.entity.Character;
 import org.meds.enums.*;
@@ -19,14 +22,14 @@ import org.meds.map.Location;
 import org.meds.map.Map;
 import org.meds.map.Region;
 import org.meds.map.Shop;
+import org.meds.util.DateFormatter;
 import org.meds.util.MD5Hasher;
 import org.meds.util.Random;
 import org.meds.util.SafeConvert;
 
 public class Session implements Runnable
 {
-    public interface DisconnectListener extends EventListener
-    {
+    public interface DisconnectListener extends EventListener {
         public void disconnect(Session session);
     }
 
@@ -70,8 +73,11 @@ public class Session implements Runnable
 
     private String sessionToString;
 
-    public Session(Socket socket)
-    {
+    private String lastLoginIp;
+    private String lastLoginDate;
+    private String currentIp;
+
+    public Session(Socket socket) {
         this.socket = socket;
 
         this.listeners = new HashSet<>();
@@ -136,6 +142,18 @@ public class Session implements Runnable
         this.key = Random.nextInt();
 
         this.sessionToString = "Session [" + this.socket.getInetAddress().toString() + "]: ";
+    }
+
+    public String getLastLoginIp() {
+        return lastLoginIp;
+    }
+
+    public String getLastLoginDate() {
+        return lastLoginDate;
+    }
+
+    public String getCurrentIp() {
+        return currentIp;
     }
 
     public void addDisconnectListener(DisconnectListener listener)
@@ -403,8 +421,7 @@ public class Session implements Runnable
 
             // Player is not found
             // Sending "Wrong login or password" result
-            if (character == null)
-            {
+            if (character == null) {
                 packet.add(LoginResults.WrongLoginOrPassword);
                 send(packet);
                 return;
@@ -415,8 +432,7 @@ public class Session implements Runnable
             String actualPassKeyHash = MD5Hasher.ComputeHash(character.getPasswordHash() + Session.this.key);
 
             // Hash does not match
-            if (!receivedPasswordHash.equalsIgnoreCase(actualPassKeyHash))
-            {
+            if (!receivedPasswordHash.equalsIgnoreCase(actualPassKeyHash)) {
                 packet.add(LoginResults.WrongLoginOrPassword);
                 send(packet);
                 return;
@@ -424,22 +440,44 @@ public class Session implements Runnable
 
             // Create a Player instance with found id
             Session.this.player = World.getInstance().getOrCreatePlayer(character.getId());
-            // Something happened and player can not be created
-            if (Session.this.player == null)
-            {
+            // Something happened and a player can not be created
+            if (Session.this.player == null) {
                 packet.add(LoginResults.InnerServerError);
                 send(packet);
+                return;
+            }
+
+
+            // Save the last login Ip
+            try {
+                Session.this.lastLoginIp = character.getLastLoginIp();
+                Date now = new Date();
+                Session.this.currentIp = Session.this.socket.getInetAddress().getHostAddress();
+                if (character.getLastLoginDate() != 0) {
+                    Session.this.lastLoginDate = DateFormatter.format(character.getLastLoginDate() * 1000);
+                } else {
+                    Session.this.lastLoginDate = "-";
+                }
+
+                character.setLastLoginIp(Session.this.currentIp);
+                character.setLastLoginDate((int)(now.getTime() / 1000));
+
+                org.hibernate.Session session = Hibernate.getSessionFactory().openSession();
+                Transaction tx = session.beginTransaction();
+                session.update(character);
+                tx.commit();
+            } catch (Exception ex) {
+                Logging.Error.log("Exception while saving the last login data for " + Session.this.toString(), ex);
+                packet.add(LoginResults.InnerServerError);
                 return;
             }
 
             packet.add(LoginResults.OK);
 
             // Add New Messages
-            if (DBStorage.NewMessageStore.size() != 0)
-            {
+            if (DBStorage.NewMessageStore.size() != 0) {
                 packet.add(ServerCommands.MessageList);
-                for (NewMessage message : DBStorage.NewMessageStore.values())
-                {
+                for (NewMessage message : DBStorage.NewMessageStore.values()) {
                     packet.add(message.getId()).add(message.getTypeId()).add(message.getMessage());
                 }
             }

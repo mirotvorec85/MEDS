@@ -3,10 +3,7 @@ package org.meds.net;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.EventListener;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.meds.Configuration;
 import org.meds.Locale;
@@ -15,6 +12,7 @@ import org.meds.World;
 import org.meds.database.DBStorage;
 import org.meds.database.Hibernate;
 import org.meds.logging.Logging;
+import org.meds.util.DateFormatter;
 import org.meds.util.Random;
 
 public class Server
@@ -42,6 +40,7 @@ public class Server
 
     public static final int MaxAllowedBuild = 33555200; // 2.0.3.0
 
+    private static String serverStartTime;
     private static int startTimeMillis;
     private static Server instance;
 
@@ -62,6 +61,10 @@ public class Server
     public static void removeStopListener(StopListener listener)
     {
         stopListeners.remove(listener);
+    }
+
+    public static String getServerStartTime() {
+        return serverStartTime;
     }
 
     public static int getServerTimeMillis()
@@ -172,6 +175,7 @@ public class Server
             return;
 
         Server.startTimeMillis = (int)System.currentTimeMillis();
+        Server.serverStartTime = DateFormatter.format(new Date());
 
         new Thread(new ServerCommandHandler(), "Server Commands handler").start();
 
