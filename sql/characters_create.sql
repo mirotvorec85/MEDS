@@ -8,7 +8,6 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 
-DROP TABLE IF EXISTS `character`;
 CREATE TABLE `character` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `login` VARCHAR(16) NOT NULL,
@@ -20,7 +19,6 @@ CREATE TABLE `character` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `character_achievement`;
 CREATE TABLE `character_achievement` (
   `character_id` INT UNSIGNED NOT NULL,
   `achievement_id` INT UNSIGNED NOT NULL,
@@ -32,7 +30,6 @@ CREATE TABLE `character_achievement` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `character_currency`;
 CREATE TABLE `character_currency` (
   `character_id` INT UNSIGNED NOT NULL,
   `currency_id` INT UNSIGNED NOT NULL,
@@ -43,7 +40,6 @@ CREATE TABLE `character_currency` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `character_guild`;
 CREATE TABLE `character_guild` (
   `character_id` INT UNSIGNED NOT NULL,
   `guild_id` INT UNSIGNED NOT NULL,
@@ -54,7 +50,6 @@ CREATE TABLE `character_guild` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `character_info`;
 CREATE TABLE `character_info` (
   `character_id` INT UNSIGNED NOT NULL,
   `name` VARCHAR(64) NOT NULL,
@@ -98,7 +93,6 @@ CREATE TABLE `character_info` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `character_inn_item`;
 CREATE TABLE `character_inn_item` (
   `character_id` INT UNSIGNED NOT NULL,
   `item_template_id` INT UNSIGNED NOT NULL,
@@ -110,7 +104,6 @@ CREATE TABLE `character_inn_item` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `character_inventory_item`;
 CREATE TABLE `character_inventory_item` (
   `character_id` INT UNSIGNED NOT NULL,
   `slot` TINYINT UNSIGNED NOT NULL,
@@ -124,7 +117,6 @@ CREATE TABLE `character_inventory_item` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `character_profession`;
 CREATE TABLE `character_profession` (
   `character_id` INT UNSIGNED NOT NULL,
   `profession_id` INT UNSIGNED NOT NULL,
@@ -135,18 +127,6 @@ CREATE TABLE `character_profession` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `character_quest`;
-CREATE TABLE `character_quest` (
-  `character_id` INT UNSIGNED NOT NULL,
-  `skill_id` INT UNSIGNED NOT NULL,
-  `level` TINYINT UNSIGNED NOT NULL DEFAULT '1',
-  PRIMARY KEY (`character_id`,`skill_id`),
-  FOREIGN KEY (`character_id`) REFERENCES `character` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (`skill_id`) REFERENCES `skill` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
-DROP TABLE IF EXISTS `character_skill`;
 CREATE TABLE `character_skill` (
   `character_id` INT UNSIGNED NOT NULL,
   `skill_id` INT UNSIGNED NOT NULL,
@@ -157,7 +137,6 @@ CREATE TABLE `character_skill` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `character_spell`;
 CREATE TABLE `character_spell` (
   `character_id` INT UNSIGNED NOT NULL,
   `spell_id` INT UNSIGNED NOT NULL,
@@ -168,7 +147,6 @@ CREATE TABLE `character_spell` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `character_quest`;
 CREATE TABLE `character_quest` (
   `character_id` INT UNSIGNED NOT NULL,
   `quest_template_id` INT UNSIGNED NOT NULL,
