@@ -5,16 +5,13 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
+import org.meds.database.dao.DAOFactory;
 import org.meds.net.Server.StopListener;
-import org.meds.database.Hibernate;
 import org.meds.database.entity.CharacterInfo;
 import org.meds.database.entity.CharacterSpell;
 import org.meds.enums.Races;
 import org.meds.logging.Logging;
 import org.meds.util.MD5Hasher;
-
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 public class ServerCommandHandler implements Runnable
 {
@@ -170,11 +167,7 @@ public class ServerCommandHandler implements Runnable
             character.setLogin(login);
             character.setPasswordHash(MD5Hasher.ComputeHash(MD5Hasher.ComputeHash(args[1]) + "dsdarkswords"));
 
-            Session session = Hibernate.getSessionFactory().openSession();
-            Transaction tx = session.beginTransaction();
-            session.save(character);
-            tx.commit();
-            session.close();
+            DAOFactory.getFactory().getCharacterDAO().save(character);
             int characterId = character.getId();
 
             CharacterInfo characterInfo = new CharacterInfo();
@@ -197,11 +190,8 @@ public class ServerCommandHandler implements Runnable
             characterInfo.getSpells().put(54, new CharacterSpell(characterId, 54, 1)); // First Aid
             characterInfo.getSpells().put(60, new CharacterSpell(characterId, 60, 1)); // Relax
 
-            session = Hibernate.getSessionFactory().openSession();
-            tx = session.beginTransaction();
-            session.save(characterInfo);
-            tx.commit();
-            session.close();
+            DAOFactory.getFactory().getCharacterDAO().save(characterInfo);
+            System.out.printf("Player %s has been create%n", charName);
         }
     }
 

@@ -8,7 +8,7 @@ import java.util.Set;
 import org.meds.Group;
 import org.meds.Player;
 import org.meds.Unit;
-import org.meds.database.Hibernate;
+import org.meds.database.dao.DAOFactory;
 import org.meds.enums.MovementDirections;
 import org.meds.logging.Logging;
 
@@ -77,15 +77,15 @@ public class Map
     @SuppressWarnings("unchecked")
     public void load()
     {
-        Session session = Hibernate.getSessionFactory().openSession();
-        List<Kingdom> kingdoms = session.createCriteria(Kingdom.class).list();
+        DAOFactory daoFactory = DAOFactory.getFactory();
+        List<Kingdom> kingdoms = daoFactory.getMapDAO().getKingdoms();
         for (Kingdom kingdom : kingdoms)
         {
             this.kingdoms.put(kingdom.getId(), kingdom);
         }
         Logging.Info.log("Loaded " + this.kingdoms.size() + " kingdoms");
 
-        List<org.meds.database.entity.Region> regionEntries = session.createCriteria(org.meds.database.entity.Region.class).list();
+        List<org.meds.database.entity.Region> regionEntries = daoFactory.getMapDAO().getRegions();
         for (org.meds.database.entity.Region entry : regionEntries)
         {
             Region region = new Region(entry);
@@ -94,7 +94,7 @@ public class Map
         }
         Logging.Info.log("Loaded " + this.regions.size() + " regions");
 
-        List<Location> locations = session.createCriteria(Location.class).list();
+        List<Location> locations = daoFactory.getMapDAO().getLocations();
         for (Location location : locations)
         {
             this.locations.put(location.getId(), location);
@@ -103,15 +103,13 @@ public class Map
         Logging.Info.log("Loaded " + this.locations.size() + " locations");
 
         // Filter duplicate values, that are the result of left outer join
-        Set<Shop> shops = new HashSet<Shop>(session.createCriteria(Shop.class).list());
+        Set<Shop> shops = new HashSet<Shop>(daoFactory.getMapDAO().getShops());
         for (Shop shop : shops)
         {
             shop.load();
             this.shops.put(shop.getId(), shop);
         }
         Logging.Info.log("Loaded " + this.shops.size() + " shops");
-
-        session.close();
     }
 
     public void addLocationUpdate(Location location)

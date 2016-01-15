@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.hibernate.Transaction;
@@ -13,7 +12,8 @@ import org.meds.*;
 import org.meds.Item.Prototype;
 import org.meds.Locale;
 import org.meds.database.DBStorage;
-import org.meds.database.Hibernate;
+import org.meds.database.dao.CharacterDAO;
+import org.meds.database.dao.DAOFactory;
 import org.meds.database.entity.*;
 import org.meds.database.entity.Character;
 import org.meds.enums.*;
@@ -34,6 +34,10 @@ public class Session implements Runnable
     }
 
     private static Set<Session> sessionsToSend;
+
+    private static CharacterDAO getCharacterDao() {
+        return DAOFactory.getFactory().getCharacterDAO();
+    }
 
     static {
         sessionsToSend = new HashSet<>();
@@ -417,7 +421,7 @@ public class Session implements Runnable
             // Response packet starts with login_result
             ServerPacket packet = new ServerPacket(ServerCommands.LoginResult);
             String playerLogin = data[0].toLowerCase();
-            Character character = DBStorage.findCharacter(playerLogin);
+            Character character = getCharacterDao().findCharacter(playerLogin);
 
             // Player is not found
             // Sending "Wrong login or password" result
@@ -461,11 +465,7 @@ public class Session implements Runnable
 
                 character.setLastLoginIp(Session.this.currentIp);
                 character.setLastLoginDate((int)(now.getTime() / 1000));
-
-                org.hibernate.Session session = Hibernate.getSessionFactory().openSession();
-                Transaction tx = session.beginTransaction();
-                session.update(character);
-                tx.commit();
+                getCharacterDao().save(character);
             } catch (Exception ex) {
                 Logging.Error.log("Exception while saving the last login data for " + Session.this.toString(), ex);
                 packet.add(LoginResults.InnerServerError);

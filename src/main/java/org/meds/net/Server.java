@@ -7,10 +7,11 @@ import java.util.*;
 
 import org.meds.Configuration;
 import org.meds.Locale;
+import org.meds.database.dao.DAOFactory;
+import org.meds.database.dao.impl.hibernate.HibernateDAOFactory;
 import org.meds.map.Map;
 import org.meds.World;
 import org.meds.database.DBStorage;
-import org.meds.database.Hibernate;
 import org.meds.logging.Logging;
 import org.meds.util.DateFormatter;
 import org.meds.util.Random;
@@ -127,7 +128,8 @@ public class Server
                 return;
             }
 
-            Hibernate.configure();
+            // Set Hibernate DAO Factory
+            DAOFactory.setFactory(new HibernateDAOFactory());
 
             DBStorage.load();
             Logging.Info.log("Database is loaded.");

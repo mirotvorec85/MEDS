@@ -7,7 +7,7 @@ public interface CharacterDAO {
 
     Character findCharacter(String login);
 
-    Character getCharacterInfo(int id);
+    CharacterInfo getCharacterInfo(int id);
 
     void save(Character character);
 

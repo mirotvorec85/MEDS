@@ -1,7 +1,6 @@
 package org.meds;
 
-import org.hibernate.Session;
-import org.meds.database.Hibernate;
+import org.meds.database.dao.DAOFactory;
 import org.meds.database.entity.LocaleString;
 import org.meds.logging.Logging;
 
@@ -14,8 +13,7 @@ public class Locale {
     private static Map<Integer, String> strings;
 
     public static void load() {
-        Session session = Hibernate.getSessionFactory().openSession();
-        List<LocaleString> localeStrings = session.createCriteria(LocaleString.class).list();
+        List<LocaleString> localeStrings = DAOFactory.getFactory().getWorldDAO().getLocaleStrings();
         strings = new HashMap<>(localeStrings.size());
         for (LocaleString string : localeStrings) {
             strings.put(string.getId(), string.getString());

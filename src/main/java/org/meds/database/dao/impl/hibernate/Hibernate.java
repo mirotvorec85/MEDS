@@ -1,20 +1,17 @@
-package org.meds.database;
-
-import org.meds.logging.Logging;
+package org.meds.database.dao.impl.hibernate;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
+import org.meds.logging.Logging;
 
 public class Hibernate
 {
     private static SessionFactory sessionFactory;
 
-    public static void configure()
-    {
-        try
-        {
+    public static void configure() {
+        try {
             Configuration configuration = new Configuration();
             // Default file name
             //cfg.addResource("hibernate.cfg.xml");
@@ -24,17 +21,14 @@ public class Hibernate
                     configuration.getProperties()).build();
 
             Hibernate.sessionFactory = configuration.buildSessionFactory(serviceRegistry);
-        }
-        catch(Exception ex)
-        {
+        } catch(Exception ex) {
             Logging.Fatal.log("An exception occurred while configuring Hibernate", ex);
             return;
         }
         Logging.Info.log("Hibernate has been configured.");
     }
 
-    public static SessionFactory getSessionFactory()
-    {
+    public static SessionFactory getSessionFactory() {
         return Hibernate.sessionFactory;
     }
 }

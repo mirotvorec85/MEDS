@@ -4,12 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.meds.database.dao.DAOFactory;
+import org.meds.database.dao.WorldDAO;
 import org.meds.database.entity.*;
-import org.meds.database.entity.Character;
 import org.meds.logging.Logging;
-
-import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 
 public class DBStorage {
 
@@ -43,10 +41,10 @@ public class DBStorage {
         DBStorage.NewMessageStore = new HashMap<>();
         DBStorage.QuestTemplateStore = new HashMap<>();
 
-        Session session = Hibernate.getSessionFactory().openSession();
+        WorldDAO worldDAO = DAOFactory.getFactory().getWorldDAO();
 
         // Achievement
-        List<Achievement> achievements = session.createCriteria(Achievement.class).list();
+        List<Achievement> achievements = worldDAO.getAchievements();
         for(Achievement achievement : achievements)
         {
             DBStorage.AchievementStore.put(achievement.getId(), achievement);
@@ -54,14 +52,14 @@ public class DBStorage {
         Logging.Info.log("Loaded " + DBStorage.AchievementStore.size() + " achievements");
 
         // Achievement Criteria
-        List<AchievementCriterion> criteria = session.createCriteria(AchievementCriterion.class).list();
+        List<AchievementCriterion> criteria = worldDAO.getAchievementCriteria();
         for (AchievementCriterion criterion : criteria) {
             DBStorage.AchievementStore.get(criterion.getAchievementId()).getCriteria().add(criterion);
         }
         Logging.Info.log("Loaded " + criteria.size() + " achievement criteria");
 
         // Currency
-        List<Currency> currencies = session.createCriteria(Currency.class).list();
+        List<Currency> currencies = worldDAO.getCurrencies();
         for(Currency currency : currencies)
         {
             DBStorage.CurrencyStore.put(currency.getId(), currency);
@@ -69,7 +67,7 @@ public class DBStorage {
         Logging.Info.log("Loaded " + DBStorage.CurrencyStore.size() + " currencies");
 
         // Guild
-        List<Guild> guilds = session.createCriteria(Guild.class).list();
+        List<Guild> guilds = worldDAO.getGuilds();
         for(Guild guild : guilds)
         {
             DBStorage.GuildStore.put(guild.getId(), guild);
@@ -77,7 +75,7 @@ public class DBStorage {
         Logging.Info.log("Loaded " + DBStorage.GuildStore.size() + " guilds");
 
         // GuildLesson
-        List<GuildLesson> guildLessons = session.createCriteria(GuildLesson.class).list();
+        List<GuildLesson> guildLessons = worldDAO.getGuildLessons();
         counter = 0;
         for(GuildLesson guildLesson : guildLessons)
         {
@@ -93,7 +91,7 @@ public class DBStorage {
         Logging.Info.log("Loaded " + counter + " guild lessons (of " + DBStorage.GuildLessonStore.size() + " guilds)");
 
         // ItemTemplate
-        List<ItemTemplate> items = session.createCriteria(ItemTemplate.class).list();
+        List<ItemTemplate> items = worldDAO.getItemTemplates();
         for(ItemTemplate item : items)
         {
             DBStorage.ItemTemplateStore.put(item.getId(), item);
@@ -101,7 +99,7 @@ public class DBStorage {
         Logging.Info.log("Loaded " + DBStorage.ItemTemplateStore.size() + " items");
 
         // Level Costs
-        List<LevelCost> levelCosts = session.createCriteria(LevelCost.class).list();
+        List<LevelCost> levelCosts = worldDAO.getLevelCosts();
         for(LevelCost cost : levelCosts)
         {
             DBStorage.LevelCostStore.put(cost.getLevel(), cost);
@@ -112,7 +110,7 @@ public class DBStorage {
         // --is obsolete
 
         // Skills
-        List<Skill> skills = session.createCriteria(Skill.class).list();
+        List<Skill> skills = worldDAO.getSkills();
         DBStorage.SkillStore = new HashMap<>(skills.size());
         for(Skill skill : skills)
         {
@@ -121,7 +119,7 @@ public class DBStorage {
         Logging.Info.log("Loaded " + DBStorage.SkillStore.size() + " skills");
 
         // Spells
-        List<Spell> spells = session.createCriteria(Spell.class).list();
+        List<Spell> spells = worldDAO.getSpells();
         DBStorage.SpellStore = new HashMap<>(spells.size());
         for(Spell spell : spells)
         {
@@ -130,7 +128,7 @@ public class DBStorage {
         Logging.Info.log("Loaded " + DBStorage.SpellStore.size() + " spells");
 
         // Creature Templates
-        List<CreatureTemplate> creatureTemplates = session.createCriteria(CreatureTemplate.class).list();
+        List<CreatureTemplate> creatureTemplates = worldDAO.getCreatureTemplates();
         for(CreatureTemplate template : creatureTemplates)
         {
             DBStorage.CreatureTemplateStore.put(template.getTemplateId(), template);
@@ -138,7 +136,7 @@ public class DBStorage {
         Logging.Info.log("Loaded " + DBStorage.CreatureTemplateStore.size() + " creature templates");
 
         // Creature Loot
-        List<CreatureLoot> creatureLootItems = session.createCriteria(CreatureLoot.class).list();
+        List<CreatureLoot> creatureLootItems = worldDAO.getCreatureLoot();
         counter = 0;
         for(CreatureLoot creatureLootItem : creatureLootItems)
         {
@@ -154,7 +152,7 @@ public class DBStorage {
         Logging.Info.log("Loaded " + counter + " creature loot (of " + DBStorage.CreatureLootStore.size() + " creature templates)");
 
         // New Messages
-        List<NewMessage> messages = session.createCriteria(NewMessage.class).list();
+        List<NewMessage> messages = worldDAO.getNewMessages();
         for(NewMessage message : messages)
         {
             DBStorage.NewMessageStore.put(message.getId(), message);
@@ -162,7 +160,7 @@ public class DBStorage {
         Logging.Info.log("Loaded " + DBStorage.NewMessageStore.size() + " new messages");
 
         // Quest Templates
-        List<QuestTemplate> questTemplates = session.createCriteria(QuestTemplate.class).list();
+        List<QuestTemplate> questTemplates = worldDAO.getQuestTemplates();
         for(QuestTemplate template : questTemplates)
         {
             DBStorage.QuestTemplateStore.put(template.getId(), template);
@@ -170,7 +168,7 @@ public class DBStorage {
         Logging.Info.log("Loaded " + DBStorage.QuestTemplateStore.size() + " quests");
 
         // Creature Quest Relations
-        List<CreatureQuestRelation> relations = session.createCriteria(CreatureQuestRelation.class).list();
+        List<CreatureQuestRelation> relations = worldDAO.getCreatureQuestRelations();
         counter = 0;
         for(CreatureQuestRelation relation : relations)
         {
@@ -184,22 +182,5 @@ public class DBStorage {
             creatureQuests.put(relation.getQuestTemplateId(), relation);
         }
         Logging.Info.log("Loaded " + counter + " creature quest relations (of " + DBStorage.CreatureQuestRelationStore.size() + " creature templates)");
-
-        session.close();
-    }
-
-    public static Character findCharacter(String login)
-    {
-        return (Character)Hibernate.getSessionFactory().openSession().createCriteria(Character.class).add(Restrictions.eq("login", login)).uniqueResult();
-    }
-
-    public static CharacterInfo getCharacterInfo(org.hibernate.Session session, int guid)
-    {
-        return (CharacterInfo)session.load(CharacterInfo.class, guid);
-    }
-
-    public static CharacterInfo getCharacterInfo(int guid)
-    {
-        return DBStorage.getCharacterInfo(Hibernate.getSessionFactory().openSession(), guid);
     }
 }

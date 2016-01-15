@@ -5,9 +5,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.annotations.common.util.impl.Log;
 import org.meds.database.DBStorage;
-import org.meds.database.Hibernate;
+import org.meds.database.dao.DAOFactory;
 import org.meds.database.entity.*;
 import org.meds.enums.*;
 import org.meds.logging.Logging;
@@ -17,9 +16,6 @@ import org.meds.net.ServerPacket;
 import org.meds.profession.Profession;
 import org.meds.spell.Aura;
 import org.meds.util.EnumFlags;
-
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 public class Player extends Unit
 {
@@ -562,11 +558,9 @@ public class Player extends Unit
         this.position.getRegion().addPlayer(this);
     }
 
-    private boolean load()
-    {
-        Session session = Hibernate.getSessionFactory().openSession();
+    private boolean load() {
 
-        this.info = DBStorage.getCharacterInfo(session, this.guid);
+        this.info = DAOFactory.getFactory().getCharacterDAO().getCharacterInfo(this.guid);
 
         // Lazy loading of collections
         this.info.getAchievements().size();
@@ -650,8 +644,6 @@ public class Player extends Unit
         this.inventory.load(this.info.getInventoryItems());
         this.inn.load(this.info.getInnItems());
 
-        session.close();
-
         this.health = this.parameters.value(Parameters.Health);
         this.mana = this.parameters.value(Parameters.Mana);
 
@@ -693,12 +685,7 @@ public class Player extends Unit
         this.inventory.save();
         this.inn.save();
 
-        Session session = Hibernate.getSessionFactory().openSession();
-        Transaction t = session.beginTransaction();
-        session.update(this.info);
-        t.commit();
-        //session.flush();
-        session.close();
+        DAOFactory.getFactory().getCharacterDAO().save(this.info);
     }
 
     public ServerPacket getParametersData()

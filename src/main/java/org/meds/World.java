@@ -6,15 +6,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.meds.database.DBStorage;
+import org.meds.database.dao.DAOFactory;
 import org.meds.database.entity.CreatureTemplate;
 import org.meds.enums.CreatureTypes;
 import org.meds.map.Map;
 import org.meds.net.Server;
 import org.meds.net.Server.StopListener;
-import org.meds.database.Hibernate;
 import org.meds.logging.Logging;
 
-import org.hibernate.Session;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 
@@ -217,9 +216,7 @@ public class World implements Runnable
 
 
         // Load and spawn all the Creatures
-        Session session = Hibernate.getSessionFactory().openSession();
-        List<Creature> creatures = session.createCriteria(Creature.class).list();
-        session.close();
+        List<Creature> creatures = DAOFactory.getFactory().getWorldDAO().getCreatures();
         for (Creature creature : creatures)
         {
             // For some reasons can not create this creature
@@ -273,7 +270,7 @@ public class World implements Runnable
             if (sleepTime < 50)
                 sleepTime = 50;
 
-            Logging.Debug.log("World sleeping time: " + sleepTime);
+//            Logging.Debug.log("World sleeping time: " + sleepTime);
 
             try
             {
@@ -316,7 +313,7 @@ public class World implements Runnable
 
     public void update(int time)
     {
-        Logging.Debug.log("World update starts; Diff time: %d", time);
+//        Logging.Debug.log("World update starts; Diff time: %d", time);
 
         // Set new Day Time
         this.dayTime += time;
