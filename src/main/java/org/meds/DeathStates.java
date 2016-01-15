@@ -1,7 +1,7 @@
 package org.meds;
 
-public enum DeathStates
-{
+public enum DeathStates {
+
     Alive,
     Dead;
 }

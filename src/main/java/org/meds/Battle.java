@@ -10,8 +10,8 @@ import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.Random;
 
-public class Battle
-{
+public class Battle {
+
     /**
      * A list of units who left this battle at the current battle update tick.
      */
@@ -22,8 +22,7 @@ public class Battle
     private Set<Unit> runUnits;
     private Set<Unit> participants;
 
-    public Battle()
-    {
+    public Battle() {
         this.leftUnits = new LinkedHashSet<>();
         this.runUnits = new HashSet<>();
         this.participants = new HashSet<>();
@@ -34,12 +33,9 @@ public class Battle
      * Involve a new participant into the battle.
      * @param unit A new Unit participant.
      */
-    public void enterBattle(Unit unit)
-    {
-        synchronized (this.participants)
-        {
-            if (!this.participants.contains(unit))
-            {
+    public void enterBattle(Unit unit) {
+        synchronized (this.participants)  {
+            if (!this.participants.contains(unit)) {
                 this.participants.add(unit);
             }
             Logging.Debug.log(unit + " has entered a battle.");
@@ -50,8 +46,7 @@ public class Battle
         }
     }
 
-    public void leaveBattle(Unit unit)
-    {
+    public void leaveBattle(Unit unit) {
         Logging.Debug.log(unit + " has left a battle.");
         sendBattleState(unit, BattleStates.NoBattle);
         // Add to the list of left units
@@ -59,16 +54,15 @@ public class Battle
         this.leftUnits.add(unit);
     }
 
-    public void runAway(Unit unit)
-    {
+    public void runAway(Unit unit) {
         // Unit is not a participant or this unit is fleeing already
-        if (!this.participants.contains(unit) || this.runUnits.contains(unit))
+        if (!this.participants.contains(unit) || this.runUnits.contains(unit)) {
             return;
+        }
         this.runUnits.add(unit);
     }
 
-    public void onTargetDied(Unit unit)
-    {
+    public void onTargetDied(Unit unit) {
         // Send to attacker BattleStates.TargetDied.
         sendBattleState(unit, BattleStates.TargetDead);
 
@@ -77,95 +71,88 @@ public class Battle
         unit.setTarget(null);
     }
 
-    public void onDied(Unit unit)
-    {
+    public void onDied(Unit unit) {
         sendBattleState(unit, BattleStates.Death);
         // Setting attacker's target to NULL will call Battle.LeaveBattle
         // where the attacker will be marked as a leftUnit
         unit.setTarget(null);
     }
 
-    private void sendBattleState(Unit unit, BattleStates state)
-    {
-        if (!unit.isPlayer())
+    private void sendBattleState(Unit unit, BattleStates state) {
+        if (!unit.isPlayer()) {
             return;
+        }
         Player player = (Player)unit;
-        if (player.getSession() != null)
+        if (player.getSession() != null) {
             player.getSession().send(new ServerPacket(ServerCommands.BattleState).add(state));
+        }
     }
 
-    public void update(int time)
-    {
+    public void update(int time) {
         // The battle has no participants from the start or
         // all the participants were left => battle is over.
-        if (this.participants.size() == 0)
-        {
+        if (this.participants.size() == 0) {
             World.getInstance().removeBattle(this);
             return;
         }
 
         // Do the attack of every participant
-        for (Unit attacker : this.participants)
-        {
+        for (Unit attacker : this.participants) {
             Unit target = attacker.getTarget();
 
             // An attacker should not be in leftUnit list
             // For ex., a previous participant has killed this unit
             // And both are still in the list
-            if (this.leftUnits.contains(attacker))
+            if (this.leftUnits.contains(attacker)) {
                 continue;
+            }
 
             // Attacker has no target
-            if (target == null)
-            {
+            if (target == null) {
                 leaveBattle(attacker);
                 continue;
             }
 
             // Target is at another location
-            if (target.getPosition() != attacker.getPosition())
-            {
+            if (target.getPosition() != attacker.getPosition()) {
                 attacker.setTarget(null);
                 continue;
             }
 
             // the attacker is fleeing
-            if (this.runUnits.contains(attacker))
-            {
+            if (this.runUnits.contains(attacker)) {
                 Player player = attacker.isPlayer() ? (Player)attacker : null;
-                if (player != null && player.getSession() == null)
+                if (player != null && player.getSession() == null) {
                     player = null;
+                }
                 // TODO: Found out chance calculation
                 double chanceToFlee = 0.5d;
-                if (Random.nextDouble() < chanceToFlee)
-                {
+                if (Random.nextDouble() < chanceToFlee) {
                     this.runUnits.remove(attacker);
 
                     sendBattleState(attacker, BattleStates.Runaway);
                     // Set target to NULL and leave the battle
                     attacker.setTarget(null);
                     // Send run away result message
-                    if (player != null)
+                    if (player != null) {
                         player.getSession().sendServerMessage(39, target.getName());
+                    }
                     // Relocate target
                     attacker.setPosition(attacker.getPosition().getRandomNeighbour(attacker.isPlayer(), attacker.isPlayer()));
                 }
                 // Send Fail message
-                else if (player != null)
+                else if (player != null) {
                     player.getSession().sendServerMessage(42, target.getName());
+                }
                 // TODO: solve isPermanent runaway state problem.
-            }
-            else
-            {
+            } else {
                 attacker.doBattleAttack();
             }
         }
 
         // Clear the leftUnits
-        synchronized (this.leftUnits)
-        {
-            for (Unit unit : this.leftUnits)
-            {
+        synchronized (this.leftUnits) {
+            for (Unit unit : this.leftUnits) {
                 this.participants.remove(unit);
             }
             this.leftUnits.clear();
@@ -173,10 +160,10 @@ public class Battle
 
         // For all participants who still is in battle
         // Send BattleState.Battle
-        synchronized (this.participants)
-        {
-            for (Unit unit : this.participants)
+        synchronized (this.participants) {
+            for (Unit unit : this.participants) {
                 sendBattleState(unit, BattleStates.Battle);
+            }
         }
     }
 }

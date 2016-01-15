@@ -7,14 +7,13 @@ import org.meds.enums.ItemBonusParameters;
 import org.meds.enums.Parameters;
 import org.meds.enums.Races;
 
-public class UnitParameters
-{
-    public class Parameter
-    {
+public class UnitParameters {
+
+    public class Parameter {
+
         protected Map<Parameters, Integer> values;
 
-        public Parameter()
-        {
+        public Parameter() {
             this.values = new HashMap<>();
             clear();
         }
@@ -22,62 +21,48 @@ public class UnitParameters
         /**
          * Gets a value of the specified parameter.
          */
-        public int value(Parameters parameter)
-        {
+        public int value(Parameters parameter) {
             return this.values.get(parameter);
         }
 
         /**
          * Sets a value of the specified parameter.
          */
-        public void value(Parameters parameter, int value)
-        {
+        public void value(Parameters parameter, int value) {
             Integer prevValue = this.values.get(parameter);
             this.values.put(parameter, value);
-            if (prevValue != null)
-            {
-                if (prevValue.intValue() != value)
-                {
-                    UnitParameters.this.onParameterChanged(parameter);
-                }
+            if (prevValue != null && prevValue != value) {
+                UnitParameters.this.onParameterChanged(parameter);
             }
         }
 
-        public void change(Parameters parameter, int difference)
-        {
+        public void change(Parameters parameter, int difference) {
             this.value(parameter, this.values.get(parameter) + difference);
         }
 
-        public void clear()
-        {
-            for (Parameters parameter : Parameters.values())
-            {
+        public void clear() {
+            for (Parameters parameter : Parameters.values()) {
                 this.value(parameter, 0);
             }
         }
     }
 
-    public class EquipmentParameter extends Parameter
-    {
-        public int value(ItemBonusParameters parameter)
-        {
+    public class EquipmentParameter extends Parameter {
+
+        public int value(ItemBonusParameters parameter) {
             return value(this.convertFromItemParameters(parameter));
         }
 
-        public void value(ItemBonusParameters parameter, int value)
-        {
+        public void value(ItemBonusParameters parameter, int value) {
             value(convertFromItemParameters(parameter), value);
         }
 
-        public void change(ItemBonusParameters parameter, int difference)
-        {
+        public void change(ItemBonusParameters parameter, int difference) {
             change(convertFromItemParameters(parameter), difference);
         }
 
-        protected Parameters convertFromItemParameters(ItemBonusParameters parameter)
-        {
-            switch (parameter)
-            {
+        protected Parameters convertFromItemParameters(ItemBonusParameters parameter) {
+            switch (parameter) {
                 case BonusConstitution:
                     return Parameters.Constitution;
                 case BonusStrength:
@@ -131,16 +116,14 @@ public class UnitParameters
     private Map<Parameters, Integer> total;
     private Unit unit;
 
-    public UnitParameters(Unit unit)
-    {
+    public UnitParameters(Unit unit) {
         this.baseParameter = new Parameter();
         this.guildParameter = new Parameter();
         this.equipmentParameter = new EquipmentParameter();
         this.magicParameter = new Parameter();
         this.total = new HashMap<>();
         // Clear Total values
-        for (Parameters parameter : Parameters.values())
-        {
+        for (Parameters parameter : Parameters.values()) {
             this.total.put(parameter, 0);
         }
         this.unit = unit;
@@ -151,47 +134,39 @@ public class UnitParameters
     /**
      * Gets a total value of the specified parameter.
      */
-    public int value(Parameters parameter)
-    {
+    public int value(Parameters parameter) {
         return this.total.get(parameter);
     }
 
     /**
      * Sets a total value of the specified parameter.
      */
-    private void value(Parameters parameter, int value)
-    {
+    private void value(Parameters parameter, int value) {
         this.total.put(parameter, value);
     }
 
-    public Parameter base()
-    {
+    public Parameter base() {
         return this.baseParameter;
     }
 
-    public Parameter guild()
-    {
+    public Parameter guild() {
         return this.guildParameter;
     }
 
-    public EquipmentParameter equipment()
-    {
+    public EquipmentParameter equipment() {
         return this.equipmentParameter;
     }
 
-    public Parameter magic()
-    {
+    public Parameter magic() {
         return this.magicParameter;
     }
 
-    private void onParameterChanged(Parameters parameter)
-    {
+    private void onParameterChanged(Parameters parameter) {
         this.value(parameter, getTotalSum(parameter));
         int modifier = 1;
         double modifierD = 1d;
 
-        switch (parameter)
-        {
+        switch (parameter) {
             case Constitution:
                 recalculateBase(Parameters.Protection);
                 recalculateBase(Parameters.Armour);
@@ -226,32 +201,13 @@ public class UnitParameters
                 // All these parameters are depending on each other
                 // So need recalculate all of them
 
-                if (this.unit.getRace() == Races.Orc)
+                if (this.unit.getRace() == Races.Orc) {
                     modifierD = 5d / 4;
+                }
 
                 // if MinDamage value has been changed, its total value calculated at the top of this method
                 this.value(Parameters.Damage, (int)((getTotalSum(Parameters.Damage) + this.value(Parameters.MinDamage)) * modifierD));
                 this.value(Parameters.MaxDamage, (int)((getTotalSum(Parameters.MaxDamage) + getTotalSum(Parameters.Damage)) * modifierD));
-
-                /*
-                switch (parameter)
-                {
-                    case Parameters.Damage:
-                        this.total[parameter] += this.total[Parameters.MinDamage];
-                        this.total[parameter] *= modifier;
-                        break;
-                    case Parameters.MaxDamage:
-                        this.total[parameter] += GetTotalSum(Parameters.Damage);
-                        this.total[parameter] *= modifier;
-                        break;
-                    case Parameters.MinDamage:
-                        this.total[Parameters.Damage] = GetTotalSum(Parameters.Damage) + this.total[Parameters.MinDamage];
-                        this.total[Parameters.MaxDamage] = GetTotalSum(Parameters.Damage) + GetTotalSum(Parameters.Damage);
-                        this.total[Parameters.Damage] *= modifier;
-                        this.total[Parameters.MaxDamage] *= modifier;
-                        break;
-                }
-                */
                 break;
             case ChanceToHit:
                 if (this.unit.getRace() == Races.Elf)
@@ -265,10 +221,11 @@ public class UnitParameters
                 break;
             case ChanceToCast:
                 modifier = 1;
-                if (this.unit.getRace() == Races.Human)
+                if (this.unit.getRace() == Races.Human) {
                     modifier = 3;
-                else if (this.unit.getRace() == Races.Drow)
+                } else if (this.unit.getRace() == Races.Drow) {
                     modifier = 2;
+                }
                 this.value(Parameters.ChanceToCast,  this.value(Parameters.ChanceToCast) * modifier);
                 break;
             case FireResistance:
@@ -276,8 +233,9 @@ public class UnitParameters
             case LightningResistance:
             case AllResistance:
                 modifier = 1;
-                if (this.unit.getRace() == Races.Orc || this.unit.getRace() == Races.Dwarf)
+                if (this.unit.getRace() == Races.Orc || this.unit.getRace() == Races.Dwarf) {
                     modifier = 3;
+                }
                 this.value(Parameters.AllResistance, getTotalSum(Parameters.AllResistance));
                 this.value(Parameters.FireResistance, getTotalSum(Parameters.FireResistance) + this.value(Parameters.AllResistance));
                 this.value(Parameters.FrostResistance, getTotalSum(Parameters.FrostResistance) + this.value(Parameters.AllResistance));
@@ -299,40 +257,41 @@ public class UnitParameters
 
     }
 
-    public void recalculate()
-    {
+    public void recalculate() {
         recalculateBase(Parameters.Constitution);
         recalculateBase(Parameters.Strength);
         recalculateBase(Parameters.Dexterity);
         recalculateBase(Parameters.Intelligence);
     }
 
-    private void recalculateBase(Parameters parameter)
-    {
+    private void recalculateBase(Parameters parameter) {
         int bonus = 0;
-        switch (parameter)
-        {
+        switch (parameter) {
             case Damage:
-                if (this.unit.getRace() == Races.Orc)
+                if (this.unit.getRace() == Races.Orc) {
                     bonus = this.unit.getLevel() * 6;
+                }
                 base().value(Parameters.Damage, bonus + this.value(Parameters.Dexterity) + this.value(Parameters.Strength));
                 break;
             case Protection:
                 base().value(Parameters.Protection, this.value(Parameters.Constitution));
                 break;
             case ChanceToHit:
-                if (this.unit.getRace() == Races.Elf)
+                if (this.unit.getRace() == Races.Elf) {
                     bonus = this.unit.getLevel() / 2;
+                }
                 base().value(Parameters.ChanceToHit, bonus + this.value(Parameters.Dexterity));
                 break;
             case Armour:
-                if (this.unit.getRace() == Races.Dwarf || this.unit.getRace() == Races.Elf)
+                if (this.unit.getRace() == Races.Dwarf || this.unit.getRace() == Races.Elf) {
                     bonus = this.unit.getLevel() * 3 / 2; // or * 1.5
+                }
                 base().value(Parameters.Armour, bonus + this.value(Parameters.Dexterity) + this.value(Parameters.Constitution) / 3);
                 break;
             case ChanceToCast:
-                if (this.unit.getRace() == Races.Human || this.unit.getRace() == Races.Drow)
+                if (this.unit.getRace() == Races.Human || this.unit.getRace() == Races.Drow) {
                     bonus = this.unit.getLevel() / 2;
+                }
                 base().value(Parameters.ChanceToCast, bonus + this.value(Parameters.Intelligence) / 2);
                 break;
             case MagicDamage:
@@ -354,9 +313,11 @@ public class UnitParameters
             case FireResistance:
             case FrostResistance:
             case LightningResistance:
-                if (this.unit.getRace() == Races.Dwarf || this.unit.getRace() == Races.Orc)
+                if (this.unit.getRace() == Races.Dwarf || this.unit.getRace() == Races.Orc) {
                     bonus = this.unit.getLevel() * 3 / 2; // or * 1.5
+                }
                 int value = this.value(Parameters.Strength) * 3 / 10 + this.value(Parameters.Intelligence) / 10;
+                value *= bonus;
                 base().value(Parameters.FireResistance, value);
                 base().value(Parameters.FrostResistance, value);
                 base().value(Parameters.LightningResistance, value);
@@ -366,8 +327,7 @@ public class UnitParameters
         }
     }
 
-    private int getTotalSum(Parameters parameter)
-    {
+    private int getTotalSum(Parameters parameter) {
         return this.baseParameter.value(parameter) + this.guildParameter.value(parameter) + this.equipmentParameter.value(parameter) + this.magicParameter.value(parameter);
     }
 }

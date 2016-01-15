@@ -74,7 +74,7 @@ public class Group implements Iterable<Player> {
         private final int value;
         private final int modeMessage;
 
-        private TeamLootModes(int value, int modeMessage) {
+        TeamLootModes(int value, int modeMessage) {
             this.value = value;
             this.modeMessage = modeMessage;
         }

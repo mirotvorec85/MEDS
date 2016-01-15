@@ -25,9 +25,7 @@ public class DBStorage {
     public static Map<Integer, Skill> SkillStore;
     public static Map<Integer, Spell> SpellStore;
 
-    @SuppressWarnings("unchecked")
-    public static void load()
-    {
+    public static void load() {
         int counter;
         DBStorage.AchievementStore = new HashMap<>();
         DBStorage.CreatureLootStore = new HashMap<>();
@@ -45,8 +43,7 @@ public class DBStorage {
 
         // Achievement
         List<Achievement> achievements = worldDAO.getAchievements();
-        for(Achievement achievement : achievements)
-        {
+        for(Achievement achievement : achievements) {
             DBStorage.AchievementStore.put(achievement.getId(), achievement);
         }
         Logging.Info.log("Loaded " + DBStorage.AchievementStore.size() + " achievements");
@@ -60,16 +57,14 @@ public class DBStorage {
 
         // Currency
         List<Currency> currencies = worldDAO.getCurrencies();
-        for(Currency currency : currencies)
-        {
+        for(Currency currency : currencies) {
             DBStorage.CurrencyStore.put(currency.getId(), currency);
         }
         Logging.Info.log("Loaded " + DBStorage.CurrencyStore.size() + " currencies");
 
         // Guild
         List<Guild> guilds = worldDAO.getGuilds();
-        for(Guild guild : guilds)
-        {
+        for(Guild guild : guilds) {
             DBStorage.GuildStore.put(guild.getId(), guild);
         }
         Logging.Info.log("Loaded " + DBStorage.GuildStore.size() + " guilds");
@@ -77,11 +72,9 @@ public class DBStorage {
         // GuildLesson
         List<GuildLesson> guildLessons = worldDAO.getGuildLessons();
         counter = 0;
-        for(GuildLesson guildLesson : guildLessons)
-        {
+        for(GuildLesson guildLesson : guildLessons) {
             Map<Integer, GuildLesson> lessons = DBStorage.GuildLessonStore.get(guildLesson.getGuildId());
-            if (lessons == null)
-            {
+            if (lessons == null) {
                 lessons = new HashMap<>();
                 DBStorage.GuildLessonStore.put(guildLesson.getGuildId(), lessons);
             }
@@ -92,16 +85,14 @@ public class DBStorage {
 
         // ItemTemplate
         List<ItemTemplate> items = worldDAO.getItemTemplates();
-        for(ItemTemplate item : items)
-        {
+        for(ItemTemplate item : items) {
             DBStorage.ItemTemplateStore.put(item.getId(), item);
         }
         Logging.Info.log("Loaded " + DBStorage.ItemTemplateStore.size() + " items");
 
         // Level Costs
         List<LevelCost> levelCosts = worldDAO.getLevelCosts();
-        for(LevelCost cost : levelCosts)
-        {
+        for(LevelCost cost : levelCosts) {
             DBStorage.LevelCostStore.put(cost.getLevel(), cost);
         }
         Logging.Info.log("Loaded " + DBStorage.LevelCostStore.size() + " level costs");
@@ -112,8 +103,7 @@ public class DBStorage {
         // Skills
         List<Skill> skills = worldDAO.getSkills();
         DBStorage.SkillStore = new HashMap<>(skills.size());
-        for(Skill skill : skills)
-        {
+        for(Skill skill : skills) {
             DBStorage.SkillStore.put(skill.getId(), skill);
         }
         Logging.Info.log("Loaded " + DBStorage.SkillStore.size() + " skills");
@@ -121,16 +111,14 @@ public class DBStorage {
         // Spells
         List<Spell> spells = worldDAO.getSpells();
         DBStorage.SpellStore = new HashMap<>(spells.size());
-        for(Spell spell : spells)
-        {
+        for(Spell spell : spells) {
             DBStorage.SpellStore.put(spell.getId(), spell);
         }
         Logging.Info.log("Loaded " + DBStorage.SpellStore.size() + " spells");
 
         // Creature Templates
         List<CreatureTemplate> creatureTemplates = worldDAO.getCreatureTemplates();
-        for(CreatureTemplate template : creatureTemplates)
-        {
+        for(CreatureTemplate template : creatureTemplates) {
             DBStorage.CreatureTemplateStore.put(template.getTemplateId(), template);
         }
         Logging.Info.log("Loaded " + DBStorage.CreatureTemplateStore.size() + " creature templates");
@@ -138,11 +126,9 @@ public class DBStorage {
         // Creature Loot
         List<CreatureLoot> creatureLootItems = worldDAO.getCreatureLoot();
         counter = 0;
-        for(CreatureLoot creatureLootItem : creatureLootItems)
-        {
+        for(CreatureLoot creatureLootItem : creatureLootItems) {
             Map<Integer, CreatureLoot> lootItems = DBStorage.CreatureLootStore.get(creatureLootItem.getCreatureTemplateId());
-            if (lootItems == null)
-            {
+            if (lootItems == null) {
                 lootItems = new HashMap<>();
                 DBStorage.CreatureLootStore.put(creatureLootItem.getCreatureTemplateId(), lootItems);
             }
@@ -153,16 +139,14 @@ public class DBStorage {
 
         // New Messages
         List<NewMessage> messages = worldDAO.getNewMessages();
-        for(NewMessage message : messages)
-        {
+        for(NewMessage message : messages) {
             DBStorage.NewMessageStore.put(message.getId(), message);
         }
         Logging.Info.log("Loaded " + DBStorage.NewMessageStore.size() + " new messages");
 
         // Quest Templates
         List<QuestTemplate> questTemplates = worldDAO.getQuestTemplates();
-        for(QuestTemplate template : questTemplates)
-        {
+        for(QuestTemplate template : questTemplates) {
             DBStorage.QuestTemplateStore.put(template.getId(), template);
         }
         Logging.Info.log("Loaded " + DBStorage.QuestTemplateStore.size() + " quests");
@@ -170,11 +154,9 @@ public class DBStorage {
         // Creature Quest Relations
         List<CreatureQuestRelation> relations = worldDAO.getCreatureQuestRelations();
         counter = 0;
-        for(CreatureQuestRelation relation : relations)
-        {
+        for(CreatureQuestRelation relation : relations) {
             Map<Integer, CreatureQuestRelation> creatureQuests = DBStorage.CreatureQuestRelationStore.get(relation.getCreatureTemplateId());
-            if (creatureQuests == null)
-            {
+            if (creatureQuests == null) {
                 creatureQuests = new HashMap<>();
                 DBStorage.CreatureQuestRelationStore.put(relation.getCreatureTemplateId(), creatureQuests);
             }

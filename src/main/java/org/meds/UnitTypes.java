@@ -1,7 +1,7 @@
 package org.meds;
 
-public enum UnitTypes
-{
+public enum UnitTypes {
+
     Unit,
     Player,
     Creature,

@@ -1,7 +1,7 @@
 package org.meds.logging;
 
-public class Logging
-{
+public class Logging {
+
     public static final Logger Debug = new Logger("Debug");
     public static final Logger Info = new Logger("Info");
     public static final Logger Warn = new Logger("Warn");

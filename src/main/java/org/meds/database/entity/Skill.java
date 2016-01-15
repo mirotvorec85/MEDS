@@ -1,40 +1,39 @@
 package org.meds.database.entity;
 
-public class Skill
-{
+public class Skill {
+
     private int id;
     private String name;
 
-    public int getId()
-    {
+    public int getId() {
         return id;
     }
-    public void setId(int id)
-    {
+
+    public void setId(int id) {
         this.id = id;
     }
-    public String getName()
-    {
+
+    public String getName() {
         return name;
     }
-    public void setName(String name)
-    {
+
+    public void setName(String name) {
         this.name = name;
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return this.id;
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
-        if (obj == null)
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
-        if (!(obj instanceof Skill))
+        }
+        if (!(obj instanceof Skill)) {
             return false;
+        }
         Skill cObj = (Skill)obj;
         return this.id == cObj.id;
     }

@@ -11,15 +11,14 @@ import org.meds.enums.Parameters;
 import org.meds.logging.Logging;
 import org.meds.map.Location;
 import org.meds.map.Map;
-import org.meds.map.Region;
 import org.meds.net.Server;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.DateFormatter;
 import org.meds.util.SafeConvert;
 
-public final class ChatHandler
-{
+public final class ChatHandler {
+
     public final static String Separator = "\u0002";
     public final static String MessageSeparator = "\u0030";
     public final static String SayChar = "\u0031";
@@ -82,27 +81,26 @@ public final class ChatHandler
         return packet;
     }
 
-    public static void sendSystemMessage(Player player, String message)
-    {
-        if (player == null || player.getSession() == null || message == null || message.length() == 0)
+    public static void sendSystemMessage(Player player, String message) {
+        if (player == null || player.getSession() == null || message == null || message.length() == 0) {
             return;
+        }
 
         player.getSession().send(constructSystemMessage(message));
     }
 
-    public static void sendSystemMessage(String message)
-    {
+    public static void sendSystemMessage(String message) {
         if (message == null || message.length() == 0)
             return;
 
         World.getInstance().send(constructSystemMessage(message));
     }
 
-    public static void handleSay(Player player, String message)
-    {
+    public static void handleSay(Player player, String message) {
         // Ignore empty messages
-        if (message == null || message.length() == 0)
+        if (message == null || message.length() == 0) {
             return;
+        }
 
         // Player is located nowhere
         if (player.getPosition() == null) {
@@ -112,24 +110,25 @@ public final class ChatHandler
         }
 
         // Message contains only whitespace
-        for (int i = 0; i < message.length(); ++i)
-        {
-            if (message.charAt(i) != ' ')
-            break;
-            if (i == message.length() - 1)
-            return;
+        for (int i = 0; i < message.length(); ++i) {
+            if (message.charAt(i) != ' ') {
+                break;
+            }
+            if (i == message.length() - 1) {
+                return;
+            }
         }
 
         // Is a command
-        if (message.charAt(0) == '\\' && message.length() > 1)
-        {
+        if (message.charAt(0) == '\\' && message.length() > 1) {
             String text = message.substring(1);
             String[] commandData = text.split(" ");
             String args;
-            if (commandData.length > 1)
+            if (commandData.length > 1) {
                 args = message.substring(commandData[0].length() + 2);
-            else
+            } else {
                 args = "";
+            }
             handleCommand(player, commandData[0], args);
             return;
         }
@@ -145,13 +144,11 @@ public final class ChatHandler
         player.getPosition().getRegion().send(packet);
     }
 
-    public static void handleWhisper(Player player, String message)
-    {
+    public static void handleWhisper(Player player, String message) {
         // TODO: Implement whispering
     }
 
-    public static void handleCommand(Player player, String command, String commandArgs)
-    {
+    public static void handleCommand(Player player, String command, String commandArgs) {
         // Parsing commands
         // Each word except surrounding with quotes
 
@@ -170,45 +167,41 @@ public final class ChatHandler
         Logging.Info.log("Executing command \"%s\" for %s", command, player);
     }
 
-    private static abstract class ChatCommand
-    {
-        public int getMinArgsCount()
-        {
+    private static abstract class ChatCommand {
+
+        public int getMinArgsCount() {
             return -1;
         }
 
         public abstract void handle(Player player, String[] args);
     }
 
-    private static class TeleportChatCommand extends ChatCommand
-    {
+    private static class TeleportChatCommand extends ChatCommand {
+
         @Override
-        public int getMinArgsCount()
-        {
+        public int getMinArgsCount() {
             return 1;
         }
 
         @Override
-        public void handle(Player player, String[] args)
-        {
+        public void handle(Player player, String[] args) {
             int locationId = SafeConvert.toInt32(args[0]);
             Location location = Map.getInstance().getLocation(locationId);
-            if (location != null)
+            if (location != null) {
                 player.setPosition(location);
+            }
         }
     }
 
-    private static class SetLevelChatCommand extends ChatCommand
-    {
+    private static class SetLevelChatCommand extends ChatCommand {
+
         @Override
-        public int getMinArgsCount()
-        {
+        public int getMinArgsCount() {
             return 1;
         }
 
         @Override
-        public void handle(Player player, String[] args)
-        {
+        public void handle(Player player, String[] args) {
             int level = SafeConvert.toInt32(args[0], -1);
             if (level < 0 || level > 360)
                 return;
@@ -216,17 +209,15 @@ public final class ChatHandler
         }
     }
 
-    private static class AnnounceChatCommand extends ChatCommand
-    {
+    private static class AnnounceChatCommand extends ChatCommand {
+
         @Override
-        public int getMinArgsCount()
-        {
+        public int getMinArgsCount() {
             return 1;
         }
 
         @Override
-        public void handle(Player player, String[] args)
-        {
+        public void handle(Player player, String[] args) {
             sendSystemMessage(args[0]);
         }
     }

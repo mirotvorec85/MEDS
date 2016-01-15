@@ -12,18 +12,15 @@ import org.meds.database.dao.DAOFactory;
 import org.meds.enums.MovementDirections;
 import org.meds.logging.Logging;
 
-import org.hibernate.Session;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 
-public class Map
-{
+public class Map {
+
     private static Map instance;
 
-    public static Map getInstance()
-    {
-        if (Map.instance == null)
-        {
+    public static Map getInstance() {
+        if (Map.instance == null) {
             Map.instance = new Map();
         }
 
@@ -42,8 +39,7 @@ public class Map
 
     private HashSet<Location> updatedLocations;
 
-    private Map()
-    {
+    private Map() {
         this.kingdoms = new HashMap<>();
         this.regions = new HashMap<>();
         this.locations = new HashMap<>();
@@ -54,40 +50,32 @@ public class Map
         this.corpseGuidCounter = 1;
     }
 
-    public Location getLocation(int locationId)
-    {
+    public Location getLocation(int locationId) {
         return this.locations.get(locationId);
     }
 
-    public Region getRegion(int regionId)
-    {
+    public Region getRegion(int regionId) {
         return this.regions.get(regionId);
     }
 
-    public Kingdom getKingdom(int kingdomId)
-    {
+    public Kingdom getKingdom(int kingdomId) {
         return this.kingdoms.get(kingdomId);
     }
 
-    public Shop getShop(int shopId)
-    {
+    public Shop getShop(int shopId) {
         return this.shops.get(shopId);
     }
 
-    @SuppressWarnings("unchecked")
-    public void load()
-    {
+    public void load() {
         DAOFactory daoFactory = DAOFactory.getFactory();
         List<Kingdom> kingdoms = daoFactory.getMapDAO().getKingdoms();
-        for (Kingdom kingdom : kingdoms)
-        {
+        for (Kingdom kingdom : kingdoms) {
             this.kingdoms.put(kingdom.getId(), kingdom);
         }
         Logging.Info.log("Loaded " + this.kingdoms.size() + " kingdoms");
 
         List<org.meds.database.entity.Region> regionEntries = daoFactory.getMapDAO().getRegions();
-        for (org.meds.database.entity.Region entry : regionEntries)
-        {
+        for (org.meds.database.entity.Region entry : regionEntries) {
             Region region = new Region(entry);
             this.regions.put(region.getId(), region);
             region.getKingdom().addRegion(region);
@@ -95,8 +83,7 @@ public class Map
         Logging.Info.log("Loaded " + this.regions.size() + " regions");
 
         List<Location> locations = daoFactory.getMapDAO().getLocations();
-        for (Location location : locations)
-        {
+        for (Location location : locations) {
             this.locations.put(location.getId(), location);
             location.getRegion().addLocation(location);
         }
@@ -104,36 +91,29 @@ public class Map
 
         // Filter duplicate values, that are the result of left outer join
         Set<Shop> shops = new HashSet<Shop>(daoFactory.getMapDAO().getShops());
-        for (Shop shop : shops)
-        {
+        for (Shop shop : shops) {
             shop.load();
             this.shops.put(shop.getId(), shop);
         }
         Logging.Info.log("Loaded " + this.shops.size() + " shops");
     }
 
-    public void addLocationUpdate(Location location)
-    {
+    public void addLocationUpdate(Location location) {
         this.updatedLocations.add(location);
     }
 
-    public void registerMovement(Unit unit, MovementDirections direction)
-    {
+    public void registerMovement(Unit unit, MovementDirections direction) {
         this.unitMovement.put(unit, direction);
     }
 
-    public int getNextCorpseGuid()
-    {
+    public int getNextCorpseGuid() {
         return this.corpseGuidCounter++;
     }
 
-    public void update(int time)
-    {
+    public void update(int time) {
         // Move all moving units
-        synchronized (this.unitMovement)
-        {
-            for (java.util.Map.Entry<Unit, MovementDirections> entry : this.unitMovement.entrySet())
-            {
+        synchronized (this.unitMovement) {
+            for (java.util.Map.Entry<Unit, MovementDirections> entry : this.unitMovement.entrySet()) {
                 Unit mover = entry.getKey();
 
                 // Current position doesn't exist
@@ -143,23 +123,27 @@ public class Map
                 }
 
                 // While fighting cancel the moving by putting at the same location
-                if (mover.isInCombat())
+                if (mover.isInCombat()) {
                     mover.setPosition(mover.getPosition());
+                }
 
-                if (!mover.canMove())
+                if (!mover.canMove()) {
                     continue;
+                }
 
                 if (mover.isPlayer()) {
                     Player player = (Player) mover;
                     // In a group but not a leader
-                    if (player.getGroup() != null && player.getGroup().getLeader() != player)
+                    if (player.getGroup() != null && player.getGroup().getLeader() != player) {
                         continue;
+                    }
                 }
 
                 // Does neighbour location exist?
                 Location location = mover.getPosition().getNeighbourLocation(entry.getValue());
-                if (location == null)
+                if (location == null) {
                     continue;
+                }
 
                 Location prevLocation = mover.getPosition();
                 // Move the unit
@@ -179,8 +163,7 @@ public class Map
                 }
 
                 ServerPacket packet = new ServerPacket(ServerCommands.ServerMessage);
-                switch (entry.getValue())
-                {
+                switch (entry.getValue()) {
                     case Up:
                         packet.add(450);
                         break;
@@ -209,10 +192,10 @@ public class Map
             this.unitMovement.clear();
         }
 
-        synchronized (this.updatedLocations)
-        {
-            for (Location location : this.updatedLocations)
+        synchronized (this.updatedLocations) {
+            for (Location location : this.updatedLocations) {
                 location.update(time);
+            }
             this.updatedLocations.clear();
         }
     }

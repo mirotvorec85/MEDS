@@ -11,8 +11,8 @@ import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.Random;
 
-public class Location
-{
+public class Location {
+
     private int id;
     private String title;
     private int topId;
@@ -63,255 +63,249 @@ public class Location
         this.items = new HashMap<>();
     }
 
-    public int getId()
-    {
+    public int getId() {
         return id;
     }
-    public void setId(int id)
-    {
+
+    public void setId(int id) {
         this.id = id;
     }
-    public String getTitle()
-    {
+
+    public String getTitle() {
         return title;
     }
-    public void setTitle(String title)
-    {
+
+    public void setTitle(String title) {
         this.title = title;
     }
-    public int getTopId()
-    {
+
+    public int getTopId() {
         return topId;
     }
-    public void setTopId(int topId)
-    {
+
+    public void setTopId(int topId) {
         this.topId = topId;
     }
-    public int getBottomId()
-    {
+
+    public int getBottomId() {
         return bottomId;
     }
-    public void setBottomId(int bottomId)
-    {
+
+    public void setBottomId(int bottomId) {
         this.bottomId = bottomId;
     }
-    public int getNorthId()
-    {
+
+    public int getNorthId() {
         return northId;
     }
-    public void setNorthId(int northId)
-    {
+
+    public void setNorthId(int northId) {
         this.northId = northId;
     }
-    public int getSouthId()
-    {
+
+    public int getSouthId() {
         return southId;
     }
-    public void setSouthId(int southId)
-    {
+
+    public void setSouthId(int southId) {
         this.southId = southId;
     }
-    public int getWestId()
-    {
+
+    public int getWestId() {
         return westId;
     }
-    public void setWestId(int westId)
-    {
+
+    public void setWestId(int westId) {
         this.westId = westId;
     }
-    public int getEastId()
-    {
+
+    public int getEastId() {
         return eastId;
     }
-    public void setEastId(int eastId)
-    {
+
+    public void setEastId(int eastId) {
         this.eastId = eastId;
     }
-    public int getxCoord()
-    {
+
+    public int getxCoord() {
         return xCoord;
     }
-    public void setxCoord(int xCoord)
-    {
+
+    public void setxCoord(int xCoord) {
         this.xCoord = xCoord;
     }
-    public int getyCoord()
-    {
+
+    public int getyCoord() {
         return yCoord;
     }
-    public void setyCoord(int yCoord)
-    {
+
+    public void setyCoord(int yCoord) {
         this.yCoord = yCoord;
     }
-    public int getzCoord()
-    {
+
+    public int getzCoord() {
         return zCoord;
     }
-    public void setzCoord(int zCoord)
-    {
+
+    public void setzCoord(int zCoord) {
         this.zCoord = zCoord;
     }
-    public int getRegionId()
-    {
+
+    public int getRegionId() {
         return regionId;
     }
-    public void setRegionId(int regionId)
-    {
+
+    public void setRegionId(int regionId) {
         this.regionId = regionId;
         this.region = Map.getInstance().getRegion(regionId);
     }
-    public Region getRegion()
-    {
+
+    public Region getRegion() {
         return this.region;
     }
-    public int getSpecialLocationTypeInt()
-    {
+
+    public int getSpecialLocationTypeInt() {
         return specialLocationType.getValue();
     }
-    public void setSpecialLocationTypeInt(int specialLocationType)
-    {
+
+    public void setSpecialLocationTypeInt(int specialLocationType) {
         this.specialLocationType = SpecialLocationTypes.parse(specialLocationType);
     }
-    public SpecialLocationTypes getSpecialLocationType()
-    {
+
+    public SpecialLocationTypes getSpecialLocationType() {
         return this.specialLocationType;
     }
-    public boolean isSafeZone()
-    {
+
+    public boolean isSafeZone() {
         return safeZone;
     }
-    public void setSafeZone(boolean safeZone)
-    {
+
+    public void setSafeZone(boolean safeZone) {
         this.safeZone = safeZone;
     }
-    public int getKeeperType()
-    {
+
+    public int getKeeperType() {
         return keeperType;
     }
-    public void setKeeperType(int keeperType)
-    {
+
+    public void setKeeperType(int keeperType) {
         this.keeperType = keeperType;
     }
-    public String getKeeperName()
-    {
+
+    public String getKeeperName() {
         return keeperName;
     }
-    public void setKeeperName(String keeperName)
-    {
+
+    public void setKeeperName(String keeperName) {
         this.keeperName = keeperName;
     }
-    public int getSpecialLocationId()
-    {
+
+    public int getSpecialLocationId() {
         return specialLocationId;
     }
-    public void setSpecialLocationId(int specialLocationId)
-    {
+
+    public void setSpecialLocationId(int specialLocationId) {
         this.specialLocationId = specialLocationId;
     }
-    public int getPictureId()
-    {
+
+    public int getPictureId() {
         return pictureId;
     }
-    public void setPictureId(int pictureId)
-    {
+
+    public void setPictureId(int pictureId) {
         this.pictureId = pictureId;
     }
-    public boolean isSquare()
-    {
+
+    public boolean isSquare() {
         return square;
     }
-    public void setSquare(boolean square)
-    {
+
+    public void setSquare(boolean square) {
         this.square = square;
     }
-    public boolean isSafeRegion()
-    {
+
+    public boolean isSafeRegion() {
         return safeRegion;
     }
-    public void setSafeRegion(boolean safeRegion)
-    {
+
+    public void setSafeRegion(boolean safeRegion) {
         this.safeRegion = safeRegion;
     }
-    public int getPictureTime()
-    {
+
+    public int getPictureTime() {
         return pictureTime;
     }
-    public void setPictureTime(int pictureTime)
-    {
+
+    public void setPictureTime(int pictureTime) {
         this.pictureTime = pictureTime;
     }
-    public int getKeeperTime()
-    {
+
+    public int getKeeperTime() {
         return keeperTime;
     }
-    public void setKeeperTime(int keeperTime)
-    {
+
+    public void setKeeperTime(int keeperTime) {
         this.keeperTime = keeperTime;
     }
 
-    private void setUpdatable(boolean updatable)
-    {
-        if (this.updatable == updatable)
+    private void setUpdatable(boolean updatable) {
+        if (this.updatable == updatable) {
             return;
+        }
         this.updatable = updatable;
-        if (updatable)
+        if (updatable) {
             Map.getInstance().addLocationUpdate(this);
+        }
     }
 
-    public Location getRandomNeighbour()
-    {
+    public Location getRandomNeighbour() {
         return this.getRandomNeighbour(true, false);
     }
 
-    public Location getRandomNeighbour(boolean includeSpecial)
-    {
+    public Location getRandomNeighbour(boolean includeSpecial) {
         return this.getRandomNeighbour(includeSpecial, false);
     }
 
-    public Location getRandomNeighbour(boolean includeSpecial, boolean stayInRegion)
-    {
+    public Location getRandomNeighbour(boolean includeSpecial, boolean stayInRegion) {
         return getNeighbourLocation(getRandomDirection(includeSpecial, stayInRegion));
     }
 
-    public MovementDirections getRandomDirection()
-    {
+    public MovementDirections getRandomDirection() {
         return this.getRandomDirection(true, false);
     }
 
-    public MovementDirections getRandomDirection(boolean includeSpecial)
-    {
+    public MovementDirections getRandomDirection(boolean includeSpecial) {
         return this.getRandomDirection(includeSpecial, false);
     }
 
-    public MovementDirections getRandomDirection(boolean includeSpecial, boolean stayInRegion)
-    {
+    public MovementDirections getRandomDirection(boolean includeSpecial, boolean stayInRegion) {
         int startIndex = Random.nextInt(MovementDirections.Up.getValue(), MovementDirections.West.getValue() + 1);
         // Increase or Decrease the index
         int bypassDirection = Random.nextInt(0, 2) == 0 ? -1 : 1;
         int index = startIndex;
         Location location;
-        do
-        {
+        do {
             location = getNeighbourLocation(MovementDirections.parse(index));
             // Neighbour exists and it is not a special location.
-            if (location != null && (includeSpecial || !location.safeZone) && (!stayInRegion || location.region == this.region))
+            if (location != null && (includeSpecial || !location.safeZone) &&
+                    (!stayInRegion || location.region == this.region)) {
                 return MovementDirections.parse(index);
+            }
             index += bypassDirection;
             // Keep boundaries
-            if (index < 0)
+            if (index < 0) {
                 index = 5;
-            else if (index > 5)
+            } else if (index > 5) {
                 index = 0;
+            }
         } while (index != startIndex);
 
         return MovementDirections.None;
     }
 
-    public Location getNeighbourLocation(MovementDirections direction)
-    {
+    public Location getNeighbourLocation(MovementDirections direction) {
         int neighbourId;
-        switch (direction)
-        {
+        switch (direction) {
             case Up:
                 neighbourId = this.topId;
                 break;
@@ -341,10 +335,8 @@ public class Location
     /**
      * Gets the shorter location info with ServerCommands.LocationInfo
      */
-    public ServerPacket getInfoData()
-    {
-        if (this.locationInfoData == null)
-        {
+    public ServerPacket getInfoData() {
+        if (this.locationInfoData == null) {
             this.locationInfoData =  new ServerPacket(ServerCommands.LocationInfo)
                 .add(this.id)
                 .add(this.title)
@@ -368,17 +360,13 @@ public class Location
         return this.locationInfoData;
     }
 
-    public ServerPacket getNeighborsInfoData()
-    {
-        if (this.neighborsInfoData == null)
-        {
+    public ServerPacket getNeighborsInfoData() {
+        if (this.neighborsInfoData == null) {
             this.neighborsInfoData = new ServerPacket();
             Location neighbor;
 
-            for (MovementDirections direction : MovementDirections.values())
-            {
-                if ((neighbor = getNeighbourLocation(direction)) != null)
-                {
+            for (MovementDirections direction : MovementDirections.values()) {
+                if ((neighbor = getNeighbourLocation(direction)) != null) {
                     this.neighborsInfoData.add(neighbor.getInfoData());
                 }
             }
@@ -386,10 +374,8 @@ public class Location
         return this.neighborsInfoData;
     }
 
-    public ServerPacket getData()
-    {
-        if (this.locationData == null)
-        {
+    public ServerPacket getData() {
+        if (this.locationData == null) {
             this.locationData = new ServerPacket(ServerCommands.Location)
                 .add(this.id)
                 .add(this.title)
@@ -432,8 +418,7 @@ public class Location
         return this.unitsView;
     }
 
-    public void addCorpse(Corpse corpse)
-    {
+    public void addCorpse(Corpse corpse) {
         this.corpses.put(corpse.getGuid(), corpse);
         send(getCorpseData());
     }
@@ -443,8 +428,7 @@ public class Location
      * @param corpseGuid Corpse GUID to find.
      * @return Reference to a Corpse class instance.
      */
-    public Corpse getCorpse(int corpseGuid)
-    {
+    public Corpse getCorpse(int corpseGuid) {
         return this.corpses.get(corpseGuid);
     }
 
@@ -452,28 +436,27 @@ public class Location
         Item _item = this.items.get(item.getPrototype());
         if (_item != null) {
             _item.tryStackItem(item);
-        }
-        else
+        } else {
             this.items.put(item.getPrototype(), item);
+        }
         // Synchronize Items/Corpses data
         send(getCorpseData());
     }
 
-    public Item getItem(Prototype proto)
-    {
+    public Item getItem(Prototype proto) {
         return this.items.get(proto);
     }
 
-    public void removeItem(Item item)
-    {
-        if (this.items.remove(item.getPrototype()) != null)
+    public void removeItem(Item item) {
+        if (this.items.remove(item.getPrototype()) != null) {
             send(getCorpseData());
+        }
     }
 
-    public void removeCorpse(Corpse corpse)
-    {
-        if (this.corpses.remove(corpse.getGuid()) != null)
+    public void removeCorpse(Corpse corpse) {
+        if (this.corpses.remove(corpse.getGuid()) != null) {
             send(getCorpseData());
+        }
     }
 
     public void unitEntered(Unit unit) {
@@ -501,23 +484,22 @@ public class Location
         setUpdatable(true);
     }
 
-    public void unitVisualChanged(Unit unit)
-    {
+    public void unitVisualChanged(Unit unit) {
         this.setUpdatable(true);
-        if (!this.updatable)
-        {
+        if (!this.updatable) {
             this.updatedUnit = unit;
         }
         // Will be updated already
-        else
-        {
+        else {
             // updatable == true AND updatedUnit == null means that "pss" command should be sent to all units
-            if (this.updatedUnit == null)
+            if (this.updatedUnit == null) {
                 return;
+            }
 
             // Exclude double unit changing as the same unit
-            if (this.updatedUnit != unit)
+            if (this.updatedUnit != unit) {
                 this.updatedUnit = null;
+            }
         }
     }
 
@@ -537,33 +519,33 @@ public class Location
     }
 
     public void send(Unit exception1, Unit exception2, ServerPacket packet) {
-        for (Unit unit : this.units)
+        for (Unit unit : this.units) {
             if (unit.getUnitType() == UnitTypes.Player) {
-                Player pl = (Player)unit;
+                Player pl = (Player) unit;
                 // Except Player
-                if (pl == exception1 || pl == exception2)
+                if (pl == exception1 || pl == exception2) {
                     continue;
+                }
 
-                if (pl.getSession() == null)
+                if (pl.getSession() == null) {
                     continue;
+                }
 
                 pl.getSession().send(packet);
             }
+        }
     }
 
-    public ServerPacket getCorpseData()
-    {
+    public ServerPacket getCorpseData() {
         ServerPacket packet = new ServerPacket(ServerCommands.CorpseList);
         packet.add(this.corpses.size() + this.items.size());
         // Corpses
-        for (Corpse corpse : this.corpses.values())
-        {
+        for (Corpse corpse : this.corpses.values()) {
             packet.add(corpse.getGuid())
                 .add(corpse.getOwner().getUnitType() == UnitTypes.Player ? "user" : "npc")
                 .add(corpse.getOwner().getName());
         }
-        for (Item item : this.items.values())
-        {
+        for (Item item : this.items.values()) {
             packet.add(item.Template.getId())
                 .add(item.getModification().getValue())
                 .add(item.getDurability())
@@ -576,8 +558,9 @@ public class Location
         List<Player> players = new ArrayList<>(this.units.size());
         synchronized (this.units) {
             for (Unit unit : this.units) {
-                if (unit.getUnitType() == UnitTypes.Player)
+                if (unit.getUnitType() == UnitTypes.Player) {
                     players.add((Player) unit);
+                }
             }
         }
         return players;

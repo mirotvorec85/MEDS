@@ -1,14 +1,13 @@
 package org.meds;
 
-public class Damage
-{
-    public enum ReductionTypes
-    {
+public class Damage {
+
+    public enum ReductionTypes {
+
         Absorption,
     }
 
-    public interface AffectionHandler
-    {
+    public interface AffectionHandler {
         boolean handle(Damage damage);
     }
 
@@ -44,24 +43,20 @@ public class Damage
     public int MessagePositionDamage = 23;
     public int MessagePositionKillingBlow = 26;
 
-    public Damage(int initialDamage, Unit target)
-    {
+    public Damage(int initialDamage, Unit target) {
         this.initialDamage = this.FinalDamage = initialDamage;
         this.target = target;
     }
 
-    public int getInitialDamage()
-    {
+    public int getInitialDamage() {
         return this.initialDamage;
     }
 
-    public int getRealDamage()
-    {
+    public int getRealDamage() {
         return FinalDamage - Absorbed;
     }
 
-    public Unit getTarget()
-    {
+    public Unit getTarget() {
         return target;
     }
 }

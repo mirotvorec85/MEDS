@@ -1,23 +1,19 @@
 package org.meds.logging;
 
-public class Logger
-{
+public class Logger {
+
     private org.apache.logging.log4j.Logger logger;
 
-    public Logger(String name)
-    {
+    public Logger(String name) {
         this.logger = org.apache.logging.log4j.LogManager.getLogger(name);
     }
 
-    public org.apache.logging.log4j.Logger getInnerLogger()
-    {
+    public org.apache.logging.log4j.Logger getInnerLogger() {
         return this.logger;
     }
 
-    public void log(String message, Throwable thr)
-    {
-        switch (this.logger.getName())
-        {
+    public void log(String message, Throwable thr) {
+        switch (this.logger.getName()) {
             case "Debug":
                 this.logger.debug(message, thr);
                 break;
@@ -38,10 +34,8 @@ public class Logger
         }
     }
 
-    public void log(String message)
-    {
-        switch (this.logger.getName())
-        {
+    public void log(String message) {
+        switch (this.logger.getName()) {
             case "Debug":
                 this.logger.debug(message);
                 break;
@@ -62,8 +56,7 @@ public class Logger
         }
     }
 
-    public void log(String message, Object... args)
-    {
+    public void log(String message, Object... args) {
         this.log(String.format(message, args));
     }
 }

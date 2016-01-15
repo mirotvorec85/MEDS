@@ -1,6 +1,6 @@
 package org.meds.util;
 
-public interface Valued
-{
-    public int getValue();
+public interface Valued {
+
+     int getValue();
 }

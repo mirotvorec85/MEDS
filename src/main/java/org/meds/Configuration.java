@@ -6,10 +6,9 @@ import java.util.HashMap;
 import org.meds.logging.Logging;
 import org.meds.util.SafeConvert;
 
-public class Configuration
-{
-    public enum Keys
-    {
+public class Configuration {
+
+    public enum Keys {
         ServerIP,
         Port;
 
@@ -30,30 +29,28 @@ public class Configuration
 
     private static String confFile = "server.conf";
 
-    public static boolean load()
-    {
+    public static boolean load() {
         values = new HashMap<>();
 
         BufferedReader reader = null;
-        try
-        {
+        try {
             reader = new BufferedReader(new InputStreamReader(
                     Configuration.class.getClassLoader().getResourceAsStream(Configuration.confFile)));
             String textLine = null;
-            while ((textLine = reader.readLine()) != null)
-            {
+            while ((textLine = reader.readLine()) != null) {
                 // Remove any spaces
                 textLine = textLine.replaceAll("\\s", "");
                 // Pass empty and commentary strings
-                if (textLine.isEmpty() || textLine.charAt(0) == '#')
+                if (textLine.isEmpty() || textLine.charAt(0) == '#') {
                     continue;
+                }
                 String[] keyValuePair = textLine.split("=");
-                if (keyValuePair.length < 2)
+                if (keyValuePair.length < 2) {
                     continue;
+                }
 
                 Keys key = Keys.parseKey(keyValuePair[0]);
-                if (key == null)
-                {
+                if (key == null) {
                     Logging.Warn.log("Found unknown config key \"" + keyValuePair[0] + "\". Skipped.");
                     continue;
                 }
@@ -62,27 +59,19 @@ public class Configuration
             }
             Logging.Info.log("Configuration is loaded.");
             reader.close();
-        }
-        catch (FileNotFoundException e)
-        {
+        } catch (FileNotFoundException e) {
             Logging.Error.log("Configuration file not found.");
             Configuration.createConfigFile();
             return false;
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             Logging.Error.log("Unhandled Exception while loading the configuration.", e);
             return false;
-        }
-        finally
-        {
-            try
-            {
-                if (reader != null)
+        } finally {
+            try {
+                if (reader != null) {
                     reader.close();
-            }
-            catch (IOException e)
-            {
+                }
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -90,26 +79,23 @@ public class Configuration
         return true;
     }
 
-    public static int getInt(Keys key)
-    {
+    public static int getInt(Keys key) {
         return SafeConvert.toInt32(values.get(key));
     }
 
-    public static String getString(Keys key)
-    {
+    public static String getString(Keys key)    {
         return values.get(key);
     }
 
-    private static void createConfigFile()
-    {
+    private static void createConfigFile() {
         String distFile = Configuration.confFile + ".dist";
         File file = new File(distFile);
         // Dist file already exists
-        if (file.exists() && file.isFile())
+        if (file.exists() && file.isFile()) {
             return;
+        }
 
-        try
-        {
+        try {
             PrintWriter pw = new PrintWriter(new FileWriter(file));
             pw.println("##################################");
             pw.println("# MEDS Server Configuration FILE #");
@@ -134,9 +120,7 @@ public class Configuration
             pw.close();
             System.out.println("Config file" + distFile + " just created.");
 
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             Logging.Warn.log("Cannot create \"" + distFile + "\" file. Error: " + ex.getMessage());
         }
     }

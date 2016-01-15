@@ -15,7 +15,7 @@ public class Trade {
 
         private final int value;
 
-        private Results(int value) {
+        Results(int value) {
             this.value = value;
         }
 

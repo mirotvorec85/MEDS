@@ -1,77 +1,68 @@
 package org.meds.util;
 
-public class EnumFlags<T extends Enum<T> & Valued> implements Valued
-{
+public class EnumFlags<T extends Enum<T> & Valued> implements Valued {
+
     private int flags;
 
-    public EnumFlags()
-    {
+    public EnumFlags() {
         this.flags = 0;
     }
 
-    public EnumFlags(int flags)
-    {
+    public EnumFlags(int flags) {
         this.flags = flags;
     }
 
-    public EnumFlags(T flag)
-    {
+    public EnumFlags(T flag) {
         this.flags = flag.getValue();
     }
 
-    public EnumFlags(T[] flags)
-    {
-        for (T flag : flags)
+    public EnumFlags(T[] flags) {
+        for (T flag : flags) {
             this.flags |= flag.getValue();
+        }
     }
 
-    public boolean set(T flag)
-    {
+    public boolean set(T flag) {
         return this.set(flag.getValue());
     }
 
-    public boolean set(int flag)
-    {
-        if (this.has(flag))
+    public boolean set(int flag) {
+        if (this.has(flag)) {
             return false;
-        else
+        } else {
             this.flags |= flag;
+        }
         return true;
     }
 
-    public boolean unset(int flag)
-    {
-        if (!this.has(flag))
+    public boolean unset(int flag) {
+        if (!this.has(flag)) {
             return false;
-        else
+        } else {
             this.flags ^= flag;
+        }
         return true;
     }
 
-    public boolean unset(T flag)
-    {
+    public boolean unset(T flag) {
         return this.unset(flag.getValue());
     }
 
-    public boolean has(int flag)
-    {
+    public boolean has(int flag) {
         return (this.flags & flag) > 0;
     }
 
-    public boolean has(T flag)
-    {
+    public boolean has(T flag) {
         return this.has(flag.getValue());
     }
 
     @Override
-    public int getValue()
-    {
+    public int getValue() {
         return this.flags;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.flags);
     }
 }

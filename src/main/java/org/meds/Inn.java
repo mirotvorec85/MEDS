@@ -9,8 +9,7 @@ import org.meds.enums.InnFilters;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 
-public class Inn
-{
+public class Inn {
     /**
      * How much different slots a Player can use.
      */
@@ -29,8 +28,7 @@ public class Inn
 
     private Map<Prototype, CharacterInnItem> items;
 
-    public Inn(Player owner)
-    {
+    public Inn(Player owner) {
         this.owner = owner;
         this.count = 0;
         this.items = new HashMap<>();
@@ -38,13 +36,11 @@ public class Inn
         this.countCapacity = 1000;
     }
 
-    public void load(Map<Prototype, CharacterInnItem> items)
-    {
+    public void load(Map<Prototype, CharacterInnItem> items) {
         this.items = items;
     }
 
-    public void save()
-    {
+    public void save() {
         // Not needed
         // All the items are already in the Character entity object.
 
@@ -52,17 +48,16 @@ public class Inn
         // empty items or something
     }
 
-    public boolean tryStoreItem(Prototype prototype, int count)
-    {
+    public boolean tryStoreItem(Prototype prototype, int count) {
         // TODO: check the inn capacity and correct an item storing count
 
         Item item;
-        if ((item = this.owner.getInventory().takeItem(prototype, count)) == null)
+        if ((item = this.owner.getInventory().takeItem(prototype, count)) == null) {
             return false;
+        }
 
         CharacterInnItem innItem = this.items.get(prototype);
-        if (innItem == null)
-        {
+        if (innItem == null) {
             innItem = new CharacterInnItem(this.owner.getGuid(), prototype);
             this.items.put(prototype, innItem);
         }
@@ -72,43 +67,42 @@ public class Inn
         return true;
     }
 
-    public boolean tryTakeItem(Prototype prototype, int count)
-    {
+    public boolean tryTakeItem(Prototype prototype, int count) {
         // TODO: Inn capacity tracking
         CharacterInnItem innItem = this.items.get(prototype);
-        if (innItem == null)
+        if (innItem == null) {
             return false;
+        }
 
         Item item = new Item(prototype, count);
 
         // Item is found but an inventory can not store anymore.
-        if (!this.owner.getInventory().tryStoreItem(item, count))
+        if (!this.owner.getInventory().tryStoreItem(item, count)) {
             return false;
+        }
 
-        if (item.getCount() == 0)
+        if (item.getCount() == 0) {
             this.items.remove(prototype);
-        else
+        } else {
             innItem.setCount(item.getCount());
+        }
 
         onInnChanged();
         return true;
     }
 
-    public ServerPacket getInnData()
-    {
+    public ServerPacket getInnData() {
         return this.getInnData(InnFilters.Disabled);
     }
 
-    public ServerPacket getInnData(InnFilters filter)
-    {
+    public ServerPacket getInnData(InnFilters filter) {
         ServerPacket packet = new ServerPacket(ServerCommands.Inn);
         packet.add(this.items.size())
             .add(this.slotCapacity)
             .add(this.count)
             .add(this.countCapacity);
 
-        for (CharacterInnItem innItem : this.items.values())
-        {
+        for (CharacterInnItem innItem : this.items.values()) {
             packet.add(innItem.getItemTemplateId())
                 .add(innItem.getModification())
                 .add(innItem.getDurability())
@@ -118,8 +112,7 @@ public class Inn
         return packet;
     }
 
-    private void onInnChanged()
-    {
+    private void onInnChanged() {
         if (this.owner.getSession() != null)
             this.owner.getSession().send(getInnData());
     }

@@ -17,14 +17,12 @@ import org.meds.logging.Logging;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 
-public class World implements Runnable
-{
+public class World implements Runnable {
+
     private static World instance;
 
-    public static World getInstance()
-    {
-        if (World.instance == null)
-        {
+    public static World getInstance() {
+        if (World.instance == null) {
             World.instance = new World();
         }
 
@@ -53,8 +51,7 @@ public class World implements Runnable
      */
     private boolean isStopping;
 
-    private World()
-    {
+    private World() {
         this.players = new HashMap<>();
         this.units = new HashMap<>();
         this.addPlayersPacket = new ServerPacket();
@@ -67,28 +64,23 @@ public class World implements Runnable
 
         this.dayTime = 0;
 
-        Server.addStopListener(new StopListener()
-        {
-
-            @Override
-            public void stop()
-            {
-                // Set isStopping value and the World.stop() method
-                // will be called just before the next update.
-                World.this.isStopping = true;
-            }
+        Server.addStopListener(() -> {
+            // Set isStopping value and the World.stop() method
+            // will be called just before the next update.
+            World.this.isStopping = true;
         });
     }
 
-    public void playerLoggedIn(Player player)
-    {
+    public void playerLoggedIn(Player player) {
         // Due to possible delay this may happen
-        if (this.isStopping)
+        if (this.isStopping) {
             return;
+        }
 
         // Already in game
-        if (this.players.containsKey(player.getGuid()))
+        if (this.players.containsKey(player.getGuid())) {
             return;
+        }
 
         this.players.put(player.getGuid(), player);
         this.units.put(player.getGuid(), player);
@@ -107,16 +99,14 @@ public class World implements Runnable
         Logging.Debug.log("addPlayersPacket updated");
     }
 
-    public void playerLoggedOut(Player player)
-    {
+    public void playerLoggedOut(Player player) {
         this.units.remove(player.getGuid());
         this.players.remove(player.getGuid());
         this.deletePlayersPacket.add(ServerCommands.PlayersListDelete).add(player.getGuid());
         Logging.Debug.log(player + "\" just logged out.");
     }
 
-    public void playerUpdated(Player player)
-    {
+    public void playerUpdated(Player player) {
         this.updatePlayersPacket.add(ServerCommands.PlayersListUpdate)
             .add(player.getGuid())
             .add(player.getLevel())
@@ -129,14 +119,11 @@ public class World implements Runnable
             .add("0");
     }
 
-    public ServerPacket getOnlineData()
-    {
+    public ServerPacket getOnlineData() {
         ServerPacket packet = new ServerPacket(ServerCommands.OnlineList);
         packet.add(this.players.size());
-        synchronized (this.players)
-        {
-            for (Player player : this.players.values())
-            {
+        synchronized (this.players) {
+            for (Player player : this.players.values()) {
                 packet.add(player.getGuid())
                     .add(player.getName())
                     .add(player.getLevel())
@@ -152,13 +139,11 @@ public class World implements Runnable
         return packet;
     }
 
-    public Player getPlayer(int guid)
-    {
+    public Player getPlayer(int guid) {
         return this.players.get(guid);
     }
 
-    public Unit getUnit(int guid)
-    {
+    public Unit getUnit(int guid) {
         return this.units.get(guid);
     }
 
@@ -170,13 +155,11 @@ public class World implements Runnable
         return type;
     }
 
-    public void addBattle(Battle battle)
-    {
+    public void addBattle(Battle battle) {
         this.newBattles.add(battle);
     }
 
-    public void removeBattle(Battle battle)
-    {
+    public void removeBattle(Battle battle) {
         this.expiredBattles.add(battle);
     }
 
@@ -184,24 +167,22 @@ public class World implements Runnable
      * Gets a Player if it was already logged or creates a new instance for further logging.
      * This method is called when new instance of Session class tries to find its Player instance.
      */
-    public Player getOrCreatePlayer(int playerGuid)
-    {
+    public Player getOrCreatePlayer(int playerGuid) {
         Player player = this.players.get(playerGuid);
-        if (player != null)
+        if (player != null) {
             return player;
+        }
 
         player = new Player(playerGuid);
 
         // Error occurred while player was creating or loading
-        if (player.create() == 0)
-        {
+        if (player.create() == 0) {
             return null;
         }
 
         return player;
     }
 
-    @SuppressWarnings("unchecked")
     public void createCreatures() {
 
         // Generate CreatureTypes
@@ -217,24 +198,22 @@ public class World implements Runnable
 
         // Load and spawn all the Creatures
         List<Creature> creatures = DAOFactory.getFactory().getWorldDAO().getCreatures();
-        for (Creature creature : creatures)
-        {
+        for (Creature creature : creatures) {
             // For some reasons can not create this creature
-            if (creature.create() == 0)
+            if (creature.create() == 0) {
                 continue;
+            }
 
             creature.spawn();
         }
         Logging.Info.log("Creatures have been loaded. Count: " + this.units.size());
     }
 
-    public void unitCreated(Unit unit)
-    {
+    public void unitCreated(Unit unit) {
         this.units.put(unit.getGuid(), unit);
     }
 
-    public ServerPacket getDayTimeData()
-    {
+    public ServerPacket getDayTimeData() {
         String day = this.dayTime < 360000 ? "0" : "1";
         String time = this.dayTime < 360000 ? Integer.toString(this.dayTime / 1000) : Integer.toString(this.dayTime / 1000 - 360);
 
@@ -255,14 +234,11 @@ public class World implements Runnable
     }
 
     @Override
-    public void run()
-    {
-
+    public void run() {
         long lastTickDuration = 0;
         long sleepTime = 0;
 
-        do
-        {
+        do {
             // Stop the thread for (2000 - world update time)
             // As a result the whole update-sleep cycle takes exactly 2 seconds
             sleepTime = 2000 - lastTickDuration;
@@ -272,12 +248,10 @@ public class World implements Runnable
 
 //            Logging.Debug.log("World sleeping time: " + sleepTime);
 
-            try
-            {
+            try {
                 Thread.sleep(sleepTime);
 
-                if (this.isStopping)
-                {
+                if (this.isStopping) {
                     stop();
                     return;
                 }
@@ -288,13 +262,9 @@ public class World implements Runnable
                 lastTickDuration = Server.getServerTimeMillis();
 
                 this.update(this.tickTime);
-            }
-            catch(InterruptedException ex)
-            {
+            } catch(InterruptedException ex) {
                 Logging.Error.log("A Thread error in World run ", ex);
-            }
-            catch(Exception ex)
-            {
+            } catch(Exception ex) {
                 Logging.Error.log("An error while updating server Tact " + this.tickTime, ex);
             }
 
@@ -303,16 +273,13 @@ public class World implements Runnable
         } while(true);
     }
 
-    private void stop()
-    {
+    private void stop() {
         Logging.Info.log("Stopping the World");
         // Save of the players to DB
-        for (Player player : this.players.values())
-            player.save();
+        this.players.values().forEach(Player::save);
     }
 
-    public void update(int time)
-    {
+    public void update(int time) {
 //        Logging.Debug.log("World update starts; Diff time: %d", time);
 
         // Set new Day Time
@@ -329,8 +296,9 @@ public class World implements Runnable
 
         // Update all units (Creatures and Players)
         synchronized (this.units) {
-            for (java.util.Map.Entry<Integer, Unit> entry : this.units.entrySet())
+            for (java.util.Map.Entry<Integer, Unit> entry : this.units.entrySet()) {
                 entry.getValue().update(time);
+            }
         }
 
         // Add new battles

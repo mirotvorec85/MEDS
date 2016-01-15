@@ -14,10 +14,10 @@ import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.Valued;
 
-public class Inventory
-{
-    public enum Slots implements Valued
-    {
+public class Inventory {
+
+    public enum Slots implements Valued {
+
         /*
          * Slots error or slot can not be retrieved
          */
@@ -74,32 +74,28 @@ public class Inventory
 
         private static final Slots[] values = new Slots[37];
 
-        static
-        {
-            for (Slots slot : Slots.values())
-            {
+        static {
+            for (Slots slot : Slots.values()) {
                 // HACK: exclude None(-1) value
-                if (slot.value < 0)
+                if (slot.value < 0) {
                     continue;
+                }
                 Slots.values[slot.value] = slot;
             }
         }
 
-        public static Slots parse(int value)
-        {
+        public static Slots parse(int value)        {
             return Slots.values[value];
         }
 
         private final int value;
 
-        private Slots(int value)
-        {
+        Slots(int value) {
             this.value = value;
         }
 
         @Override
-        public int getValue()
-        {
+        public int getValue() {
             return this.value;
         }
     }
@@ -107,20 +103,16 @@ public class Inventory
     public static final int InventorySlotCount = 25;
     public static final int EquipmentSlotCount = 12;
 
-    public static boolean isEquipmentSlot(int slot)
-    {
+    public static boolean isEquipmentSlot(int slot) {
         return slot >= Slots.Head.getValue() && slot <= Slots.LeftHandRing.getValue();
     }
 
-    public static Slots getEquipmentSlot(Item item)
-    {
+    public static Slots getEquipmentSlot(Item item) {
         return Inventory.getEquipmentSlot(item.Template.getItemClass());
     }
 
-    public static Slots getEquipmentSlot(ItemClasses itemClass)
-    {
-        switch (itemClass)
-        {
+    public static Slots getEquipmentSlot(ItemClasses itemClass) {
+        switch (itemClass) {
             case Head:
                 return Slots.Head;
             case Neck:
@@ -160,43 +152,39 @@ public class Inventory
     private Map<Integer, CharacterInventoryItem> characterItems = new HashMap<>();
 
 
-    public Inventory(Player owner)
-    {
+    public Inventory(Player owner) {
         this.owner = owner;
         this.inventorySlots = new Item[EquipmentSlotCount + InventorySlotCount];
     }
 
-    public Item get(int slot)
-    {
+    public Item get(int slot) {
         if (slot > this.inventorySlots.length)
             return null;
         return this.inventorySlots[slot];
     }
 
-    public Item get(Slots slot)
-    {
+    public Item get(Slots slot) {
         return this.inventorySlots[slot.getValue()];
     }
 
-    public int getCapacity()
-    {
+    public int getCapacity() {
         return this.capacity;
     }
 
-    public void load(Map<Integer, CharacterInventoryItem> items)
-    {
+    public void load(Map<Integer, CharacterInventoryItem> items) {
         this.characterItems = items;
-        if (this.characterItems.size() == 0)
+        if (this.characterItems.size() == 0) {
             return;
+        }
 
-        for (CharacterInventoryItem charItem : items.values())
-        {
+        for (CharacterInventoryItem charItem : items.values()) {
             Prototype prototype = new Prototype(charItem.getItemTemplateId(), charItem.getModification(),
                     charItem.getDurability());
             Item item = new Item(prototype, charItem.getCount());
             // Item is valid
-            if (item.Template != null)
+            if (item.Template != null) {
                 this.inventorySlots[charItem.getSlot()] = item;
+            }
         }
         onEquipmentChanged();
     }
@@ -204,27 +192,21 @@ public class Inventory
     /**
      * Saves all the inventory and equipment items into database.
      */
-    public void save()
-    {
-        for (int i = 0; i < this.inventorySlots.length; ++i)
-        {
-            if (this.inventorySlots[i] == null)
-            {
+    public void save() {
+        for (int i = 0; i < this.inventorySlots.length; ++i) {
+            if (this.inventorySlots[i] == null) {
                     this.characterItems.remove(i);
-            }
-            else
-            {
+            } else {
                 Item item = this.inventorySlots[i];
                 CharacterInventoryItem charItem = this.characterItems.get(i);
-                if (item == null)
-                {
-                    if (charItem != null)
+                if (item == null) {
+                    if (charItem != null) {
                         this.characterItems.remove(i);
+                    }
                     continue;
                 }
 
-                if (charItem == null)
-                {
+                if (charItem == null) {
                     charItem = new CharacterInventoryItem(this.owner.getGuid(), i);
                     this.characterItems.put(i, charItem);
                 }
@@ -237,17 +219,14 @@ public class Inventory
         }
     }
 
-    public ServerPacket getInventoryData()
-    {
+    public ServerPacket getInventoryData() {
         ServerPacket packet = new ServerPacket(ServerCommands.InventoryInfo);
         packet.add(0); // Count of bought slots
         packet.add("5 platinum"); // Cost of new slots
         packet.add(25); // Current available count of slots
 
-        for (int i = Slots.Inventory1.getValue(); i < InventorySlotCount + Slots.Inventory1.getValue(); ++i)
-        {
-            if (this.inventorySlots[i] == null)
-            {
+        for (int i = Slots.Inventory1.getValue(); i < InventorySlotCount + Slots.Inventory1.getValue(); ++i) {
+            if (this.inventorySlots[i] == null) {
                 packet.add("0").add("0").add("0").add("0");
                 continue;
             }
@@ -260,13 +239,10 @@ public class Inventory
         return packet;
     }
 
-    public ServerPacket getEquipmentData()
-    {
+    public ServerPacket getEquipmentData() {
         ServerPacket packet = new ServerPacket(ServerCommands.EquipmentInfo);
-        for (int i = 0; i < EquipmentSlotCount; ++i)
-        {
-            if (this.inventorySlots[i] == null)
-            {
+        for (int i = 0; i < EquipmentSlotCount; ++i) {
+            if (this.inventorySlots[i] == null) {
                 packet.add("0").add("0").add("0").add("0");
                 continue;
             }
@@ -279,16 +255,12 @@ public class Inventory
         return packet;
     }
 
-    public ServerPacket getUpdatedSlotData(int slot)
-    {
+    public ServerPacket getUpdatedSlotData(int slot) {
         ServerPacket packet = new ServerPacket(ServerCommands.InventoryUpdate);
         packet.add(slot);
-        if (this.inventorySlots[slot] == null)
-        {
+        if (this.inventorySlots[slot] == null) {
             packet.add("0").add("0").add("0").add("0");
-        }
-        else
-        {
+        } else {
             packet.add(this.inventorySlots[slot].Template.getId());
             packet.add(this.inventorySlots[slot].getModification().getValue());
             packet.add(this.inventorySlots[slot].getDurability());
@@ -298,66 +270,63 @@ public class Inventory
         return packet;
     }
 
-    public void swapItem(int currentSlot, int newSlot, int count)
-    {
-        do
-        {
+    public void swapItem(int currentSlot, int newSlot, int count) {
+        do {
             Item sourceItem = this.inventorySlots[currentSlot];
             Item targetItem =  this.inventorySlots[newSlot];
             // Source slot is empty
-            if (sourceItem == null || sourceItem.getCount() < count)
+            if (sourceItem == null || sourceItem.getCount() < count) {
                 break;
+            }
             // TODO: better check for equipment
             // mb separate method EquipItem
-            if (!canSlotStoreItem(newSlot, sourceItem))
+            if (!canSlotStoreItem(newSlot, sourceItem)) {
                 break;
+            }
             // Equipments slot can take only 1 item
-            if (isEquipmentSlot(newSlot))
+            if (isEquipmentSlot(newSlot)) {
                 count = 1;
+            }
 
             // Move item
-            if (targetItem == null)
-            {
+            if (targetItem == null) {
                 // move the whole stack
-                if (sourceItem.getCount() == count)
-                {
+                if (sourceItem.getCount() == count) {
                     this.inventorySlots[currentSlot] = null;
                     this.inventorySlots[newSlot] = sourceItem;
-                }
-                else
+                } else {
                     this.inventorySlots[newSlot] = sourceItem.unstackItem(count);
+                }
             }
             // Stack items
-            else if(targetItem.isStackableWith(sourceItem) && !isEquipmentSlot(newSlot))
-            {
+            else if(targetItem.isStackableWith(sourceItem) && !isEquipmentSlot(newSlot)) {
                 // Swap the whole stack
-                if (sourceItem.getCount() == count)
-                {
+                if (sourceItem.getCount() == count) {
                     this.inventorySlots[currentSlot] = null;
                     targetItem.tryStackItem(sourceItem);
-                }
-                else
+                } else {
                     targetItem.tryStackItem(sourceItem.unstackItem(count));
+                }
             }
             // Swap items
-            else
-            {
+            else {
                 // Not the whole stack -> cancel the swapping
-                if (sourceItem.getCount() != count)
+                if (sourceItem.getCount() != count) {
                     break;
+                }
 
                 this.inventorySlots[currentSlot] = targetItem;
                 this.inventorySlots[newSlot] = sourceItem;
             }
 
             // Update equipment
-            if (isEquipmentSlot(currentSlot) || isEquipmentSlot(newSlot))
+            if (isEquipmentSlot(currentSlot) || isEquipmentSlot(newSlot)) {
                 onEquipmentChanged();
+            }
         } while (false);
 
         // No matters the result of swapping - send current inventory data
-        if (this.owner.getSession() != null)
-        {
+        if (this.owner.getSession() != null) {
             this.owner.getSession().send(getUpdatedSlotData(currentSlot));
             this.owner.getSession().send(getUpdatedSlotData(newSlot));
         }
@@ -367,8 +336,9 @@ public class Inventory
         // Calculate total weight
         int weight = 0;
         for (Item item : items) {
-            if (item == null)
+            if (item == null) {
                 continue;
+            }
             weight += item.Weight;
         }
 
@@ -432,14 +402,14 @@ public class Inventory
      * Returns slot number of the first item that has the specified template ID or returns -1 if no items are found.
      * @return The first slot index of the item if an item was found; otherwise, -1
      */
-    public int findItem(int templateId)
-    {
-        for (int i = Slots.Inventory1.getValue(); i <= Slots.Inventory25.getValue(); ++i)
-        {
-            if (this.inventorySlots[i] == null)
+    public int findItem(int templateId) {
+        for (int i = Slots.Inventory1.getValue(); i <= Slots.Inventory25.getValue(); ++i) {
+            if (this.inventorySlots[i] == null) {
                 continue;
-            if (this.inventorySlots[i].Template.getId() != templateId)
+            }
+            if (this.inventorySlots[i].Template.getId() != templateId) {
                 continue;
+            }
             return i;
         }
         return -1;
@@ -450,8 +420,9 @@ public class Inventory
      * @return The first slot index of the item if an item was found; otherwise, -1
      */
     public int findItem(Item.Prototype prototype) {
-        if (prototype == null)
+        if (prototype == null) {
             return -1;
+        }
         for (int i = Slots.Inventory1.getValue(); i <= Slots.Inventory25.getValue(); ++i) {
             if (prototype.equals(this.inventorySlots[i]))
                 return i;
@@ -459,15 +430,15 @@ public class Inventory
         return -1;
     }
 
-    public Integer[] findAllItems(int templateId)
-    {
+    public Integer[] findAllItems(int templateId) {
         List<Integer> slots = new ArrayList<>();
-        for (int i = Slots.Inventory1.getValue(); i <= Slots.Inventory25.getValue(); ++i)
-        {
-            if (this.inventorySlots[i] == null)
+        for (int i = Slots.Inventory1.getValue(); i <= Slots.Inventory25.getValue(); ++i) {
+            if (this.inventorySlots[i] == null) {
                 continue;
-            if (this.inventorySlots[i].Template.getId() != templateId)
+            }
+            if (this.inventorySlots[i].Template.getId() != templateId) {
                 continue;
+            }
             slots.add(i);
         }
 
@@ -496,19 +467,14 @@ public class Inventory
         // TODO: Check Weight
 
         // Find appropriate slot
-        for (int i = Slots.Inventory1.getValue(); i <= Slots.Inventory25.getValue(); ++i)
-        {
-            if (this.inventorySlots[i] != null)
-            {
+        for (int i = Slots.Inventory1.getValue(); i <= Slots.Inventory25.getValue(); ++i) {
+            if (this.inventorySlots[i] != null) {
                 // Tries to stack (includes items comparability checking)
-                if (this.inventorySlots[i].tryStackItem(item, count))
-                {
+                if (this.inventorySlots[i].tryStackItem(item, count)) {
                     onInventoryChanged();
                     return true;
                 }
-            }
-            else
-            {
+            } else {
                 this.inventorySlots[i] = item.unstackItem(count);
                 onInventoryChanged();
                 return true;
@@ -518,17 +484,15 @@ public class Inventory
         return false;
     }
 
-    private boolean canSlotStoreItem(int slot, Item item)
-    {
+    private boolean canSlotStoreItem(int slot, Item item) {
         // Slot is equipment: check a compatibility between slot type and item type. Also check the item requirements.
-        if (isEquipmentSlot(slot))
-        {
+        if (isEquipmentSlot(slot)) {
             // Check min level
-            if (item.Template.getLevel() > this.owner.getLevel())
+            if (item.Template.getLevel() > this.owner.getLevel()) {
                 return false;
+            }
 
-            switch (Slots.parse(slot))
-            {
+            switch (Slots.parse(slot)) {
                 case Head:
                     return item.Template.getItemClass() == ItemClasses.Head;
                 case Neck:
@@ -560,56 +524,57 @@ public class Inventory
         return true;
     }
 
-    private void onEquipmentChanged()
-    {
+    private void onEquipmentChanged() {
         this.owner.getParameters().equipment().clear();
-        for (int i = 0; i < EquipmentSlotCount; ++i)
-        {
+        for (int i = 0; i < EquipmentSlotCount; ++i) {
             if (this.inventorySlots[i] == null)
                 continue;
 
-            for (Map.Entry<ItemBonusParameters, Integer> entry : this.inventorySlots[i].getBonusParameters().entrySet())
-            {
+            for (Map.Entry<ItemBonusParameters, Integer> entry : this.inventorySlots[i].getBonusParameters().entrySet()) {
                 this.owner.getParameters().equipment().change(entry.getKey(), entry.getValue());
             }
         }
     }
 
-    private void onInventoryChanged()
-    {
+    private void onInventoryChanged() {
         this.owner.getSession().send(getInventoryData());
     }
 
     public Item takeItem(Prototype prototype, int count) {
-        if (prototype == null || prototype.getTemplateId() == 0)
+        if (prototype == null || prototype.getTemplateId() == 0) {
             return null;
+        }
 
         // Try to find all the slots contain the specified prototype
         Integer[] itemSlots = this.findAllItems(prototype);
 
-        if (itemSlots.length == 0)
+        if (itemSlots.length == 0) {
             return null;
+        }
 
         int i = itemSlots.length - 1;
         Item item = null;
-        do
-        {
-            if (item == null)
+        do {
+            if (item == null) {
                 item = this.inventorySlots[itemSlots[i]].unstackItem(count);
-            else
+            } else {
                 item.transfer(this.inventorySlots[itemSlots[i]], count - item.getCount());
+            }
 
-            if (this.inventorySlots[itemSlots[i]].getCount() == 0)
+            if (this.inventorySlots[itemSlots[i]].getCount() == 0) {
                 this.inventorySlots[itemSlots[i]] = null;
+            }
 
-            if (item.getCount() == count)
+            if (item.getCount() == count) {
                 break;
+            }
 
             --i;
         } while (i >= 0);
 
-        if (item.getCount() != 0)
+        if (item.getCount() != 0) {
             onInventoryChanged();
+        }
         return item;
     }
 
@@ -619,26 +584,24 @@ public class Inventory
         return takeItem(item.getPrototype(), item.getCount());
     }
 
-    public Item takeItem(int slot, int count)
-    {
+    public Item takeItem(int slot, int count) {
         Item item = this.inventorySlots[slot];
-        if (item == null)
+        if (item == null) {
             return null;
-
-        if (item.getCount() == count)
-        {
-            this.inventorySlots[slot] = null;
         }
-        else
-        {
+
+        if (item.getCount() == count) {
+            this.inventorySlots[slot] = null;
+        } else {
             item = item.unstackItem(count);
         }
 
         // Raise an event
-        if (isEquipmentSlot(slot))
+        if (isEquipmentSlot(slot)) {
             onEquipmentChanged();
-        else
+        } else {
             onInventoryChanged();
+        }
 
         return item;
     }
@@ -670,28 +633,26 @@ public class Inventory
         return true;
     }
 
-    public void useItem(int slot)
-    {
+    public void useItem(int slot) {
         Item item = this.inventorySlots[slot];
         if (item == null)
             return;
 
         // Using equipment items is like to equip it
-        if (item.isEquipment())
-        {
+        if (item.isEquipment()) {
             this.swapItem(slot, getEquipmentSlot(item).getValue(), 1);
             return;
         }
 
         item.use(this.owner);
         // Used the last item in the stack
-        if (item.getCount() == 0)
+        if (item.getCount() == 0) {
             this.inventorySlots[slot] = null;
+        }
 
         // No matter whether the item was used or not
         // Send updated slot info
-        if (this.owner.getSession() != null)
-        {
+        if (this.owner.getSession() != null) {
             this.owner.getSession().send(getUpdatedSlotData(slot));
         }
 
