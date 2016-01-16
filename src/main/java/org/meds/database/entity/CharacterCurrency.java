@@ -2,8 +2,8 @@ package org.meds.database.entity;
 
 import java.io.Serializable;
 
-public class CharacterCurrency implements Serializable
-{
+public class CharacterCurrency implements Serializable {
+
     private static final long serialVersionUID = -6216284843138605L;
 
     private int characterId;
@@ -17,13 +17,11 @@ public class CharacterCurrency implements Serializable
         setCurrencyId(currencyId);
     }
 
-    public int getCharacterId()
-    {
+    public int getCharacterId() {
         return characterId;
     }
 
-    public void setCharacterId(int characterId)
-    {
+    public void setCharacterId(int characterId) {
         this.characterId = characterId;
     }
 
@@ -31,18 +29,15 @@ public class CharacterCurrency implements Serializable
         return currencyId;
     }
 
-    public void setCurrencyId(int currencyId)
-    {
+    public void setCurrencyId(int currencyId) {
         this.currencyId = currencyId;
     }
 
-    public int getAmount()
-    {
+    public int getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount)
-    {
+    public void setAmount(int amount) {
         this.amount = amount;
     }
 

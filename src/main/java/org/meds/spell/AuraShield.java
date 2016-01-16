@@ -3,24 +3,20 @@ package org.meds.spell;
 import org.meds.Damage;
 import org.meds.Damage.AffectionHandler;
 
-public class AuraShield extends Aura
-{
-	private class AbsorptionHandler implements AffectionHandler
-    {
+public class AuraShield extends Aura {
+
+    private class AbsorptionHandler implements AffectionHandler {
+        
         @Override
-        public boolean handle(Damage damage)
-        {
+        public boolean handle(Damage damage) {
             int cleanDamage = damage.FinalDamage - damage.Absorbed;
             // The shield expires
-            if (cleanDamage  >= level)
-            {
+            if (cleanDamage >= level) {
                 damage.Absorbed += level;
                 // Force remove this aura
                 owner.removeAura(spellEntry.getId());
                 return false;
-            }
-            else
-            {
+            } else {
                 setLevel(level - cleanDamage);
                 damage.Absorbed = damage.FinalDamage;
                 return true;
@@ -31,8 +27,7 @@ public class AuraShield extends Aura
     private AffectionHandler absorptionHandler;
 
     @Override
-    protected void applyAura()
-    {
+    protected void applyAura() {
         super.applyAura();
         // Server message
         if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null && this.spellEntry.getId() == 1141)
@@ -48,8 +43,7 @@ public class AuraShield extends Aura
     }
 
     @Override
-    protected void removeAura()
-    {
+    protected void removeAura() {
         super.removeAura();
         this.owner.removeDamageReduction(Damage.ReductionTypes.Absorption, this.absorptionHandler);
         // Server message

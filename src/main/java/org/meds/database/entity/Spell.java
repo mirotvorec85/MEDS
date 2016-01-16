@@ -3,6 +3,7 @@ package org.meds.database.entity;
 import org.meds.enums.SpellTypes;
 
 public class Spell {
+
     private int id;
     private SpellTypes type;
     private String name;

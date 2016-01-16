@@ -2,8 +2,8 @@ package org.meds.enums;
 
 import org.meds.util.Valued;
 
-public enum Currencies implements Valued
-{
+public enum Currencies implements Valued {
+
     Gold(0),
     Platinum(1),
     QuestPoint(2),
@@ -19,20 +19,17 @@ public enum Currencies implements Valued
 
     private final int value;
 
-    private Currencies(int value)
-    {
+    Currencies(int value) {
         this.value = value;
     }
 
     @Override
-    public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.value);
     }
 }

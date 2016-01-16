@@ -3,10 +3,9 @@ package org.meds.net;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
-public class ServerPacket implements Cloneable
-{
-    private enum PacketEnds
-    {
+public class ServerPacket implements Cloneable {
+
+    private enum PacketEnds {
         Value,
         InterValue,
         InterPacket,
@@ -15,8 +14,7 @@ public class ServerPacket implements Cloneable
     private PacketEnds packetEnd;
     private StringBuilder data;
 
-    private ServerPacket(CharSequence seq, PacketEnds end)
-    {
+    private ServerPacket(CharSequence seq, PacketEnds end) {
         this.data = new StringBuilder(seq);
         this.packetEnd = end;
     }
@@ -24,37 +22,31 @@ public class ServerPacket implements Cloneable
     /**
      * Initializes a new empty instance of the ServerPacket class.
      */
-    public ServerPacket()
-    {
+    public ServerPacket() {
         this.data = new StringBuilder();
         this.packetEnd = PacketEnds.InterPacket;
     }
 
-    public ServerPacket(ServerCommands command)
-    {
+    public ServerPacket(ServerCommands command) {
         this();
         add(command);
     }
 
-    public ServerPacket(ServerPacket packet)
-    {
+    public ServerPacket(ServerPacket packet) {
         this.data = packet.data;
         this.packetEnd = packet.packetEnd;
     }
 
-    public void clear()
-    {
+    public void clear() {
         this.data.setLength(0);
         this.packetEnd = PacketEnds.InterPacket;
     }
 
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return this.data.length() == 0;
     }
 
-    public ServerPacket add(ServerCommands command)
-    {
+    public ServerPacket add(ServerCommands command) {
         if (this.packetEnd != PacketEnds.InterPacket)
             this.data.append("\u0000");
         this.data.append(command.toString()).append("\u0001");
@@ -62,8 +54,7 @@ public class ServerPacket implements Cloneable
         return this;
     }
 
-    public ServerPacket add(String value)
-    {
+    public ServerPacket add(String value) {
         if (this.packetEnd == PacketEnds.Value)
             this.data.append("\u0001");
         this.data.append(value);
@@ -71,21 +62,18 @@ public class ServerPacket implements Cloneable
         return this;
     }
 
-    public ServerPacket add(int value)
-    {
+    public ServerPacket add(int value) {
         return add(Integer.toString(value));
     }
 
-    public ServerPacket add(Object object)
-    {
+    public ServerPacket add(Object object) {
         // NULL should be replaced with empty value
         if (object == null)
             return add("");
         return add(object.toString());
     }
 
-    public ServerPacket add(ServerPacket packet)
-    {
+    public ServerPacket add(ServerPacket packet) {
         if (packet == null || packet.isEmpty())
             return this;
         if (this.packetEnd != PacketEnds.InterPacket)
@@ -97,14 +85,13 @@ public class ServerPacket implements Cloneable
 
     /**
      * Appends the specified packet as an command and an array of strings..
+     *
      * @return A reference to this instance after addition operation has completed.
      */
-    public ServerPacket addData(ServerCommands command, String... data)
-    {
+    public ServerPacket addData(ServerCommands command, String... data) {
         add(command);
 
-        if (data.length != 0)
-        {
+        if (data.length != 0) {
             for (String value : data)
                 add(value);
             this.data.append("\u0000");
@@ -114,25 +101,20 @@ public class ServerPacket implements Cloneable
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         if (this.packetEnd != PacketEnds.InterPacket)
             this.data.append("\u0000");
         return this.data.toString();
     }
 
-    public byte[] getBytes()
-    {
+    public byte[] getBytes() {
         String string = this.toString();
 
         byte[] bytes;
-        try
-        {
+        try {
             bytes = string.getBytes("Unicode");
             bytes = Arrays.copyOfRange(bytes, 2, bytes.length);
-        }
-        catch (UnsupportedEncodingException e)
-        {
+        } catch (UnsupportedEncodingException e) {
             bytes = new byte[0];
         }
         /*
@@ -155,8 +137,7 @@ public class ServerPacket implements Cloneable
     }
 
     @Override
-    public ServerPacket clone()
-    {
+    public ServerPacket clone() {
         return new ServerPacket(this.data, this.packetEnd);
     }
 

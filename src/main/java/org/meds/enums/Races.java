@@ -1,7 +1,7 @@
 package org.meds.enums;
 
-public enum Races
-{
+public enum Races {
+
     Generic(0),
     Human(1),
     Dwarf(2),
@@ -9,10 +9,8 @@ public enum Races
     Orc(4),
     Drow(5);
 
-    public static Races parse(int value)
-    {
-        switch (value)
-        {
+    public static Races parse(int value) {
+        switch (value) {
             case 1:
                 return Human;
             case 2:
@@ -30,19 +28,16 @@ public enum Races
 
     private final int value;
 
-    private Races(int value)
-    {
+    Races(int value) {
         this.value = value;
     }
 
-    public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.value);
     }
 }

@@ -8,8 +8,7 @@ import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.Random;
 
-public class Region
-{
+public class Region {
     private class PlayerPositionChanged implements Unit.PositionChangedListener {
         @Override
         public void handleEvent(Unit.PositionEvent event) {

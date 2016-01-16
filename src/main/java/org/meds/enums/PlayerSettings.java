@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.meds.util.Valued;
 
-public enum PlayerSettings implements Valued
-{
+public enum PlayerSettings implements Valued {
+
     AutoLoot(0x0001),
     AutoAttack(0x0002),
     unk4(0x0004),
@@ -21,27 +21,23 @@ public enum PlayerSettings implements Valued
 
     private static Map<Integer, PlayerSettings> values = new HashMap<>();
 
-    static
-    {
+    static {
         for (PlayerSettings settings : PlayerSettings.values())
             PlayerSettings.values.put(settings.value, settings);
     }
 
-    public static PlayerSettings parse(int value)
-    {
+    public static PlayerSettings parse(int value) {
         return PlayerSettings.values.get(value);
     }
 
     private final int value;
 
-    private PlayerSettings(int value)
-    {
+    PlayerSettings(int value) {
         this.value = value;
     }
 
     @Override
-	public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 }

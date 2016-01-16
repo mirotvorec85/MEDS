@@ -9,10 +9,9 @@ import org.meds.net.ServerPacket;
 import org.meds.Unit;
 import org.meds.logging.Logging;
 
-public class Aura
-{
-    public enum States
-    {
+public class Aura {
+
+    public enum States {
         /**
          * An aura just has been created and is yet not applied to a target.
          */
@@ -33,8 +32,7 @@ public class Aura
 
     private static final Map<Integer, Class<? extends Aura>> customAuraClasses = new HashMap<>();
 
-    static
-    {
+    static {
         customAuraClasses.put(14, AuraBuff.class); // Tigers Strength
         customAuraClasses.put(16, AuraBuff.class); // Steel Body
         customAuraClasses.put(17, AuraBuff.class); // Feline Grace
@@ -56,39 +54,34 @@ public class Aura
 
     /**
      * Creates a new instance of an Aura class.
-     * @param entry Entry of the related spell.
-     * @param owner A unit who is target of the aura
-     * @param level Level of the aura.
+     *
+     * @param entry    Entry of the related spell.
+     * @param owner    A unit who is target of the aura
+     * @param level    Level of the aura.
      * @param duration Duration in milliseconds. If duration is negative the the aura is isPermanent.
      * @return A new Aura instance for this Spell
      */
-    public static Aura createAura(org.meds.database.entity.Spell entry, Unit owner, int level, int duration)
-    {
+    public static Aura createAura(org.meds.database.entity.Spell entry, Unit owner, int level, int duration) {
         Aura aura = null;
         Class<? extends Aura> auraClass = Aura.customAuraClasses.get(entry.getId());
         // Custom aura Class
 
-        if (auraClass != null)
-        {
-            try
-            {
+        if (auraClass != null) {
+            try {
                 aura = auraClass.newInstance();
-            }
-            catch (InstantiationException | IllegalAccessException e)
-            {
+            } catch (InstantiationException | IllegalAccessException e) {
                 Logging.Error.log("Can not instantiate the Aura class " + auraClass.getName() + " for spell ID " + entry.getId() + " Error: " + e.getMessage());
             }
         }
         // Generic (this) aura class
-        else
-        {
+        else {
             aura = new Aura();
         }
 
         aura.spellEntry = entry;
         aura.owner = owner;
         if (owner.isPlayer())
-            aura.ownerPlayer = (Player)owner;
+            aura.ownerPlayer = (Player) owner;
         aura.level = level;
         aura.remainingTime = duration;
         aura.isPermanent = duration < 0;
@@ -98,50 +91,42 @@ public class Aura
         return aura;
     }
 
-    protected Aura()
-    {
+    protected Aura() {
 
     }
 
-    public org.meds.database.entity.Spell getSpellEntity()
-    {
+    public org.meds.database.entity.Spell getSpellEntity() {
         return this.spellEntry;
     }
 
-    public int getLevel()
-    {
+    public int getLevel() {
         return this.level;
     }
 
-    protected void setLevel(int level)
-    {
+    protected void setLevel(int level) {
         this.level = level;
         if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null)
             this.ownerPlayer.getSession().send(getPacketData());
     }
 
-    public int getRemainingTime()
-    {
+    public int getRemainingTime() {
         return this.remainingTime;
     }
 
-    public States getState()
-    {
+    public States getState() {
         return this.state;
     }
-    public void setState(States state)
-    {
-        switch (state)
-        {
+
+    public void setState(States state) {
+        switch (state) {
             case Created:
                 break;
             case Active:
                 applyAura();
                 break;
             case Ending:
-                if (this.owner.isPlayer())
-                {
-                    Player player = (Player)this.owner;
+                if (this.owner.isPlayer()) {
+                    Player player = (Player) this.owner;
                     if (player.getSession() != null)
                         player.getSession().sendServerMessage(1529, this.spellEntry.getName());
                 }
@@ -154,18 +139,15 @@ public class Aura
         this.state = state;
     }
 
-    public boolean isPermanent()
-    {
+    public boolean isPermanent() {
         return this.isPermanent;
     }
 
-    protected void applyAura()
-    {
+    protected void applyAura() {
 
     }
 
-    public void refresh(int level, int time)
-    {
+    public void refresh(int level, int time) {
         this.level = level;
         this.remainingTime = time;
         this.minuteLeft = false;
@@ -179,12 +161,11 @@ public class Aura
         }
     }
 
-    public ServerPacket getPacketData()
-    {
+    public ServerPacket getPacketData() {
         return new ServerPacket(ServerCommands.Aura)
-            .add(this.spellEntry.getId())
-            .add(this.level)
-            .add(this.isPermanent ? "-1" : this.remainingTime / 1000);
+                .add(this.spellEntry.getId())
+                .add(this.level)
+                .add(this.isPermanent ? "-1" : this.remainingTime / 1000);
     }
 
     /**
@@ -197,8 +178,7 @@ public class Aura
         }
     }
 
-    public void update(int time)
-    {
+    public void update(int time) {
         if (this.isPermanent)
             return;
 
@@ -210,8 +190,7 @@ public class Aura
 
         if (this.remainingTime < 0)
             this.setState(States.Removed);
-        else if (this.remainingTime < 60000 && this.state == States.Active)
-        {
+        else if (this.remainingTime < 60000 && this.state == States.Active) {
             this.setState(States.Ending);
         }
     }

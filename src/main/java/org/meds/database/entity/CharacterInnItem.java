@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 import org.meds.Item.Prototype;
 
-public class CharacterInnItem implements Serializable
-{
+public class CharacterInnItem implements Serializable {
+
     private static final long serialVersionUID = 3117954164373143395L;
 
     private int characterId;
@@ -14,14 +14,12 @@ public class CharacterInnItem implements Serializable
     private int durability;
     private int count;
 
-    public CharacterInnItem()
-    {
+    public CharacterInnItem() {
 
     }
 
     // TODO: Check primary key assignment
-    public CharacterInnItem(int characterId, Prototype prototype, int count)
-    {
+    public CharacterInnItem(int characterId, Prototype prototype, int count) {
         this.characterId = characterId;
         this.itemTemplateId = prototype.getTemplateId();
         this.modification = prototype.getModification();
@@ -29,20 +27,17 @@ public class CharacterInnItem implements Serializable
         this.count = count;
     }
 
-    public CharacterInnItem(int characterId, Prototype prototype)
-    {
+    public CharacterInnItem(int characterId, Prototype prototype) {
         this(characterId, prototype, 0);
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return this.characterId * 1000 + (this.itemTemplateId ^ this.modification ^ this.durability);
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
@@ -56,44 +51,44 @@ public class CharacterInnItem implements Serializable
                 this.modification == cObj.modification &&
                 this.durability == cObj.durability;
     }
-    public int getCharacterId()
-    {
+
+    public int getCharacterId() {
         return characterId;
     }
-    public void setCharacterId(int characterId)
-    {
+
+    public void setCharacterId(int characterId) {
         this.characterId = characterId;
     }
-    public int getItemTemplateId()
-    {
+
+    public int getItemTemplateId() {
         return itemTemplateId;
     }
-    public void setItemTemplateId(int itemTemplateId)
-    {
+
+    public void setItemTemplateId(int itemTemplateId) {
         this.itemTemplateId = itemTemplateId;
     }
-    public int getModification()
-    {
+
+    public int getModification() {
         return modification;
     }
-    public void setModification(int modification)
-    {
+
+    public void setModification(int modification) {
         this.modification = modification;
     }
-    public int getDurability()
-    {
+
+    public int getDurability() {
         return durability;
     }
-    public void setDurability(int durability)
-    {
+
+    public void setDurability(int durability) {
         this.durability = durability;
     }
-    public int getCount()
-    {
+
+    public int getCount() {
         return count;
     }
-    public void setCount(int count)
-    {
+
+    public void setCount(int count) {
         this.count = count;
     }
 }

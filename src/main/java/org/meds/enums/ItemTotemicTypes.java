@@ -2,8 +2,8 @@ package org.meds.enums;
 
 import org.meds.util.Valued;
 
-public enum ItemTotemicTypes implements Valued
-{
+public enum ItemTotemicTypes implements Valued {
+
     None(0, 0, null, 0),
     /**
      * Bonus Constitution
@@ -76,8 +76,7 @@ public enum ItemTotemicTypes implements Valued
 
     private static final ItemTotemicTypes[] values = new ItemTotemicTypes[18];
 
-    static
-    {
+    static {
         for (ItemTotemicTypes type : ItemTotemicTypes.values())
             ItemTotemicTypes.values[type.value] = type;
     }
@@ -93,7 +92,7 @@ public enum ItemTotemicTypes implements Valued
     private final ItemBonusParameters parameter;
     private final double ratio;
 
-    private ItemTotemicTypes(int value, int titleStringId, ItemBonusParameters parameter, double ratio) {
+    ItemTotemicTypes(int value, int titleStringId, ItemBonusParameters parameter, double ratio) {
         this.value = value;
         this.titleStringId = titleStringId;
         this.parameter = parameter;
@@ -113,14 +112,12 @@ public enum ItemTotemicTypes implements Valued
     }
 
     @Override
-    public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.value);
     }
 }

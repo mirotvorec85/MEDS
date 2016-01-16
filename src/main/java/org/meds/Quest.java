@@ -92,14 +92,12 @@ public class Quest {
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return this.player.hashCode() + this.questTemplate.hashCode();
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         if (obj == null)
             return false;
         if (!(obj instanceof Quest))

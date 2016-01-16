@@ -7,6 +7,7 @@ import org.meds.util.Valued;
 
 public enum ItemFlags implements Valued {
 
+
     /**
      * Calculate stats as Magic Item (more Protection and less Armour)
      */
@@ -33,7 +34,7 @@ public enum ItemFlags implements Valued {
 
     private final int value;
 
-    private ItemFlags(int value) {
+    ItemFlags(int value) {
         this.value = value;
     }
 

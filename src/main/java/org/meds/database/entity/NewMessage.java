@@ -1,33 +1,32 @@
 package org.meds.database.entity;
 
-public class NewMessage
-{
+public class NewMessage {
+
     private int id;
     private int typeId;
     private String message;
 
-    public int getId()
-    {
+    public int getId() {
         return id;
     }
-    public void setId(int id)
-    {
+
+    public void setId(int id) {
         this.id = id;
     }
-    public int getTypeId()
-    {
+
+    public int getTypeId() {
         return typeId;
     }
-    public void setTypeId(int typeId)
-    {
+
+    public void setTypeId(int typeId) {
         this.typeId = typeId;
     }
-    public String getMessage()
-    {
+
+    public String getMessage() {
         return message;
     }
-    public void setMessage(String message)
-    {
+
+    public void setMessage(String message) {
         this.message = message;
     }
 }

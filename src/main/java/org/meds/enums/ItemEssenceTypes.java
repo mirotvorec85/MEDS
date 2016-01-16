@@ -2,8 +2,8 @@ package org.meds.enums;
 
 import org.meds.util.Valued;
 
-public enum ItemEssenceTypes implements Valued
-{
+public enum ItemEssenceTypes implements Valued {
+
     None(0),
     /**
      * Bonus Health
@@ -109,8 +109,7 @@ public enum ItemEssenceTypes implements Valued
 
     private static final ItemEssenceTypes[] values = new ItemEssenceTypes[26];
 
-    static
-    {
+    static {
         for (ItemEssenceTypes type : ItemEssenceTypes.values())
             ItemEssenceTypes.values[type.value] = type;
     }
@@ -123,20 +122,17 @@ public enum ItemEssenceTypes implements Valued
 
     private final int value;
 
-    private ItemEssenceTypes(int value)
-    {
+    ItemEssenceTypes(int value) {
         this.value = value;
     }
 
     @Override
-    public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.value);
     }
 }

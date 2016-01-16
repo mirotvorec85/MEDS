@@ -48,7 +48,7 @@ public enum CreatureTypes implements Valued {
     private final int value;
     private final int titleStringId;
 
-    private CreatureTypes(int value, int titleStringId) {
+    CreatureTypes(int value, int titleStringId) {
         this.value = value;
         this.titleStringId = titleStringId;
     }

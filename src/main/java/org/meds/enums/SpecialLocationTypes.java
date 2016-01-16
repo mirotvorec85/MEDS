@@ -2,8 +2,8 @@ package org.meds.enums;
 
 import org.meds.util.Valued;
 
-public enum SpecialLocationTypes implements Valued
-{
+public enum SpecialLocationTypes implements Valued {
+
     Generic(0),
     Star(1),
     MilitarySchool(2),
@@ -34,33 +34,28 @@ public enum SpecialLocationTypes implements Valued
 
     private static SpecialLocationTypes[] values = new SpecialLocationTypes[36];
 
-    static
-    {
+    static {
         for (SpecialLocationTypes type : SpecialLocationTypes.values())
             SpecialLocationTypes.values[type.getValue()] = type;
     }
 
-    public static SpecialLocationTypes parse(int value)
-    {
+    public static SpecialLocationTypes parse(int value) {
         return SpecialLocationTypes.values[value];
     }
 
     private final int value;
 
-    private SpecialLocationTypes(int value)
-    {
+    SpecialLocationTypes(int value) {
         this.value = value;
     }
 
     @Override
-    public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.value);
     }
 }

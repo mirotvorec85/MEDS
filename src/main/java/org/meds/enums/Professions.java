@@ -20,7 +20,7 @@ public enum Professions implements Valued {
     private final int value;
     private final int titleId;
 
-    private Professions(int value, int titleId) {
+    Professions(int value, int titleId) {
         this.value = value;
         this.titleId = titleId;
     }

@@ -2,8 +2,8 @@ package org.meds.enums;
 
 import org.meds.util.Valued;
 
-public enum LocationKeeperTypes implements Valued
-{
+public enum LocationKeeperTypes implements Valued {
+
     /**
      * Ordinary Location.
      */
@@ -38,33 +38,28 @@ public enum LocationKeeperTypes implements Valued
 
     private static LocationKeeperTypes[] values = new LocationKeeperTypes[10];
 
-    static
-    {
+    static {
         for (LocationKeeperTypes state : LocationKeeperTypes.values())
             LocationKeeperTypes.values[state.value] = state;
     }
 
-    public static LocationKeeperTypes parse(int value)
-    {
+    public static LocationKeeperTypes parse(int value) {
         return LocationKeeperTypes.values[value];
     }
 
     private final int value;
 
-    private LocationKeeperTypes(int value)
-    {
+    LocationKeeperTypes(int value) {
         this.value = value;
     }
 
     @Override
-    public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.value);
     }
 }

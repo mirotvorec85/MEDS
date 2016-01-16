@@ -2,8 +2,8 @@ package org.meds.enums;
 
 import org.meds.util.Valued;
 
-public enum ShopTypes implements Valued
-{
+public enum ShopTypes implements Valued {
+
     None(0),
     AlchemicalShop(1),
     ArmourShop(2),
@@ -21,33 +21,28 @@ public enum ShopTypes implements Valued
 
     private static ShopTypes[] values = new ShopTypes[14];
 
-    static
-    {
+    static {
         for (ShopTypes state : ShopTypes.values())
             ShopTypes.values[state.value] = state;
     }
 
-    public static ShopTypes parse(int value)
-    {
+    public static ShopTypes parse(int value) {
         return ShopTypes.values[value];
     }
 
     private final int value;
 
-    private ShopTypes(int value)
-    {
+    ShopTypes(int value) {
         this.value = value;
     }
 
     @Override
-    public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.value);
     }
 }

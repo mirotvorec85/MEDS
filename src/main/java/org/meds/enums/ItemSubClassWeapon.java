@@ -2,8 +2,8 @@ package org.meds.enums;
 
 import org.meds.util.Valued;
 
-public enum ItemSubClassWeapon implements Valued
-{
+public enum ItemSubClassWeapon implements Valued {
+
     None(0),
     Sword(1),
     Axe(2),
@@ -14,33 +14,28 @@ public enum ItemSubClassWeapon implements Valued
 
     private static ItemSubClassWeapon[] values = new ItemSubClassWeapon[7];
 
-    static
-    {
+    static {
         for (ItemSubClassWeapon subClass : ItemSubClassWeapon.values())
             ItemSubClassWeapon.values[subClass.value] = subClass;
     }
 
-    public static ItemSubClassWeapon parse(int value)
-    {
+    public static ItemSubClassWeapon parse(int value) {
         return ItemSubClassWeapon.values[value];
     }
 
     private final int value;
 
-    private ItemSubClassWeapon(int value)
-    {
+    ItemSubClassWeapon(int value) {
         this.value = value;
     }
 
     @Override
-	public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.value);
     }
 }

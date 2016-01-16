@@ -2,8 +2,8 @@ package org.meds.enums;
 
 import org.meds.util.Valued;
 
-public enum BattleStates implements Valued
-{
+public enum BattleStates implements Valued {
+
     NoBattle(0),
     EnterBattle(1),
     TargetDead(2),
@@ -13,33 +13,28 @@ public enum BattleStates implements Valued
 
     private static final BattleStates[] values = new BattleStates[6];
 
-    static
-    {
+    static {
         for (BattleStates state : BattleStates.values())
             BattleStates.values[state.value] = state;
     }
 
-    public static BattleStates parse(int value)
-    {
+    public static BattleStates parse(int value) {
         return BattleStates.values[value];
     }
 
     private final int value;
 
-    private BattleStates(int value)
-    {
+    BattleStates(int value) {
         this.value = value;
     }
 
     @Override
-    public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.value);
     }
 }

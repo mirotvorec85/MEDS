@@ -27,8 +27,8 @@ import org.meds.util.MD5Hasher;
 import org.meds.util.Random;
 import org.meds.util.SafeConvert;
 
-public class Session implements Runnable
-{
+public class Session implements Runnable {
+
     public interface DisconnectListener extends EventListener {
         public void disconnect(Session session);
     }
@@ -160,35 +160,28 @@ public class Session implements Runnable
         return currentIp;
     }
 
-    public void addDisconnectListener(DisconnectListener listener)
-    {
+    public void addDisconnectListener(DisconnectListener listener) {
         this.listeners.add(listener);
     }
 
-    public void removeDisconnectListener(DisconnectListener listener)
-    {
+    public void removeDisconnectListener(DisconnectListener listener) {
         this.listeners.remove(listener);
     }
 
     @Override
-    public void run()
-    {
-        try
-        {
+    public void run() {
+        try {
             InputStream is = this.socket.getInputStream();
             int bufferSize = 1024;
 
-            while (true)
-            {
+            while (true) {
                 int receivedSize = 0;
                 String receivedString = "";
                 byte[] buffer = new byte[bufferSize];
-                do
-                {
+                do {
                     receivedSize = is.read(buffer);
                     // End Of Stream / Socket is closed
-                    if (receivedSize == -1)
-                    {
+                    if (receivedSize == -1) {
                         Logging.Debug.log(toString() + "Received -1");
                         disconnect();
                         return;
@@ -200,68 +193,54 @@ public class Session implements Runnable
 
                 ClientPacket packet = new ClientPacket(receivedString);
 
-                for (PacketCommand command : packet.getPacketCommands())
-                {
+                for (PacketCommand command : packet.getPacketCommands()) {
                     if (!command.isValid())
                         continue;
                     ClientCommands clientCommand = ClientCommands.parse(command.getCommand());
-                    if (clientCommand == null)
-                    {
+                    if (clientCommand == null) {
                         Logging.Warn.log(toString() + "Received unknown command \"" + command.getCommand() + "\".");
                         continue;
                     }
 
                     CommandHandler handler = this.commandHandlers.get(clientCommand);
-                    if (handler == null)
-                    {
+                    if (handler == null) {
                         Logging.Warn.log(toString() + "Handler for the command \"" + clientCommand + "\" not found.");
                         continue;
                     }
-                    if (!this.isAuthenticated && handler.isAuthenticatedOnly())
-                    {
+                    if (!this.isAuthenticated && handler.isAuthenticatedOnly()) {
                         Logging.Warn.log(toString() + "Attempt to handle the command \"" +
                                 clientCommand + "\" with the not authenticated session.");
                         continue;
                     }
 
                     String[] data = command.getData();
-                    if (handler.getMinDataLength() != -1 && data.length < handler.getMinDataLength())
-                    {
+                    if (handler.getMinDataLength() != -1 && data.length < handler.getMinDataLength()) {
                         Logging.Warn.log(toString() + "Command \"" + clientCommand + "\" has the length " + data.length +
                                 ", but minimal is " + handler.getMinDataLength() + ". Handling aborted.");
                         continue;
                     }
 
-                    try
-                    {
+                    try {
                         handler.handle(data);
-                    }
-                    catch(Exception ex)
-                    {
-                        Logging.Error.log( toString() + "An exception has occurred while handling the command " +
+                    } catch (Exception ex) {
+                        Logging.Error.log(toString() + "An exception has occurred while handling the command " +
                                 clientCommand.toString(), ex);
                         continue;
                     }
                 }
                 Session.sendBuffers();
             }
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             // Then the Server is stopping this exception is the expected
             if (!Server.isStopping())
                 Logging.Error.log(toString() + "An exception while reading a socket.", e);
         }
     }
 
-    private void disconnect()
-    {
-        try
-        {
+    private void disconnect() {
+        try {
             this.socket.close();
-        }
-        catch (IOException ex)
-        {
+        } catch (IOException ex) {
             Logging.Error.log(toString() + "IOException while trying to close the Session socket", ex);
         }
 
@@ -334,7 +313,7 @@ public class Session implements Runnable
 
     private abstract class CommandHandler {
         /**
-         *  Gets a minimal length that allows to handle an command
+         * Gets a minimal length that allows to handle an command
          */
         public int getMinDataLength() {
             // No limit
@@ -351,32 +330,23 @@ public class Session implements Runnable
         public abstract void handle(String[] data);
     }
 
-    private class VerificationCommandHandler extends CommandHandler
-    {
+    private class VerificationCommandHandler extends CommandHandler {
         @Override
-        public boolean isAuthenticatedOnly()
-        {
+        public boolean isAuthenticatedOnly() {
             return false;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             ServerPacket packet = new ServerPacket(ServerCommands.Version);
             // Checking Client version
-            if (data.length == 0)
-            {
+            if (data.length == 0) {
                 packet.add(0);
-            }
-            else
-            {
+            } else {
                 int clientBuild = SafeConvert.toInt32(data[0]);
-                if (clientBuild < Server.Build || clientBuild > Server.MaxAllowedBuild)
-                {
+                if (clientBuild < Server.Build || clientBuild > Server.MaxAllowedBuild) {
                     packet.add(0);
-                }
-                else
-                {
+                } else {
                     packet.add(Server.Build).add(Session.this.key);
                 }
             }
@@ -385,23 +355,19 @@ public class Session implements Runnable
         }
     }
 
-    private class LoginCommandHandler extends CommandHandler
-    {
+    private class LoginCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 2;
         }
 
         @Override
-        public boolean isAuthenticatedOnly()
-        {
+        public boolean isAuthenticatedOnly() {
             return false;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             /*
              * Data Structure
              * data[0]: Login name
@@ -464,7 +430,7 @@ public class Session implements Runnable
                 }
 
                 character.setLastLoginIp(Session.this.currentIp);
-                character.setLastLoginDate((int)(now.getTime() / 1000));
+                character.setLastLoginDate((int) (now.getTime() / 1000));
                 getCharacterDao().save(character);
             } catch (Exception ex) {
                 Logging.Error.log("Exception while saving the last login data for " + Session.this.toString(), ex);
@@ -484,20 +450,20 @@ public class Session implements Runnable
 
             // Unknown "cs" values
             packet.addData(ServerCommands._cs, "44", "0").addData(ServerCommands._cs, "45", "0").addData(ServerCommands._cs, "46", "0")
-                .addData(ServerCommands._cs, "47", "0").addData(ServerCommands._cs, "48", "0").addData(ServerCommands._cs, "49", "0");
+                    .addData(ServerCommands._cs, "47", "0").addData(ServerCommands._cs, "48", "0").addData(ServerCommands._cs, "49", "0");
 
             packet.addData(ServerCommands.ClanInfo, "1", "1", "0", "Clan Name")
-                .add(Session.this.player.getMagicData())
-                .add(Session.this.player.getSkillData())
-                .add(Session.this.player.getGuildData());
+                    .add(Session.this.player.getMagicData())
+                    .add(Session.this.player.getSkillData())
+                    .add(Session.this.player.getGuildData());
 
             // NOTE: Sometimes the data above is sent as a separate packet
 
             packet.add(Session.this.player.getCurrencyData())
-                .add(Session.this.player.getParametersData())
-                .addData(ServerCommands.BattleState, BattleStates.NoBattle.toString())
-                .add(Session.this.player.getHealthManaData())
-                .add(Session.this.player.getLevelData());
+                    .add(Session.this.player.getParametersData())
+                    .addData(ServerCommands.BattleState, BattleStates.NoBattle.toString())
+                    .add(Session.this.player.getHealthManaData())
+                    .add(Session.this.player.getLevelData());
 
             send(packet);
             packet.clear();
@@ -524,9 +490,9 @@ public class Session implements Runnable
 
             // BonusMagicParameters? Why?
             packet.addData(ServerCommands.BonusMagicParameter, "10", "0")
-                .addData(ServerCommands.BonusMagicParameter, "15", "0")
-                .addData(ServerCommands.BonusMagicParameter, "16", "0")
-                .addData(ServerCommands.BonusMagicParameter, "17", "0");
+                    .addData(ServerCommands.BonusMagicParameter, "15", "0")
+                    .addData(ServerCommands.BonusMagicParameter, "16", "0")
+                    .addData(ServerCommands.BonusMagicParameter, "17", "0");
 
             // TODO: add cm datas here (current available magic spells)
 
@@ -613,11 +579,9 @@ public class Session implements Runnable
         }
     }
 
-    private class ReadyCommandHandler extends CommandHandler
-    {
+    private class ReadyCommandHandler extends CommandHandler {
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             Session.this.player.logIn(Session.this);
             World.getInstance().playerLoggedIn(Session.this.player);
         }
@@ -631,17 +595,14 @@ public class Session implements Runnable
         }
     }
 
-    private class MovementCommandHandler extends CommandHandler
-    {
+    private class MovementCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 1;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             // Battle does not allow movement
             if (Session.this.player.isInCombat())
                 return;
@@ -688,17 +649,14 @@ public class Session implements Runnable
         }
     }
 
-    private class BankExchangeCommandHandler extends CommandHandler
-    {
+    private class BankExchangeCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 1;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             // TODO: implement Player.bankExchange
             //Session.this.player.bankExchange(SafeConvert.toInt32(data[0]));
 
@@ -706,28 +664,22 @@ public class Session implements Runnable
         }
     }
 
-    private class AttackCommandHandler extends CommandHandler
-    {
+    private class AttackCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 1;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             /*
              * data[0] = Attack type ("udar", "run")
              * data[1] = victim GUID
              */
-            if (data[0].equals("run"))
-            {
-                Session.this.player.runAway() ;
+            if (data[0].equals("run")) {
+                Session.this.player.runAway();
                 return;
-            }
-            else if (data[0].equals("udar"))
-            {
+            } else if (data[0].equals("udar")) {
                 if (data.length < 2)
                     return;
 
@@ -745,28 +697,23 @@ public class Session implements Runnable
         }
     }
 
-    private class UseMagicCommandHandler extends CommandHandler
-    {
+    private class UseMagicCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 2;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             int spellId = SafeConvert.toInt32(data[0]);
             int targetGuid = SafeConvert.toInt32(data[1]);
             Session.this.player.useMagic(spellId, targetGuid);
         }
     }
 
-    private class RelaxCommandHandler extends CommandHandler
-    {
+    private class RelaxCommandHandler extends CommandHandler {
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             /*
              * data[0] - "0".
              */
@@ -774,17 +721,14 @@ public class Session implements Runnable
         }
     }
 
-    private class GuildLearnCommandHandler extends CommandHandler
-    {
+    private class GuildLearnCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 1;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             // Inside a Guild location only
             if (Session.this.player.getPosition().getSpecialLocationType() != SpecialLocationTypes.MagicSchool)
                 return;
@@ -810,40 +754,32 @@ public class Session implements Runnable
         }
     }
 
-    private class GetGuildLevelsCommandHandler extends CommandHandler
-    {
+    private class GetGuildLevelsCommandHandler extends CommandHandler {
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             send(Session.this.player.getGuildLevelData());
         }
     }
 
-    private class SayCommandHandler extends CommandHandler
-    {
+    private class SayCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 1;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             ChatHandler.handleSay(Session.this.player, data[0]);
         }
     }
 
-    private class GetItemInfoCommandHandler extends CommandHandler
-    {
+    private class GetItemInfoCommandHandler extends CommandHandler {
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             ServerPacket packet = new ServerPacket();
             int templateId;
             int modification;
-            for (int i = 1; i < data.length; i += 2)
-            {
+            for (int i = 1; i < data.length; i += 2) {
                 templateId = SafeConvert.toInt32(data[i - 1]);
                 modification = SafeConvert.toInt32(data[i]);
                 Item.getItemInfo(templateId, modification, packet);
@@ -852,17 +788,14 @@ public class Session implements Runnable
         }
     }
 
-    private class SwapItemsCommandHandler extends CommandHandler
-    {
+    private class SwapItemsCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 3;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             int slot1 = SafeConvert.toInt32(data[0]);
             int slot2 = SafeConvert.toInt32(data[1]);
             int count = SafeConvert.toInt32(data[2]);
@@ -871,17 +804,14 @@ public class Session implements Runnable
         }
     }
 
-    private class LootCorpseCommandHandler extends CommandHandler
-    {
+    private class LootCorpseCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 3;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             int guid = SafeConvert.toInt32(data[0], 0);
 
             int itemModification = SafeConvert.toInt32(data[1]);
@@ -893,8 +823,7 @@ public class Session implements Runnable
             // TODO: sound 26 on gold collect. Sound 27 on item collect
 
             // Loot a corpse
-            if (guid > 0)
-            {
+            if (guid > 0) {
                 Corpse corpse = Session.this.player.getPosition().getCorpse(guid);
                 if (corpse == null)
                     return;
@@ -902,15 +831,13 @@ public class Session implements Runnable
                 Session.this.player.lootCorpse(corpse);
             }
             // Pick up an item
-            else if (guid < 0)
-            {
+            else if (guid < 0) {
                 Prototype proto = new Prototype(-guid, itemModification, itemDurability);
                 Item item = Session.this.player.getPosition().getItem(proto);
                 if (item == null)
                     return;
                 int itemCount = item.getCount();
-                if (Session.this.player.getInventory().tryStoreItem(item))
-                {
+                if (Session.this.player.getInventory().tryStoreItem(item)) {
                     Session.this.sendServerMessage(1014, itemCount > 1 ? itemCount + " " : "", item.getTitle());
                     Session.this.player.getPosition().send(Session.this.player,
                             new ServerPacket(ServerCommands.ServerMessage)
@@ -919,20 +846,16 @@ public class Session implements Runnable
                                     .add(item.getTitle()));
                     if (item.getCount() == 0)
                         Session.this.player.getPosition().removeItem(item);
-                }
-                else
-                {
+                } else {
                     Session.this.sendServerMessage(1001, item.getTitle());
                 }
             }
         }
     }
 
-    private class EnterShopCommandHandler extends CommandHandler
-    {
+    private class EnterShopCommandHandler extends CommandHandler {
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             Location location = Session.this.player.getPosition();
             if (location.getSpecialLocationType() == SpecialLocationTypes.Generic)
                 return;
@@ -945,17 +868,14 @@ public class Session implements Runnable
         }
     }
 
-    private class SellItemCommandHandler extends CommandHandler
-    {
+    private class SellItemCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 5;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             Prototype prototype = new Prototype(SafeConvert.toInt32(data[0]), SafeConvert.toInt32(data[1], -1),
                     SafeConvert.toInt32(data[2], -1));
             int count = SafeConvert.toInt32(data[3], -1);
@@ -977,17 +897,14 @@ public class Session implements Runnable
         }
     }
 
-    private class BuyItemCommandHandler extends CommandHandler
-    {
+    private class BuyItemCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 5;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             Prototype prototype = new Prototype(SafeConvert.toInt32(data[0]), SafeConvert.toInt32(data[1], -1),
                     SafeConvert.toInt32(data[2], -1));
             int count = SafeConvert.toInt32(data[3], -1);
@@ -1009,17 +926,14 @@ public class Session implements Runnable
         }
     }
 
-    private class SetAutoLootCommandHandler extends CommandHandler
-    {
+    private class SetAutoLootCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 1;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             int status = SafeConvert.toInt32(data[0]);
             if (status == 1)
                 Session.this.player.getSettings().set(PlayerSettings.AutoLoot);
@@ -1028,26 +942,21 @@ public class Session implements Runnable
         }
     }
 
-    private class GetInnCommandHandler extends CommandHandler
-    {
+    private class GetInnCommandHandler extends CommandHandler {
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             send(Session.this.player.getInn().getInnData());
         }
     }
 
-    private class InnStoreCommandHandler extends CommandHandler
-    {
+    private class InnStoreCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 4;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             Prototype prototype = new Prototype(SafeConvert.toInt32(data[0]), SafeConvert.toInt32(data[1], -1),
                     SafeConvert.toInt32(data[2], -1));
             int count = SafeConvert.toInt32(data[3], -1);
@@ -1058,17 +967,14 @@ public class Session implements Runnable
         }
     }
 
-    private class InnGetCommandHandler extends CommandHandler
-    {
+    private class InnGetCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 4;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             Prototype prototype = new Prototype(SafeConvert.toInt32(data[0]), SafeConvert.toInt32(data[1], -1),
                     SafeConvert.toInt32(data[2], -1));
             int count = SafeConvert.toInt32(data[3], -1);
@@ -1079,32 +985,26 @@ public class Session implements Runnable
         }
     }
 
-    private class WhisperCommandHandler extends CommandHandler
-    {
+    private class WhisperCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 1;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             ChatHandler.handleWhisper(Session.this.player, data[0]);
         }
     }
 
-    private class DestroyItemCommandHandler extends CommandHandler
-    {
+    private class DestroyItemCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 2;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             int slotId = SafeConvert.toInt32(data[0], -1);
             int count = SafeConvert.toInt32(data[1]);
 
@@ -1112,17 +1012,14 @@ public class Session implements Runnable
         }
     }
 
-    private class UseItemCommandHandler extends CommandHandler
-    {
+    private class UseItemCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 3;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             int slotId = SafeConvert.toInt32(data[0], -1);
             // TODO: assign unknown second and third values
             if (slotId == -1)
@@ -1131,17 +1028,14 @@ public class Session implements Runnable
         }
     }
 
-    private class QuestListFilterCommandHandler extends CommandHandler
-    {
+    private class QuestListFilterCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 1;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             boolean isHideCompleted = SafeConvert.toInt32(data[0]) == 1;
             Iterator<Quest> iterator = Session.this.player.getQuestIterator();
             while (iterator.hasNext()) {
@@ -1157,17 +1051,14 @@ public class Session implements Runnable
         }
     }
 
-    private class GetQuestInfoCommandHandler extends CommandHandler
-    {
+    private class GetQuestInfoCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 1;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             int questId = SafeConvert.toInt32(data[0]);
             QuestTemplate template = DBStorage.QuestTemplateStore.get(questId);
             if (template != null)
@@ -1175,32 +1066,26 @@ public class Session implements Runnable
         }
     }
 
-    private class GetQuestInfoForAcceptCommandHandler extends CommandHandler
-    {
+    private class GetQuestInfoForAcceptCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 1;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             Session.this.player.tryAcceptQuest(SafeConvert.toInt32(data[0]));
         }
     }
 
-    private class QuestAcceptCommandHandler extends CommandHandler
-    {
+    private class QuestAcceptCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 1;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             int questId = SafeConvert.toInt32(data[0]);
             Quest quest = Session.this.player.getQuest(questId);
             // This quest previously wasn't requested to accept.
@@ -1211,26 +1096,21 @@ public class Session implements Runnable
         }
     }
 
-    private class SetAutoSpellCommandHandler extends CommandHandler
-    {
+    private class SetAutoSpellCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 1;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             Session.this.player.setAutoSpell(SafeConvert.toInt32(data[0]));
         }
     }
 
-    private class EnterStarCommandHandler extends CommandHandler
-    {
+    private class EnterStarCommandHandler extends CommandHandler {
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             send(new ServerPacket(ServerCommands.StarInfo).add(Session.this.player.getHome().getId()).add("0") // Corpse1 Location ID
                     .add("0") // Corpse2 Location ID
                     .add("0") // Corpse3 Location ID
@@ -1240,71 +1120,58 @@ public class Session implements Runnable
         }
     }
 
-    private class SetHomeCommandHandler extends CommandHandler
-    {
+    private class SetHomeCommandHandler extends CommandHandler {
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             Session.this.player.setHome();
         }
     }
 
-    private class LocationInfoCommandHandler extends CommandHandler
-    {
+    private class LocationInfoCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 1;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             Location location = Map.getInstance().getLocation(SafeConvert.toInt32(data[0]));
             if (location != null)
                 Session.this.send(location.getInfoData());
         }
     }
 
-    private class RegionLocationsCommandHandler extends CommandHandler
-    {
+    private class RegionLocationsCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 1;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             Region region = Map.getInstance().getRegion(SafeConvert.toInt32(data[0]));
             if (region != null)
                 Session.this.send(region.getLocationListData());
         }
     }
 
-    private class GuildLessonsInfoCommandHandler extends CommandHandler
-    {
+    private class GuildLessonsInfoCommandHandler extends CommandHandler {
         @Override
-        public int getMinDataLength()
-        {
+        public int getMinDataLength() {
             return 1;
         }
 
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             Guild guild = DBStorage.GuildStore.get(SafeConvert.toInt32(data[0]));
             if (guild != null)
                 Session.this.send(guild.getLessonsData());
         }
     }
 
-    private class LearnGuildInfoCommandHandler extends CommandHandler
-    {
+    private class LearnGuildInfoCommandHandler extends CommandHandler {
         @Override
-        public void handle(String[] data)
-        {
+        public void handle(String[] data) {
             ServerPacket packet = new ServerPacket(ServerCommands.LearnGuildInfo);
             packet.add("0");  // Always 0
             int availableCount = Session.this.player.getLevel() - Session.this.player.getGuildLevel();
@@ -1492,7 +1359,7 @@ public class Session implements Runnable
                     new Trade(Session.this.player, trader);
                 }
 
-            // Send the existing trade data
+                // Send the existing trade data
             } else {
                 Session.this.player.getTrade().sendTradeData();
             }

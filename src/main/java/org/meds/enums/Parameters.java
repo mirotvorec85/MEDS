@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.meds.util.Valued;
 
-public enum Parameters implements Valued
-{
+public enum Parameters implements Valued {
+
     None(0),
     /* Base Parameters */
     Constitution(1),
@@ -23,7 +23,7 @@ public enum Parameters implements Valued
     Armour(8),
     ChanceToCast(9),
     MagicDamage(10),
-    Health (11),
+    Health(11),
     Mana(12),
     HealthRegeneration(13),
     ManaRegeneration(14),
@@ -48,33 +48,28 @@ public enum Parameters implements Valued
 
     private static final Map<Integer, Parameters> values = new HashMap<>();
 
-    static
-    {
+    static {
         for (Parameters parameter : Parameters.values())
             Parameters.values.put(parameter.value, parameter);
     }
 
-    public static Parameters parse(int value)
-    {
+    public static Parameters parse(int value) {
         return Parameters.values.get(value);
     }
 
     private final int value;
 
-    private Parameters(int value)
-    {
+    Parameters(int value) {
         this.value = value;
     }
 
     @Override
-    public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.value);
     }
 }

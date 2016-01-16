@@ -28,7 +28,7 @@ public enum AchievementCriterionTypes implements Valued {
 
     private final int value;
 
-    private AchievementCriterionTypes(int value) {
+    AchievementCriterionTypes(int value) {
         this.value = value;
     }
 

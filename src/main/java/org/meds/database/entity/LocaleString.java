@@ -2,6 +2,7 @@ package org.meds.database.entity;
 
 public class LocaleString {
 
+
     private int id;
     private String string;
 

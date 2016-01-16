@@ -11,7 +11,6 @@ import org.meds.database.entity.CreatureTemplate;
 import org.meds.enums.CreatureTypes;
 import org.meds.map.Map;
 import org.meds.net.Server;
-import org.meds.net.Server.StopListener;
 import org.meds.logging.Logging;
 
 import org.meds.net.ServerCommands;

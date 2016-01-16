@@ -16,18 +16,15 @@ import org.meds.logging.Logging;
 import org.meds.util.DateFormatter;
 import org.meds.util.Random;
 
-public class Server
-{
-    public interface StopListener extends EventListener
-    {
-        public void stop();
+public class Server {
+
+    public interface StopListener extends EventListener {
+        void stop();
     }
 
-    private class SessionDisconnect implements Session.DisconnectListener
-    {
+    private class SessionDisconnect implements Session.DisconnectListener {
         @Override
-        public void disconnect(Session session)
-        {
+        public void disconnect(Session session) {
             // Ignore disconnection while stopping
             if (Server.isStopping)
                 return;
@@ -49,18 +46,15 @@ public class Server
 
     private static Set<StopListener> stopListeners = new HashSet<>();
 
-    public static boolean isStopping()
-    {
+    public static boolean isStopping() {
         return Server.isStopping;
     }
 
-    public static void addStopListener(StopListener listener)
-    {
+    public static void addStopListener(StopListener listener) {
         stopListeners.add(listener);
     }
 
-    public static void removeStopListener(StopListener listener)
-    {
+    public static void removeStopListener(StopListener listener) {
         stopListeners.remove(listener);
     }
 
@@ -68,34 +62,26 @@ public class Server
         return serverStartTime;
     }
 
-    public static int getServerTimeMillis()
-    {
-        return (int)System.currentTimeMillis() - startTimeMillis;
+    public static int getServerTimeMillis() {
+        return (int) System.currentTimeMillis() - startTimeMillis;
     }
 
-    public static void exit()
-    {
+    public static void exit() {
         Server.isStopping = true;
 
         // Stop server socket
-        try
-        {
+        try {
             Server.instance.serverSocket.close();
-        }
-        catch(IOException ex)
-        {
+        } catch (IOException ex) {
             Logging.Error.log("IOException while stopping the server socket", ex);
         }
 
 
         // Then close all the session sockets
         for (Socket socket : Server.instance.sessions.values())
-            try
-            {
+            try {
                 socket.close();
-            }
-            catch(IOException ex)
-            {
+            } catch (IOException ex) {
                 Logging.Error.log("IOException while closing the session socket", ex);
             }
 
@@ -105,16 +91,11 @@ public class Server
 
         // 5 seconds is enough for World to stop all the updated and save all the players
         Logging.Info.log("The server will be shut down in 5 seconds...");
-        try
-        {
+        try {
             Thread.sleep(5000);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
-        }
-        finally
-        {
+        } finally {
             System.exit(0);
         }
     }
@@ -156,8 +137,7 @@ public class Server
 
     private SessionDisconnect sessionDisconnector;
 
-    public Server() throws IOException
-    {
+    public Server() throws IOException {
         Server.instance = this;
 
         this.isLoaded = false;
@@ -171,12 +151,11 @@ public class Server
         this.isLoaded = true;
     }
 
-    public void Start()
-    {
+    public void Start() {
         if (!this.isLoaded)
             return;
 
-        Server.startTimeMillis = (int)System.currentTimeMillis();
+        Server.startTimeMillis = (int) System.currentTimeMillis();
         Server.serverStartTime = DateFormatter.format(new Date());
 
         new Thread(new ServerCommandHandler(), "Server Commands handler").start();
@@ -185,10 +164,8 @@ public class Server
 
         Logging.Info.log("Waiting for connections...");
 
-        while (true)
-        {
-            try
-            {
+        while (true) {
+            try {
                 Socket clientSocket = this.serverSocket.accept();
                 Session session = new Session(clientSocket);
                 session.addDisconnectListener(this.sessionDisconnector);
@@ -197,9 +174,7 @@ public class Server
                 this.sessions.put(session, clientSocket);
                 thread.start();
 
-            }
-            catch (IOException ex)
-            {
+            } catch (IOException ex) {
                 // Stopping the Server - the next exception is the expected
                 if (!Server.isStopping)
                     Logging.Error.log("IO Exception while accepting a socket", ex);

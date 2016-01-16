@@ -2,8 +2,8 @@ package org.meds.enums;
 
 import org.meds.util.Valued;
 
-public enum LoginResults implements Valued
-{
+public enum LoginResults implements Valued {
+
     OutdatedVersion(0),
     OK(1),
     WrongLoginOrPassword(2),
@@ -16,33 +16,28 @@ public enum LoginResults implements Valued
 
     private static LoginResults[] values = new LoginResults[9];
 
-    static
-    {
+    static {
         for (LoginResults type : LoginResults.values())
             LoginResults.values[type.getValue()] = type;
     }
 
-    public static LoginResults parse(int value)
-    {
+    public static LoginResults parse(int value) {
         return LoginResults.values[value];
     }
 
     private final int value;
 
-    private LoginResults(int value)
-    {
+    LoginResults(int value) {
         this.value = value;
     }
 
     @Override
-    public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.value);
     }
 }

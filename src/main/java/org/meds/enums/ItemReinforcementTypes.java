@@ -2,8 +2,8 @@ package org.meds.enums;
 
 import org.meds.util.Valued;
 
-public enum ItemReinforcementTypes implements Valued
-{
+public enum ItemReinforcementTypes implements Valued {
+
     None(0),
     Fire(1),
     Ice(2),
@@ -11,8 +11,7 @@ public enum ItemReinforcementTypes implements Valued
 
     private static final ItemReinforcementTypes[] values = new ItemReinforcementTypes[4];
 
-    static
-    {
+    static {
         for (ItemReinforcementTypes type : ItemReinforcementTypes.values())
             ItemReinforcementTypes.values[type.value] = type;
     }
@@ -25,20 +24,17 @@ public enum ItemReinforcementTypes implements Valued
 
     private final int value;
 
-    private ItemReinforcementTypes(int value)
-    {
+    ItemReinforcementTypes(int value) {
         this.value = value;
     }
 
     @Override
-    public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.value);
     }
 }

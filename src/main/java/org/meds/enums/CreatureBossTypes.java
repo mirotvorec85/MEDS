@@ -29,7 +29,7 @@ public enum CreatureBossTypes implements Valued {
     private final int value;
     private final int titleStringId;
 
-    private CreatureBossTypes(int value, int titleStringId) {
+    CreatureBossTypes(int value, int titleStringId) {
         this.value = value;
         this.titleStringId = titleStringId;
     }

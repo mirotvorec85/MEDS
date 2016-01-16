@@ -2,8 +2,8 @@ package org.meds.enums;
 
 import org.meds.util.Valued;
 
-public enum ItemClasses implements Valued
-{
+public enum ItemClasses implements Valued {
+
     Generic(0),
     Head(1),
     Neck(2),
@@ -39,33 +39,28 @@ public enum ItemClasses implements Valued
 
     private static final ItemClasses[] values = new ItemClasses[17];
 
-    static
-    {
+    static {
         for (ItemClasses itemClass : ItemClasses.values())
             ItemClasses.values[itemClass.value] = itemClass;
     }
 
-    public static ItemClasses parse(int value)
-    {
+    public static ItemClasses parse(int value) {
         return ItemClasses.values[value];
     }
 
     private final int value;
 
-    private ItemClasses(int value)
-    {
+    ItemClasses(int value) {
         this.value = value;
     }
 
     @Override
-    public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.value);
     }
 }

@@ -2,8 +2,8 @@ package org.meds.enums;
 
 import org.meds.util.Valued;
 
-public enum GuildLessonStatuses implements Valued
-{
+public enum GuildLessonStatuses implements Valued {
+
     /**
      * This guild requires another guild to be learned.
      */
@@ -17,33 +17,28 @@ public enum GuildLessonStatuses implements Valued
 
     private static GuildLessonStatuses[] values = new GuildLessonStatuses[4];
 
-    static
-    {
+    static {
         for (GuildLessonStatuses state : GuildLessonStatuses.values())
             GuildLessonStatuses.values[state.value] = state;
     }
 
-    public static GuildLessonStatuses parse(int value)
-    {
+    public static GuildLessonStatuses parse(int value) {
         return GuildLessonStatuses.values[value];
     }
 
     private final int value;
 
-    private GuildLessonStatuses(int value)
-    {
+    GuildLessonStatuses(int value) {
         this.value = value;
     }
 
     @Override
-    public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.value);
     }
 }

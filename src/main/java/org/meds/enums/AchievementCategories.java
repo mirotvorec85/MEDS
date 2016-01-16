@@ -20,7 +20,7 @@ public enum AchievementCategories implements Valued {
 
     private final int value;
 
-    private AchievementCategories(int value) {
+    AchievementCategories(int value) {
         this.value = value;
     }
 

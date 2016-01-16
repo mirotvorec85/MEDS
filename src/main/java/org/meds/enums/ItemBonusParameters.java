@@ -2,8 +2,8 @@ package org.meds.enums;
 
 import org.meds.util.Valued;
 
-public enum ItemBonusParameters implements Valued
-{
+public enum ItemBonusParameters implements Valued {
+
     BaseMinDamage(0),
     BaseMaxDamage(1),
     BaseProtection(2),
@@ -34,14 +34,12 @@ public enum ItemBonusParameters implements Valued
 
     private static final ItemBonusParameters[] values = new ItemBonusParameters[27];
 
-    static
-    {
+    static {
         for (ItemBonusParameters parameter : ItemBonusParameters.values())
             ItemBonusParameters.values[parameter.value] = parameter;
     }
 
-    public static ItemBonusParameters parse(int value)
-    {
+    public static ItemBonusParameters parse(int value) {
         if (value < 0 || value >= values.length)
             return null;
         return ItemBonusParameters.values[value];
@@ -49,20 +47,17 @@ public enum ItemBonusParameters implements Valued
 
     private final int value;
 
-    private ItemBonusParameters(int value)
-    {
+    ItemBonusParameters(int value) {
         this.value = value;
     }
 
     @Override
-    public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.value);
     }
 }

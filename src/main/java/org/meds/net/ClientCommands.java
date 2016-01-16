@@ -3,8 +3,8 @@ package org.meds.net;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum ClientCommands
-{
+public enum ClientCommands {
+
     Ping("0"),
     SetHome("acity"),
     Attack("at"),
@@ -65,27 +65,23 @@ public enum ClientCommands
 
     private static final Map<String, ClientCommands> values = new HashMap<>();
 
-    static
-    {
+    static {
         for (ClientCommands command : ClientCommands.values())
             ClientCommands.values.put(command.value, command);
     }
 
-    public static ClientCommands parse(String command)
-    {
+    public static ClientCommands parse(String command) {
         return ClientCommands.values.get(command);
     }
 
     private final String value;
 
-    private ClientCommands(String value)
-    {
+    ClientCommands(String value) {
         this.value = value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return this.value;
     }
 }

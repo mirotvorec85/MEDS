@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.meds.util.Valued;
 
-public enum PlayerStatuses implements Valued
-{
+public enum PlayerStatuses implements Valued {
+
     Player(0x00000),
     Moderator(0x00001),
     Dealer(0x00002),
@@ -29,21 +29,18 @@ public enum PlayerStatuses implements Valued
             PlayerStatuses.values.put(settings.value, settings);
     }
 
-    public static PlayerStatuses parse(int value)
-    {
+    public static PlayerStatuses parse(int value) {
         return PlayerStatuses.values.get(value);
     }
 
     private final int value;
 
-    private PlayerStatuses(int value)
-    {
+    PlayerStatuses(int value) {
         this.value = value;
     }
 
     @Override
-	public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 }

@@ -2,8 +2,8 @@ package org.meds.enums;
 
 import org.meds.util.Valued;
 
-public enum ItemEssenceLevels implements Valued
-{
+public enum ItemEssenceLevels implements Valued {
+
     None(0),
 
     Miraculous(6),
@@ -14,8 +14,7 @@ public enum ItemEssenceLevels implements Valued
 
     private static final ItemEssenceLevels[] values = new ItemEssenceLevels[11];
 
-    static
-    {
+    static {
         for (ItemEssenceLevels type : ItemEssenceLevels.values())
             ItemEssenceLevels.values[type.value] = type;
     }
@@ -28,20 +27,17 @@ public enum ItemEssenceLevels implements Valued
 
     private final int value;
 
-    private ItemEssenceLevels(int value)
-    {
+    ItemEssenceLevels(int value) {
         this.value = value;
     }
 
     @Override
-    public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.value);
     }
 }

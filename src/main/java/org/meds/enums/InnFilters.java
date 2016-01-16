@@ -2,8 +2,8 @@ package org.meds.enums;
 
 import org.meds.util.Valued;
 
-public enum InnFilters implements Valued
-{
+public enum InnFilters implements Valued {
+
     /**
      * All filters are disabled.
      */
@@ -26,37 +26,32 @@ public enum InnFilters implements Valued
     /**
      * Recipes, Runes, Books, Tablets
      */
-    Books(7);
+    Books(7),;
 
     private static InnFilters[] values = new InnFilters[8];
 
-    static
-    {
+    static {
         for (InnFilters state : InnFilters.values())
             InnFilters.values[state.value] = state;
     }
 
-    public static InnFilters parse(int value)
-    {
+    public static InnFilters parse(int value) {
         return InnFilters.values[value];
     }
 
     private final int value;
 
-    private InnFilters(int value)
-    {
+    InnFilters(int value) {
         this.value = value;
     }
 
     @Override
-    public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.value);
     }
 

@@ -17,13 +17,12 @@ import org.meds.profession.Profession;
 import org.meds.spell.Aura;
 import org.meds.util.EnumFlags;
 
-public class Player extends Unit
-{
-    private class SessionDisconnect implements org.meds.net.Session.DisconnectListener
-    {
+public class Player extends Unit {
+
+    private class SessionDisconnect implements org.meds.net.Session.DisconnectListener {
+
         @Override
-        public void disconnect(org.meds.net.Session session)
-        {
+        public void disconnect(org.meds.net.Session session) {
             // TODO; Implement timer to logout the hanging player
             Player.this.session = null;
         }
@@ -91,8 +90,7 @@ public class Player extends Unit
 
     private Trade trade;
 
-    public Player(int guid)
-    {
+    public Player(int guid) {
         super();
         this.guid = guid;
         this.unitType = UnitTypes.Player;
@@ -111,8 +109,7 @@ public class Player extends Unit
     }
 
     @Override
-    public int getAutoSpell()
-    {
+    public int getAutoSpell() {
         Integer autoSpell = this.info.getAutoSpellId();
         if (autoSpell == null)
             return 0;
@@ -120,8 +117,7 @@ public class Player extends Unit
     }
 
     @Override
-    public int getSkillLevel(int skillId)
-    {
+    public int getSkillLevel(int skillId) {
         CharacterSkill skill = this.info.getSkills().get(skillId);
         if (skill == null)
             return 0;
@@ -129,8 +125,7 @@ public class Player extends Unit
     }
 
     @Override
-    public int getSpellLevel(int spellId)
-    {
+    public int getSpellLevel(int spellId) {
         CharacterSpell spell = this.info.getSpells().get(spellId);
         if (spell == null)
             return 0;
@@ -148,23 +143,19 @@ public class Player extends Unit
             this.session.send(new ServerPacket(ServerCommands.AutoSpell).add(spellId));
     }
 
-    public boolean isRelax()
-    {
+    public boolean isRelax() {
         return this.hasAura(1000);
     }
 
-    public Location getHome()
-    {
+    public Location getHome() {
         return org.meds.map.Map.getInstance().getLocation(this.info.getHomeId());
     }
 
-    public void setHome()
-    {
+    public void setHome() {
         this.setHome(this.position);
     }
 
-    public void setHome(Location home)
-    {
+    public void setHome(Location home) {
         if (home == null)
             return;
         if (home.getSpecialLocationType() != SpecialLocationTypes.Star)
@@ -175,40 +166,33 @@ public class Player extends Unit
             this.session.sendServerMessage(17, home.getRegion().getName());
     }
 
-    public org.meds.net.Session getSession()
-    {
+    public org.meds.net.Session getSession() {
         return this.session;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return this.info.getName();
     }
 
     @Override
-    public int getAvatar()
-    {
+    public int getAvatar() {
         return this.info.getAvatarId();
     }
 
-    public Inventory getInventory()
-    {
+    public Inventory getInventory() {
         return this.inventory;
     }
 
-    public Inn getInn()
-    {
+    public Inn getInn() {
         return this.inn;
     }
 
-    public EnumFlags<PlayerSettings> getSettings()
-    {
+    public EnumFlags<PlayerSettings> getSettings() {
         return this.settings;
     }
 
-    public EnumFlags<PlayerStatuses> getStatuses()
-    {
+    public EnumFlags<PlayerStatuses> getStatuses() {
         return this.statuses;
     }
 
@@ -240,26 +224,22 @@ public class Player extends Unit
         return this.professions[profession.getValue() - 1];
     }
 
-    public int getGuildLevel()
-    {
+    public int getGuildLevel() {
         return this.guildLevel;
     }
 
     @Override
-    public int getHealth()
-    {
+    public int getHealth() {
         return this.info.getHealth();
     }
 
     @Override
-    public int getMana()
-    {
+    public int getMana() {
         return this.info.getMana();
     }
 
     @Override
-    public void setHealth(int health)
-    {
+    public void setHealth(int health) {
         super.setHealth(health);
         this.info.setHealth(health);
         if (this.session != null)
@@ -267,8 +247,7 @@ public class Player extends Unit
     }
 
     @Override
-    public void setMana(int mana)
-    {
+    public void setMana(int mana) {
         super.setMana(mana);
         this.info.setMana(mana);
         if (this.session != null)
@@ -276,8 +255,7 @@ public class Player extends Unit
     }
 
     @Override
-    public void setHealthMana(int health, int mana)
-    {
+    public void setHealthMana(int health, int mana) {
         super.setHealthMana(health, mana);
         this.info.setHealth(health);
         this.info.setMana(mana);
@@ -286,36 +264,30 @@ public class Player extends Unit
     }
 
     @Override
-    public int getLevel()
-    {
+    public int getLevel() {
         return this.info.getLevel();
     }
 
     @Override
-    public int getReligLevel()
-    {
+    public int getReligLevel() {
         return this.info.getReligLevel();
     }
 
-    public int getReligExp()
-    {
+    public int getReligExp() {
         return this.info.getReligExp();
     }
 
-    public int getExp()
-    {
+    public int getExp() {
         return this.info.getExp();
     }
 
-    private void setExp(int value)
-    {
+    private void setExp(int value) {
         this.info.setExp(value);
 
         int nextLvlExp = LevelCost.getExp(this.getLevel() + 1);
 
         // Is Level Up
-        if (nextLvlExp <= this.getExp())
-        {
+        if (nextLvlExp <= this.getExp()) {
             this.info.setExp(this.info.getExp() - nextLvlExp);
             this.info.setLevel(this.info.getLevel() + 1);
             // Send messages
@@ -325,17 +297,14 @@ public class Player extends Unit
                 this.session.sendServerMessage(497). // You gain a new level
                         sendServerMessage(492). // You can learn new lesson in a guild
                         send(this.getLevelData()).send(getParametersData());
-        }
-        else
-        {
+        } else {
             if (this.session != null)
                 this.session.send(this.getLevelData(true));
         }
 
     }
 
-    public void setLevel(int level)
-    {
+    public void setLevel(int level) {
         if (this.info.getLevel() == level)
             return;
         this.info.setLevel(level);
@@ -355,19 +324,16 @@ public class Player extends Unit
         this.info.setNotepad(notes);
     }
 
-    public ServerPacket getLevelData()
-    {
+    public ServerPacket getLevelData() {
         return this.getLevelData(false);
     }
 
-    public ServerPacket getLevelData(boolean experienceOnly)
-    {
+    public ServerPacket getLevelData(boolean experienceOnly) {
         ServerPacket packet = new ServerPacket(ServerCommands.Experience);
         packet.add(this.getExp());
         packet.add(this.getReligExp());
 
-        if(!experienceOnly)
-        {
+        if (!experienceOnly) {
             packet.add(this.getLevel());
             packet.add("0");
             packet.add(this.getReligLevel());
@@ -376,40 +342,33 @@ public class Player extends Unit
         return packet;
     }
 
-    protected void addExp(int value)
-    {
+    protected void addExp(int value) {
         this.setExp(this.getExp() + value);
     }
 
-    public int getCurrencyAmount(Currency currency)
-    {
+    public int getCurrencyAmount(Currency currency) {
         return this.getCurrencyAmount(currency.getId());
     }
 
-    public int getCurrencyAmount(Currencies currency)
-    {
+    public int getCurrencyAmount(Currencies currency) {
         return this.getCurrencyAmount(currency.getValue());
     }
 
-    public int getCurrencyAmount(int currencyId)
-    {
+    public int getCurrencyAmount(int currencyId) {
         CharacterCurrency currency = this.info.getCurrencies().get(currencyId);
         if (currency == null)
             return 0;
         return currency.getAmount();
     }
 
-    public boolean changeCurrency(Currencies currency, int difference)
-    {
+    public boolean changeCurrency(Currencies currency, int difference) {
         return this.changeCurrency(currency.getValue(), difference);
     }
 
-    public boolean changeCurrency(int currencyId, int difference)
-    {
+    public boolean changeCurrency(int currencyId, int difference) {
         CharacterCurrency currency = this.info.getCurrencies().get(currencyId);
         // Create new record
-        if (currency == null)
-        {
+        if (currency == null) {
             currency = new CharacterCurrency(this.guid, currencyId);
             this.info.getCurrencies().put(currencyId, currency);
         }
@@ -425,8 +384,7 @@ public class Player extends Unit
     /**
      * Converts the specified amount of the gold currency into the bank currency.
      */
-    public void depositMoney(int amount)
-    {
+    public void depositMoney(int amount) {
         if (amount <= 0)
             return;
 
@@ -441,8 +399,7 @@ public class Player extends Unit
     /**
      * Converts the specified amount of the bank currency into gold.
      */
-    public void withdrawMoney(int amount)
-    {
+    public void withdrawMoney(int amount) {
         if (amount <= 0)
             return;
 
@@ -531,8 +488,7 @@ public class Player extends Unit
     }
 
     @Override
-    public int create()
-    {
+    public int create() {
         if (!load())
             return 0;
 
@@ -542,10 +498,8 @@ public class Player extends Unit
         return super.create();
     }
 
-    public void logIn(org.meds.net.Session session)
-    {
-        if (this.session != null)
-        {
+    public void logIn(org.meds.net.Session session) {
+        if (this.session != null) {
             Logging.Warn.log(toString() + " assigns a new session with existing one.");
             this.session.removeDisconnectListener(this.disconnector);
         }
@@ -573,8 +527,7 @@ public class Player extends Unit
         this.info.getSpells().size();
 
         // Guild Level
-        for (CharacterGuild guild : this.info.getGuilds().values())
-        {
+        for (CharacterGuild guild : this.info.getGuilds().values()) {
             this.guildLevel += guild.getLevel();
         }
 
@@ -652,8 +605,7 @@ public class Player extends Unit
         return true;
     }
 
-    public void save()
-    {
+    public void save() {
         this.info.setBaseCon(this.parameters.base().value(Parameters.Constitution));
         this.info.setBaseStr(this.parameters.base().value(Parameters.Strength));
         this.info.setBaseDex(this.parameters.base().value(Parameters.Dexterity));
@@ -688,59 +640,56 @@ public class Player extends Unit
         DAOFactory.getFactory().getCharacterDAO().save(this.info);
     }
 
-    public ServerPacket getParametersData()
-    {
+    public ServerPacket getParametersData() {
         return new ServerPacket(ServerCommands.PlayerInfo)
-            .add(this.guid)
-            .add(this.getName())
-            .add(this.getAvatar())
-            .add("1248860848") // Seems like a date. but what the date???
-            .add(this.race.toString())
-            .add(0)
-            .add(this.clanId)
-            .add(this.clanMemberStatus)
-            .add(0) // Clan bonus???
-            .add(0) // TODO: SkullsCount
-            .add(this.parameters.base().value(Parameters.Intelligence))
-            .add(this.parameters.base().value(Parameters.Constitution))
-            .add(this.parameters.base().value(Parameters.Strength))
-            .add(this.parameters.base().value(Parameters.Dexterity))
-            .add(this.parameters.guild().value(Parameters.Constitution))
-            .add(this.parameters.guild().value(Parameters.Strength))
-            .add(this.parameters.guild().value(Parameters.Dexterity))
-            .add(this.parameters.guild().value(Parameters.Intelligence))
-            .add(this.parameters.guild().value(Parameters.Damage))
-            .add(this.parameters.guild().value(Parameters.Protection))
-            .add(this.parameters.guild().value(Parameters.ChanceToHit))
-            .add(this.parameters.guild().value(Parameters.Armour))
-            .add(this.parameters.guild().value(Parameters.ChanceToCast))
-            .add(this.parameters.guild().value(Parameters.MagicDamage))
-            .add(this.parameters.guild().value(Parameters.Health))
-            .add(this.parameters.guild().value(Parameters.Mana))
-            .add(this.parameters.guild().value(Parameters.HealthRegeneration))
-            .add(this.parameters.guild().value(Parameters.ManaRegeneration))
-            .add(this.parameters.guild().value(Parameters.FireResistance))
-            .add(this.parameters.guild().value(Parameters.FrostResistance))
-            .add(this.parameters.guild().value(Parameters.LightningResistance))
-            .add("9989") // StartCell ?
-            .add(this.settings.toString())
-            .add("1367478137") // Start Server Time
-            .add("16909320") // TODO: Version (or Version of what???)
-            .add(this.inventory.getCapacity())
-            .add("0")
-            .add("1") // TODO: Gender
-            .add("0"); // TODO: Religious status
+                .add(this.guid)
+                .add(this.getName())
+                .add(this.getAvatar())
+                .add("1248860848") // Seems like a date. but what the date???
+                .add(this.race.toString())
+                .add(0)
+                .add(this.clanId)
+                .add(this.clanMemberStatus)
+                .add(0) // Clan bonus???
+                .add(0) // TODO: SkullsCount
+                .add(this.parameters.base().value(Parameters.Intelligence))
+                .add(this.parameters.base().value(Parameters.Constitution))
+                .add(this.parameters.base().value(Parameters.Strength))
+                .add(this.parameters.base().value(Parameters.Dexterity))
+                .add(this.parameters.guild().value(Parameters.Constitution))
+                .add(this.parameters.guild().value(Parameters.Strength))
+                .add(this.parameters.guild().value(Parameters.Dexterity))
+                .add(this.parameters.guild().value(Parameters.Intelligence))
+                .add(this.parameters.guild().value(Parameters.Damage))
+                .add(this.parameters.guild().value(Parameters.Protection))
+                .add(this.parameters.guild().value(Parameters.ChanceToHit))
+                .add(this.parameters.guild().value(Parameters.Armour))
+                .add(this.parameters.guild().value(Parameters.ChanceToCast))
+                .add(this.parameters.guild().value(Parameters.MagicDamage))
+                .add(this.parameters.guild().value(Parameters.Health))
+                .add(this.parameters.guild().value(Parameters.Mana))
+                .add(this.parameters.guild().value(Parameters.HealthRegeneration))
+                .add(this.parameters.guild().value(Parameters.ManaRegeneration))
+                .add(this.parameters.guild().value(Parameters.FireResistance))
+                .add(this.parameters.guild().value(Parameters.FrostResistance))
+                .add(this.parameters.guild().value(Parameters.LightningResistance))
+                .add("9989") // StartCell ?
+                .add(this.settings.toString())
+                .add("1367478137") // Start Server Time
+                .add("16909320") // TODO: Version (or Version of what???)
+                .add(this.inventory.getCapacity())
+                .add("0")
+                .add("1") // TODO: Gender
+                .add("0"); // TODO: Religious status
     }
 
-    public ServerPacket getGuildData()
-    {
+    public ServerPacket getGuildData() {
         ServerPacket packet = new ServerPacket(ServerCommands.GuildInfo);
         packet.add(DBStorage.GuildStore.size());
-        for (Map.Entry<Integer, Guild> entry : DBStorage.GuildStore.entrySet())
-        {
+        for (Map.Entry<Integer, Guild> entry : DBStorage.GuildStore.entrySet()) {
             packet.add(entry.getValue().getId())
-                .add(entry.getValue().getName())
-                .add(entry.getValue().getPrevId());
+                    .add(entry.getValue().getName())
+                    .add(entry.getValue().getPrevId());
             CharacterGuild characterGuild = this.info.getGuilds().get(entry.getValue().getId());
             if (characterGuild == null)
                 packet.add("0");
@@ -750,16 +699,14 @@ public class Player extends Unit
         return packet;
     }
 
-    public ServerPacket getMagicData()
-    {
+    public ServerPacket getMagicData() {
         ServerPacket packet = new ServerPacket(ServerCommands.MagicInfo);
         packet.add(DBStorage.SpellStore.size());
 
-        for (Map.Entry<Integer, Spell> entry : DBStorage.SpellStore.entrySet())
-        {
+        for (Map.Entry<Integer, Spell> entry : DBStorage.SpellStore.entrySet()) {
             packet.add(entry.getValue().getId())
-                .add(entry.getValue().getType().toString())
-                .add(entry.getValue().getName());
+                    .add(entry.getValue().getType().toString())
+                    .add(entry.getValue().getName());
             CharacterSpell characterSpell = this.info.getSpells().get(entry.getValue().getId());
             if (characterSpell == null)
                 packet.add("0");
@@ -769,15 +716,13 @@ public class Player extends Unit
         return packet;
     }
 
-    public ServerPacket getSkillData()
-    {
+    public ServerPacket getSkillData() {
         ServerPacket packet = new ServerPacket(ServerCommands.SkillInfo);
         packet.add(DBStorage.SkillStore.size());
 
-        for (Map.Entry<Integer, Skill> entry : DBStorage.SkillStore.entrySet())
-        {
+        for (Map.Entry<Integer, Skill> entry : DBStorage.SkillStore.entrySet()) {
             packet.add(entry.getValue().getId())
-                .add(entry.getValue().getName());
+                    .add(entry.getValue().getName());
             CharacterSkill characterSkill = this.info.getSkills().get(entry.getValue().getId());
             if (characterSkill == null)
                 packet.add("0");
@@ -787,8 +732,7 @@ public class Player extends Unit
         return packet;
     }
 
-    public ServerPacket getGuildLevelData()
-    {
+    public ServerPacket getGuildLevelData() {
         ServerPacket packet = new ServerPacket(ServerCommands.GuildLevels);
         packet.add(this.guildLevel);
         packet.add(this.info.getGuilds().size());
@@ -801,20 +745,17 @@ public class Player extends Unit
         return packet;
     }
 
-    public void learnGuildLesson(Guild guild)
-    {
+    public void learnGuildLesson(Guild guild) {
         if (guild == null)
             return;
 
         int guildId = guild.getId();
 
         CharacterGuild charGuild = this.info.getGuilds().get(guildId);
-        if (charGuild == null)
-        {
+        if (charGuild == null) {
             // This is the first lesson in this guild
             // Check the previous(required) guild to be learned;
-            if (guild.getPrevId() != 0)
-            {
+            if (guild.getPrevId() != 0) {
                 CharacterGuild prevCharGuild = this.info.getGuilds().get(guild.getPrevId());
                 if (prevCharGuild == null || prevCharGuild.getLevel() != 15)
                     return;
@@ -848,17 +789,14 @@ public class Player extends Unit
         }
     }
 
-    private void applyGuildImprovement(GuildLesson.ImprovementTypes type, int id, int count)
-    {
-        switch(type)
-        {
+    private void applyGuildImprovement(GuildLesson.ImprovementTypes type, int id, int count) {
+        switch (type) {
             case Parameter:
                 this.parameters.guild().change(Parameters.parse(id), count);
                 break;
             case Skill:
                 CharacterSkill characterSkill = this.info.getSkills().get(id);
-                if (characterSkill == null)
-                {
+                if (characterSkill == null) {
                     characterSkill = new CharacterSkill(id, 0);
                     this.info.getSkills().put(id, characterSkill);
                 }
@@ -878,7 +816,8 @@ public class Player extends Unit
                 // TODO: Message about new level with spell
                 // TODO: Set AutoSpell if not set
                 break;
-            default: break;
+            default:
+                break;
         }
     }
 
@@ -920,7 +859,7 @@ public class Player extends Unit
     }
 
     private void cancelGuildImprovement(GuildLesson.ImprovementTypes type, int id, int count) {
-        switch(type) {
+        switch (type) {
             case Parameter:
                 this.parameters.guild().change(Parameters.parse(id), -count);
                 break;
@@ -946,7 +885,8 @@ public class Player extends Unit
                 Logging.Debug.log(this + " has removed level of a spell id " + id + " and the current level is " +
                         characterSpell.getLevel());
                 break;
-            default: break;
+            default:
+                break;
         }
     }
 
@@ -976,18 +916,16 @@ public class Player extends Unit
         return packet;
     }
 
-    public ServerPacket getCurrencyData()
-    {
+    public ServerPacket getCurrencyData() {
         ServerPacket packet = new ServerPacket(ServerCommands.Currencies);
-        for (Currency currency : DBStorage.CurrencyStore.values())
-        {
+        for (Currency currency : DBStorage.CurrencyStore.values()) {
             packet.add(currency.getId())
-                .add(currency.getUnk2())
-                .add(currency.getTitle())
-                .add(currency.getDescription())
-                .add(currency.getUnk5())
-                .add(currency.isDisabled() ? "1" : "0")
-                .add(getCurrencyAmount(currency.getId()));
+                    .add(currency.getUnk2())
+                    .add(currency.getTitle())
+                    .add(currency.getDescription())
+                    .add(currency.getUnk5())
+                    .add(currency.isDisabled() ? "1" : "0")
+                    .add(getCurrencyAmount(currency.getId()));
         }
         return packet;
     }
@@ -1004,16 +942,14 @@ public class Player extends Unit
     }
 
     @Override
-    public ServerPacket getHealthManaData()
-    {
+    public ServerPacket getHealthManaData() {
         return new ServerPacket(ServerCommands.Health).
                 add(this.health).
                 add(this.mana).
                 add("0"); // Unknown. Always is 0.
     }
 
-    private void onCurrencyChanged(int currencyId, int difference)
-    {
+    private void onCurrencyChanged(int currencyId, int difference) {
         // HACK: Bank deposit sends all the data
 
         // Partial Data change
@@ -1022,14 +958,12 @@ public class Player extends Unit
     }
 
     @Override
-    public Corpse die()
-    {
+    public Corpse die() {
         // TODO: Remove auras
 
         this.deathState = DeathStates.Dead;
 
-        if (this.session != null)
-        {
+        if (this.session != null) {
             // TODO: why do we send relax state?
             //player.Session.AddData("r0");
             ServerPacket packet = new ServerPacket(ServerCommands._lh0).add("");
@@ -1043,11 +977,9 @@ public class Player extends Unit
         return null;
     }
 
-    public void lootCorpse(Corpse corpse)
-    {
+    public void lootCorpse(Corpse corpse) {
         // Money
-        if (corpse.getGold() > 0)
-        {
+        if (corpse.getGold() > 0) {
             if (this.session != null)
                 this.session.sendServerMessage(998, corpse.getOwner().getName(), Integer.toString(corpse.getGold()), Locale.getString(2));
             this.position.send(this,
@@ -1060,12 +992,10 @@ public class Player extends Unit
         }
 
         Set<Item> items = corpse.getItems();
-        if (items.size() > 0)
-        {
-            for (Item item : items)
-            {
+        if (items.size() > 0) {
+            for (Item item : items) {
                 if (this.session != null)
-                this.session.sendServerMessage(998, corpse.getOwner().getName(), item.getCount() > 1 ? item.getCount() + " " : "", item.getTitle());
+                    this.session.sendServerMessage(998, corpse.getOwner().getName(), item.getCount() > 1 ? item.getCount() + " " : "", item.getTitle());
                 this.position.send(this,
                         new ServerPacket(ServerCommands.ServerMessage)
                                 .add("999")
@@ -1257,7 +1187,7 @@ public class Player extends Unit
         Logging.Debug.log("Player " + this.getName() + " interacts with " + unit.getName());
 
         if (unit.getUnitType() == UnitTypes.Creature) {
-            Creature creature = (Creature)unit;
+            Creature creature = (Creature) unit;
 
             // Quests
             if (creature.getTemplate().hasFlag(CreatureFlags.QuestGiver)) {
@@ -1272,7 +1202,7 @@ public class Player extends Unit
                 int nextQuestId = 0;
 
                 // Look through all the quests to define whether the player has not completed that quests
-                for (Integer questTemplateId :  creatureQuests.keySet()) {
+                for (Integer questTemplateId : creatureQuests.keySet()) {
                     quest = getQuest(questTemplateId);
                     if (quest == null)
                         continue;
@@ -1296,7 +1226,7 @@ public class Player extends Unit
                 ServerPacket packet = new ServerPacket(ServerCommands.NpcQuestList);
                 int count = 0;
                 // Search through quest relations of the NPC
-                for(CreatureQuestRelation creatureQuest : creatureQuests.values()) {
+                for (CreatureQuestRelation creatureQuest : creatureQuests.values()) {
                     QuestTemplate template = DBStorage.QuestTemplateStore.get(creatureQuest.getQuestTemplateId());
                     // NPC can give a quest
                     // The quest is valid
@@ -1361,8 +1291,7 @@ public class Player extends Unit
     }
 
     @Override
-    public void addServerMessage(int messageId, String... args)
-    {
+    public void addServerMessage(int messageId, String... args) {
         if (this.session != null)
             this.session.sendServerMessage(messageId, args);
     }
@@ -1370,30 +1299,24 @@ public class Player extends Unit
     /**
      * Occurs when at least one of player parameters that are displayed in online list changes.
      */
-    protected void onDisplayChanged()
-    {
+    protected void onDisplayChanged() {
         World.getInstance().playerUpdated(this);
     }
 
     @Override
-    public void update(int time)
-    {
+    public void update(int time) {
         super.update(time);
 
         // Client-Server Aura Synchronization
         // TODO: also recalculate aura bonus parameters
-        if (this.syncTimer < 0)
-        {
+        if (this.syncTimer < 0) {
             // Update Heroic Shield effect
             if (!this.isInCombat())
                 new org.meds.spell.Spell(1141, this, 1).cast();
 
-            if (this.session != null && this.auras.size() != 0)
-            {
-                synchronized (this.auras)
-                {
-                    for(Aura aura : this.auras.values())
-                    {
+            if (this.session != null && this.auras.size() != 0) {
+                synchronized (this.auras) {
+                    for (Aura aura : this.auras.values()) {
                         // Synchronize timed auras only!
                         if (aura.isPermanent())
                             continue;
@@ -1403,18 +1326,15 @@ public class Player extends Unit
                 }
             }
             this.syncTimer = Player.SyncTime;
-        }
-        else
+        } else
             this.syncTimer -= time;
 
         // Auto-Save
-        if (this.saverTimer < 0)
-        {
+        if (this.saverTimer < 0) {
             Logging.Debug.log("Player save timer executing");
             save();
             this.saverTimer = SaveTime;
-        }
-        else
+        } else
             this.saverTimer -= time;
     }
 }

@@ -2,16 +2,14 @@ package org.meds.net;
 
 import java.util.Arrays;
 
-public class PacketCommand
-{
+public class PacketCommand {
+
     private String command;
     private String[] data;
     private boolean isValid;
 
-    public PacketCommand(String data)
-    {
-        if (data.isEmpty())
-        {
+    public PacketCommand(String data) {
+        if (data.isEmpty()) {
             this.isValid = false;
             return;
         }
@@ -22,18 +20,15 @@ public class PacketCommand
         this.isValid = true;
     }
 
-    public String getCommand()
-    {
+    public String getCommand() {
         return this.command;
     }
 
-    public String[] getData()
-    {
+    public String[] getData() {
         return this.data;
     }
 
-    public boolean isValid()
-    {
+    public boolean isValid() {
         return this.isValid;
     }
 }

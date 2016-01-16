@@ -4,14 +4,13 @@ import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.enums.Parameters;
 
-public class AuraRelax extends Aura
-{
+public class AuraRelax extends Aura {
+
     private int healthRegenBonus = 0;
     private int manaRegenBonus = 0;
 
     @Override
-    protected void applyAura()
-    {
+    protected void applyAura() {
         if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null)
             this.ownerPlayer.getSession().sendServerMessage(1051).send(new ServerPacket(ServerCommands.RelaxOn));
         this.healthRegenBonus = this.owner.getParameters().base().value(Parameters.HealthRegeneration);
@@ -22,8 +21,7 @@ public class AuraRelax extends Aura
     }
 
     @Override
-    protected void removeAura()
-    {
+    protected void removeAura() {
         if (this.ownerPlayer != null && this.ownerPlayer.getSession() != null)
             this.ownerPlayer.getSession().sendServerMessage(303).send(new ServerPacket(ServerCommands.RelaxOff));
         this.owner.getParameters().magic().change(Parameters.HealthRegeneration, -this.healthRegenBonus);

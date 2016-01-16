@@ -5,20 +5,19 @@ import org.meds.net.ServerPacket;
 import org.meds.enums.Parameters;
 import org.meds.util.KeyValuePair;
 
-public class AuraBuff extends Aura
-{
+public class AuraBuff extends Aura {
+
     protected KeyValuePair<Parameters, Integer> bonusParameter1;
     protected KeyValuePair<Parameters, Integer> bonusParameter2;
 
     @Override
-    protected void applyAura()
-    {
+    protected void applyAura() {
         recalculateBonus();
         super.applyAura();
     }
+
     @Override
-    protected void removeAura()
-    {
+    protected void removeAura() {
         super.removeAura();
 
         removeBonus();
@@ -27,9 +26,7 @@ public class AuraBuff extends Aura
         int positionMessage = -1;
 
         // Special Messages
-        switch (this.spellEntry.getId())
-        {
-
+        switch (this.spellEntry.getId()) {
             case 14: // Tiger Strength
                 selfMessage = 707;
                 positionMessage = 725;
@@ -64,20 +61,17 @@ public class AuraBuff extends Aura
         removeBonus();
     }
 
-    protected void recalculateBonus()
-    {
+    protected void recalculateBonus() {
         this.removeBonus(false);
 
         // Calculate Bonus parameters
-        switch (this.spellEntry.getId())
-        {
+        switch (this.spellEntry.getId()) {
             case 14: // Tigers Strength
             case 16: // Steel Body
             case 18: // Feline Grace
             case 37: // Wisdom of the Owl
                 Parameters parameter = Parameters.None;
-                switch (this.spellEntry.getId())
-                {
+                switch (this.spellEntry.getId()) {
                     case 14: // Tigers Strength
                         parameter = Parameters.Strength;
                         break;
@@ -92,8 +86,7 @@ public class AuraBuff extends Aura
                         break;
                 }
                 int effect = 0;
-                switch (this.level)
-                {
+                switch (this.level) {
                     case 1:
                         effect = 128;
                         break;
@@ -125,15 +118,14 @@ public class AuraBuff extends Aura
                         effect = 448;
                         break;
                 }
-                int limit = (int)((this.owner.getParameters().base().value(parameter) + this.owner.getParameters().guild().value(parameter)) * 5.6);
+                int limit = (int) ((this.owner.getParameters().base().value(parameter) + this.owner.getParameters().guild().value(parameter)) * 5.6);
                 if (effect > limit)
                     effect = limit;
                 this.bonusParameter1 = new KeyValuePair<>(parameter, effect);
                 break;
             case 17: // Bears Blood
                 double effectPercent = 0d;
-                switch (this.level)
-                {
+                switch (this.level) {
                     case 1:
                         effectPercent = 0.15;
                         break;
@@ -166,38 +158,33 @@ public class AuraBuff extends Aura
                         break;
                 }
                 this.bonusParameter1 = new KeyValuePair<>(Parameters.Health,
-                    (int)(this.owner.getParameters().value(Parameters.Health) * effectPercent + this.owner.getLevel() * this.level * (1 + effectPercent)));
+                        (int) (this.owner.getParameters().value(Parameters.Health) * effectPercent + this.owner.getLevel() * this.level * (1 + effectPercent)));
                 break;
         }
 
         // Apply Bonus parameters
-        if (this.bonusParameter1 != null)
-        {
+        if (this.bonusParameter1 != null) {
             this.owner.getParameters().magic().change(this.bonusParameter1.getKey(), this.bonusParameter1.getValue());
             if (this.bonusParameter2 != null)
                 this.owner.getParameters().magic().change(this.bonusParameter2.getKey(), this.bonusParameter2.getValue());
         }
     }
 
-    protected void removeBonus()
-    {
+    protected void removeBonus() {
         this.removeBonus(true);
     }
 
-    protected void removeBonus(boolean isSendToPlayer)
-    {
+    protected void removeBonus(boolean isSendToPlayer) {
         // Remove bonus parameters
-        if (this.bonusParameter1 != null)
-        {
+        if (this.bonusParameter1 != null) {
             this.owner.getParameters().magic().change(this.bonusParameter1.getKey(), -this.bonusParameter1.getValue());
             if (isSendToPlayer && this.ownerPlayer != null && this.ownerPlayer.getSession() != null)
                 this.ownerPlayer.getSession().send(new ServerPacket(ServerCommands.BonusMagicParameter).add(this.bonusParameter1.getKey()).add("0"));
 
-            if (this.bonusParameter2 != null)
-            {
+            if (this.bonusParameter2 != null) {
                 this.owner.getParameters().magic().change(this.bonusParameter2.getKey(), -this.bonusParameter2.getValue());
-                 if (isSendToPlayer && this.ownerPlayer != null && this.ownerPlayer.getSession() != null)
-                     this.ownerPlayer.getSession().send(new ServerPacket(ServerCommands.BonusMagicParameter).add(this.bonusParameter2.getKey()).add("0"));
+                if (isSendToPlayer && this.ownerPlayer != null && this.ownerPlayer.getSession() != null)
+                    this.ownerPlayer.getSession().send(new ServerPacket(ServerCommands.BonusMagicParameter).add(this.bonusParameter2.getKey()).add("0"));
             }
             this.bonusParameter1 = null;
             this.bonusParameter2 = null;
@@ -205,18 +192,15 @@ public class AuraBuff extends Aura
     }
 
     @Override
-    public void refresh(int level, int time)
-    {
+    public void refresh(int level, int time) {
         super.refresh(level, time);
     }
 
     @Override
-    public ServerPacket getPacketData()
-    {
+    public ServerPacket getPacketData() {
         ServerPacket packet = super.getPacketData();
 
-        if (this.bonusParameter1 != null)
-        {
+        if (this.bonusParameter1 != null) {
             packet.add(ServerCommands.BonusMagicParameter).add(this.bonusParameter1.getKey()).add(this.bonusParameter1.getValue());
             if (this.bonusParameter2 != null)
                 packet.add(ServerCommands.BonusMagicParameter).add(this.bonusParameter2.getKey()).add(this.bonusParameter2.getValue());

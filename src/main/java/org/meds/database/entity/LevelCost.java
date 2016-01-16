@@ -2,15 +2,14 @@ package org.meds.database.entity;
 
 import org.meds.database.DBStorage;
 
-public class LevelCost
-{
+public class LevelCost {
+    
     /**
      * Canceled amount of gold that should has been paid for leveling from 1 up to 7 level.
      */
     private static final int SeverLevelsGold = 205;
 
-    public static int getExp(int level)
-    {
+    public static int getExp(int level) {
         if (level < 1 || level > 360)
             return 0;
 
@@ -22,14 +21,12 @@ public class LevelCost
         return exp;
     }
 
-    public static int getGold(int level)
-    {
+    public static int getGold(int level) {
         if (level < 7 || level > 360)
             return 0;
 
         int gold = level * level + 4 * level + 5;
-        if (level >= 301)
-        {
+        if (level >= 301) {
             gold *= 1.5 + 0.5 * (level - 302);
             gold += 25 * (299 - level);
         }
@@ -37,8 +34,7 @@ public class LevelCost
         return gold;
     }
 
-    public static int getTotalGold(int level)
-    {
+    public static int getTotalGold(int level) {
         if (level < 8)
             return 0;
 
@@ -47,24 +43,21 @@ public class LevelCost
 
         int firstLevels = level;
         int lastLevels = 0;
-        if (firstLevels > 300)
-        {
+        if (firstLevels > 300) {
             firstLevels = 300;
             lastLevels = level - 300;
         }
 
         int gold = firstLevels * (firstLevels + 1) * (2 * firstLevels + 1) / 6 + 2 * (firstLevels + 1) * firstLevels + 5 * firstLevels - SeverLevelsGold;
 
-        while (lastLevels != 0)
-        {
+        while (lastLevels != 0) {
             gold += getGold(lastLevels-- + 300);
         }
 
         return gold;
     }
 
-    public static int getTotalGold(int startLevel, int finalLevel)
-    {
+    public static int getTotalGold(int startLevel, int finalLevel) {
         if (startLevel > finalLevel)
             return 0;
 
@@ -78,44 +71,39 @@ public class LevelCost
     private LevelCost nextLevelCost;
     private LevelCost prevLevelCost;
 
-    public int getLevel()
-    {
+    public int getLevel() {
         return level;
     }
-    public void setLevel(int level)
-    {
+
+    public void setLevel(int level) {
         this.level = level;
     }
-    public int getExperience()
-    {
+
+    public int getExperience() {
         return experience;
     }
-    public void setExperience(int experience)
-    {
+
+    public void setExperience(int experience) {
         this.experience = experience;
     }
-    public int getGold()
-    {
+
+    public int getGold() {
         return gold;
     }
-    public void setGold(int gold)
-    {
+
+    public void setGold(int gold) {
         this.gold = gold;
     }
 
-    public LevelCost getNextLevelCost()
-    {
-        if (this.nextLevelCost == null)
-        {
+    public LevelCost getNextLevelCost() {
+        if (this.nextLevelCost == null) {
             this.nextLevelCost = DBStorage.LevelCostStore.get(level + 1);
         }
         return this.nextLevelCost;
     }
 
-    public LevelCost getPrevLevelCost()
-    {
-        if (this.prevLevelCost == null)
-        {
+    public LevelCost getPrevLevelCost() {
+        if (this.prevLevelCost == null) {
             this.prevLevelCost = DBStorage.LevelCostStore.get(level - 1);
         }
         return this.prevLevelCost;

@@ -2,8 +2,8 @@ package org.meds.enums;
 
 import org.meds.util.Valued;
 
-public enum Religions implements Valued
-{
+public enum Religions implements Valued {
+
     None(0),
 
     Sun(1),
@@ -13,33 +13,28 @@ public enum Religions implements Valued
 
     private static Religions[] values = new Religions[6];
 
-    static
-    {
+    static {
         for (Religions state : Religions.values())
             Religions.values[state.value] = state;
     }
 
-    public static Religions parse(int value)
-    {
+    public static Religions parse(int value) {
         return Religions.values[value];
     }
 
     private final int value;
 
-    private Religions(int value)
-    {
+    Religions(int value) {
         this.value = value;
     }
 
     @Override
-    public int getValue()
-    {
+    public int getValue() {
         return this.value;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Integer.toString(this.value);
     }
 }

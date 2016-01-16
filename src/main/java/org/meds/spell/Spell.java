@@ -17,6 +17,7 @@ import org.meds.util.Random;
 
 public class Spell {
 
+
     private org.meds.database.entity.Spell entry;
     private Unit caster;
     private Unit target;
@@ -61,14 +62,14 @@ public class Spell {
             case 2: // Ice Arrow
             case 3: // Electroshock
                 handleSpellBattleMagic();
-            break;
+                break;
             case 14: // Tigers Strength
             case 16: // Steel Body
             case 17: // Bears Blood
             case 18: // Feline Grace
             case 37: // Wisdom of the Owl
                 handleSpellBuff();
-            break;
+                break;
             case 36:  // Layered Defense
             case 1141: // Heroic Shield
                 handleSpellShield();
@@ -79,8 +80,8 @@ public class Spell {
                     ((Player) this.caster).examine(this.target);
                 }
                 break;
-                // First Aid
-                case 54:
+            // First Aid
+            case 54:
                 handleSpellFirstAid();
                 break;
             // Relax
@@ -98,17 +99,13 @@ public class Spell {
         return true;
     }
 
-    private void handleSpellFirstAid()
-    {
+    private void handleSpellFirstAid() {
         int recoveredHealth = this.caster.getParameters().value(Parameters.Health) / 2;
 
         // Caster is at full HP
-        if (this.caster.getHealth() >= this.caster.getParameters().value(Parameters.Health))
-        {
+        if (this.caster.getHealth() >= this.caster.getParameters().value(Parameters.Health)) {
             recoveredHealth = 0;
-        }
-        else
-        {
+        } else {
             if (recoveredHealth > 12 * this.caster.getLevel())
                 recoveredHealth = 12 * this.caster.getLevel();
 
@@ -119,17 +116,15 @@ public class Spell {
                 recoveredHealth = this.caster.getMana() * 6;
         }
 
-        if (this.caster.isPlayer() && ((Player)this.caster).getSession() != null)
-        {
-            ((Player)this.caster).getSession().sendServerMessage(501, Integer.toString(recoveredHealth));
+        if (this.caster.isPlayer() && ((Player) this.caster).getSession() != null) {
+            ((Player) this.caster).getSession().sendServerMessage(501, Integer.toString(recoveredHealth));
         }
 
         this.caster.changeHealth(recoveredHealth);
-        this.caster.changeMana( - recoveredHealth / 6);
+        this.caster.changeMana(-recoveredHealth / 6);
     }
 
-    private void handleSpellBuff()
-    {
+    private void handleSpellBuff() {
         // Missing target - target is a caster
         if (this.target == null)
             this.target = caster;
@@ -148,7 +143,7 @@ public class Spell {
         // Aura from elixirs lasts 15 minutes
         if (item != null)
             duration = 900000;
-        // Self-buffing is 20 minutes long
+            // Self-buffing is 20 minutes long
         else if (caster == target)
             duration = 1200000;
 
@@ -162,8 +157,7 @@ public class Spell {
         //
 
         // Message by item
-        if (item != null)
-        {
+        if (item != null) {
             SendMessage(this.target, 4, item.getTitle());
             return;
         }
@@ -178,8 +172,7 @@ public class Spell {
         int targetMessage = -1;
         int positionMessage = -1;
 
-        switch (entry.getId())
-        {
+        switch (entry.getId()) {
             case 14: // Tiger Strength
                 selfMessage = 513;
                 targetMessage = 514;
@@ -214,8 +207,7 @@ public class Spell {
 
         if (selfMessage != -1 && this.caster == target)
             SendMessage(this.caster, selfMessage);
-        else if (caster != null)
-        {
+        else if (caster != null) {
             if (casterMessage != -1)
                 SendMessage(this.caster, casterMessage, target.getName());
             if (targetMessage != -1)
@@ -235,7 +227,7 @@ public class Spell {
 
         // Staff damage
         if (this.caster.isPlayer()) {
-            Player pCaster = (Player)this.caster;
+            Player pCaster = (Player) this.caster;
             Item rightHandItem = pCaster.getInventory().get(Inventory.Slots.RightHand);
             if (rightHandItem != null
                     && rightHandItem.Template.getItemClass() == ItemClasses.Weapon
@@ -350,7 +342,7 @@ public class Spell {
                 dispersion = 0d;
                 break;
         }
-        initialDamage = (int)(initialDamage * (Random.nextDouble() * (dispersion * 2) - dispersion + 1));
+        initialDamage = (int) (initialDamage * (Random.nextDouble() * (dispersion * 2) - dispersion + 1));
 
         Damage damage = new Damage(initialDamage, this.target);
         damage.Spell = this;
@@ -411,12 +403,10 @@ public class Spell {
         this.caster.dealDamage(damage);
     }
 
-    private void handleSpellShield()
-    {
+    private void handleSpellShield() {
         int level = 0;
         int duration = 1200000; // 20 minutes by default
-        switch (this.entry.getId())
-        {
+        switch (this.entry.getId()) {
             case 36:  // Layered Defense
                 level = this.caster.getParameters().value(Parameters.Health);
                 break;
@@ -433,11 +423,10 @@ public class Spell {
         this.caster.addAura(Aura.createAura(this.entry, this.caster, level, duration));
     }
 
-    private void SendMessage(Unit unit, int messageId, String... data)
-    {
+    private void SendMessage(Unit unit, int messageId, String... data) {
         if (unit == null || !unit.isPlayer())
             return;
-        Player player = (Player)unit;
+        Player player = (Player) unit;
         if (player.getSession() == null)
             return;
         player.getSession().sendServerMessage(messageId, data);
