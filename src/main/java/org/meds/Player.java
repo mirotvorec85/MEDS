@@ -637,7 +637,7 @@ public class Player extends Unit {
         this.inventory.save();
         this.inn.save();
 
-        DAOFactory.getFactory().getCharacterDAO().save(this.info);
+        DAOFactory.getFactory().getCharacterDAO().update(this.info);
     }
 
     public ServerPacket getParametersData() {

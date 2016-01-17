@@ -137,9 +137,9 @@ public class ServerCommandHandler implements Runnable {
 
             org.meds.database.entity.Character character = new org.meds.database.entity.Character();
             character.setLogin(login);
-            character.setPasswordHash(MD5Hasher.ComputeHash(MD5Hasher.ComputeHash(args[1]) + "dsdarkswords"));
+            character.setPasswordHash(MD5Hasher.computePasswordHash(args[1]));
 
-            DAOFactory.getFactory().getCharacterDAO().save(character);
+            DAOFactory.getFactory().getCharacterDAO().insert(character);
             int characterId = character.getId();
 
             CharacterInfo characterInfo = new CharacterInfo();
@@ -162,8 +162,8 @@ public class ServerCommandHandler implements Runnable {
             characterInfo.getSpells().put(54, new CharacterSpell(characterId, 54, 1)); // First Aid
             characterInfo.getSpells().put(60, new CharacterSpell(characterId, 60, 1)); // Relax
 
-            DAOFactory.getFactory().getCharacterDAO().save(characterInfo);
-            System.out.printf("Player %s has been create%n", charName);
+            DAOFactory.getFactory().getCharacterDAO().insert(characterInfo);
+            System.out.printf("Player %s has been created%n", charName);
         }
     }
 

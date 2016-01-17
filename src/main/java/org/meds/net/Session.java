@@ -399,7 +399,7 @@ public class Session implements Runnable {
 
             // Check Password
             String receivedPasswordHash = data[1].substring(0, 32);
-            String actualPassKeyHash = MD5Hasher.ComputeHash(character.getPasswordHash() + Session.this.key);
+            String actualPassKeyHash = MD5Hasher.computeHash(character.getPasswordHash() + Session.this.key);
 
             // Hash does not match
             if (!receivedPasswordHash.equalsIgnoreCase(actualPassKeyHash)) {
@@ -431,7 +431,7 @@ public class Session implements Runnable {
 
                 character.setLastLoginIp(Session.this.currentIp);
                 character.setLastLoginDate((int) (now.getTime() / 1000));
-                getCharacterDao().save(character);
+                getCharacterDao().update(character);
             } catch (Exception ex) {
                 Logging.Error.log("Exception while saving the last login data for " + Session.this.toString(), ex);
                 packet.add(LoginResults.InnerServerError);

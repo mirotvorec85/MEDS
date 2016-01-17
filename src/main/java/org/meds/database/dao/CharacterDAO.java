@@ -9,7 +9,17 @@ public interface CharacterDAO {
 
     CharacterInfo getCharacterInfo(int id);
 
-    void save(Character character);
+    /**
+     * Saves a new character
+     */
+    void insert(Character character);
 
-    void save(CharacterInfo info);
+    /**
+     * Updates the character record
+     */
+    void update(Character character);
+
+    void insert(CharacterInfo info);
+
+    void update(CharacterInfo info);
 }

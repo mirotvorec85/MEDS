@@ -7,7 +7,7 @@ import org.meds.logging.Logging;
 
 public class MD5Hasher {
 
-    public static String ComputeHash(String string) {
+    public static String computeHash(String string) {
         StringBuilder sb = new StringBuilder();
         try {
             MessageDigest dm = MessageDigest.getInstance("MD5");
@@ -22,5 +22,9 @@ public class MD5Hasher {
         }
 
         return sb.toString();
+    }
+
+    public static String computePasswordHash(String password) {
+        return computeHash(computeHash(password) + "dsdarkswords");
     }
 }
