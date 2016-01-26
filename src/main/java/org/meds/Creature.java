@@ -49,8 +49,8 @@ public class Creature extends Unit {
     }
 
     @SuppressWarnings("unused")
-    private void setGuid(int guid) {
-        this.guid = guid;
+    private void setId(int id) {
+        this.id = id;
     }
 
     public int getTemplateId() {
@@ -164,7 +164,7 @@ public class Creature extends Unit {
 
         World.getInstance().unitCreated(this);
 
-        return this.guid;
+        return this.id;
     }
 
     private void calculateParameters() {

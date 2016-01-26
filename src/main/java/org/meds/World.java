@@ -77,15 +77,15 @@ public class World implements Runnable {
         }
 
         // Already in game
-        if (this.players.containsKey(player.getGuid())) {
+        if (this.players.containsKey(player.getId())) {
             return;
         }
 
-        this.players.put(player.getGuid(), player);
-        this.units.put(player.getGuid(), player);
+        this.players.put(player.getId(), player);
+        this.units.put(player.getId(), player);
         Logging.Debug.log("World adds a new " + player);
         this.addPlayersPacket.add(ServerCommands.PlayersListAdd)
-            .add(player.getGuid())
+            .add(player.getId())
             .add(player.getName())
             .add(player.getLevel())
             .add(player.getReligion())
@@ -99,15 +99,15 @@ public class World implements Runnable {
     }
 
     public void playerLoggedOut(Player player) {
-        this.units.remove(player.getGuid());
-        this.players.remove(player.getGuid());
-        this.deletePlayersPacket.add(ServerCommands.PlayersListDelete).add(player.getGuid());
+        this.units.remove(player.getId());
+        this.players.remove(player.getId());
+        this.deletePlayersPacket.add(ServerCommands.PlayersListDelete).add(player.getId());
         Logging.Debug.log(player + "\" just logged out.");
     }
 
     public void playerUpdated(Player player) {
         this.updatePlayersPacket.add(ServerCommands.PlayersListUpdate)
-            .add(player.getGuid())
+            .add(player.getId())
             .add(player.getLevel())
             .add(player.getReligion())
             .add(player.getReligLevel())
@@ -123,7 +123,7 @@ public class World implements Runnable {
         packet.add(this.players.size());
         synchronized (this.players) {
             for (Player player : this.players.values()) {
-                packet.add(player.getGuid())
+                packet.add(player.getId())
                     .add(player.getName())
                     .add(player.getLevel())
                     .add(player.getReligion())
@@ -138,12 +138,12 @@ public class World implements Runnable {
         return packet;
     }
 
-    public Player getPlayer(int guid) {
-        return this.players.get(guid);
+    public Player getPlayer(int id) {
+        return this.players.get(id);
     }
 
-    public Unit getUnit(int guid) {
-        return this.units.get(guid);
+    public Unit getUnit(int id) {
+        return this.units.get(id);
     }
 
     public CreatureTypes getCreatureType(int creatureTemplateId) {
@@ -166,13 +166,13 @@ public class World implements Runnable {
      * Gets a Player if it was already logged or creates a new instance for further logging.
      * This method is called when new instance of Session class tries to find its Player instance.
      */
-    public Player getOrCreatePlayer(int playerGuid) {
-        Player player = this.players.get(playerGuid);
+    public Player getOrCreatePlayer(int playerId) {
+        Player player = this.players.get(playerId);
         if (player != null) {
             return player;
         }
 
-        player = new Player(playerGuid);
+        player = new Player(playerId);
 
         // Error occurred while player was creating or loading
         if (player.create() == 0) {
@@ -209,7 +209,7 @@ public class World implements Runnable {
     }
 
     public void unitCreated(Unit unit) {
-        this.units.put(unit.getGuid(), unit);
+        this.units.put(unit.getId(), unit);
     }
 
     public ServerPacket getDayTimeData() {

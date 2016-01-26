@@ -35,7 +35,7 @@ public class Map {
 
     private HashMap<Unit, MovementDirections> unitMovement;
 
-    private int corpseGuidCounter;
+    private int corpseIdCounter;
 
     private HashSet<Location> updatedLocations;
 
@@ -47,7 +47,7 @@ public class Map {
         this.shops = new HashMap<>();
         this.unitMovement = new HashMap<>();
 
-        this.corpseGuidCounter = 1;
+        this.corpseIdCounter = 1;
     }
 
     public Location getLocation(int locationId) {
@@ -106,8 +106,8 @@ public class Map {
         this.unitMovement.put(unit, direction);
     }
 
-    public int getNextCorpseGuid() {
-        return this.corpseGuidCounter++;
+    public int getNextCorpseId() {
+        return this.corpseIdCounter++;
     }
 
     public void update(int time) {

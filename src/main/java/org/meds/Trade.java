@@ -68,7 +68,7 @@ public class Trade {
 
         public ServerPacket getSupplyData() {
             ServerPacket packet = new ServerPacket(ServerCommands.TradeUpdate);
-            packet.add(Trade.this.player.getGuid());
+            packet.add(Trade.this.player.getId());
             for (int i = 0; i < ITEM_SLOTS_COUNT; ++i) {
                 if (this.items[i] == null) {
                     packet.add("0").add("0").add("0").add("0");
@@ -141,7 +141,7 @@ public class Trade {
         side2.setTrade(this.otherSide);
 
         if (side2.getSession() != null) {
-            side2.getSession().send(new ServerPacket(ServerCommands.GetTrade).add(side1.getGuid()));
+            side2.getSession().send(new ServerPacket(ServerCommands.GetTrade).add(side1.getId()));
         }
     }
 

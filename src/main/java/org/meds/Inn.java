@@ -58,7 +58,7 @@ public class Inn {
 
         CharacterInnItem innItem = this.items.get(prototype);
         if (innItem == null) {
-            innItem = new CharacterInnItem(this.owner.getGuid(), prototype);
+            innItem = new CharacterInnItem(this.owner.getId(), prototype);
             this.items.put(prototype, innItem);
         }
         innItem.setCount(innItem.getCount() + item.getCount());

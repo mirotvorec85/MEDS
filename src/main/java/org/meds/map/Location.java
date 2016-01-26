@@ -419,17 +419,17 @@ public class Location {
     }
 
     public void addCorpse(Corpse corpse) {
-        this.corpses.put(corpse.getGuid(), corpse);
+        this.corpses.put(corpse.getId(), corpse);
         send(getCorpseData());
     }
 
     /**
-     * Gets a Corpse instance with the specified GUID value.
-     * @param corpseGuid Corpse GUID to find.
+     * Gets a Corpse instance with the specified ID value.
+     * @param corpseId Corpse ID to find.
      * @return Reference to a Corpse class instance.
      */
-    public Corpse getCorpse(int corpseGuid) {
-        return this.corpses.get(corpseGuid);
+    public Corpse getCorpse(int corpseId) {
+        return this.corpses.get(corpseId);
     }
 
     public void addItem(Item item) {
@@ -454,7 +454,7 @@ public class Location {
     }
 
     public void removeCorpse(Corpse corpse) {
-        if (this.corpses.remove(corpse.getGuid()) != null) {
+        if (this.corpses.remove(corpse.getId()) != null) {
             send(getCorpseData());
         }
     }
@@ -541,7 +541,7 @@ public class Location {
         packet.add(this.corpses.size() + this.items.size());
         // Corpses
         for (Corpse corpse : this.corpses.values()) {
-            packet.add(corpse.getGuid())
+            packet.add(corpse.getId())
                 .add(corpse.getOwner().getUnitType() == UnitTypes.Player ? "user" : "npc")
                 .add(corpse.getOwner().getName());
         }
@@ -612,7 +612,7 @@ public class Location {
                     if (_unit == unit) continue;
 
                     pss.add(_unit.getName());
-                    pss.add(_unit.getGuid());
+                    pss.add(_unit.getId());
                     pss.add(_unit.getAvatar());
                     pss.add((int) (73d * _unit.getHealth() / _unit.getParameters().value(Parameters.Health)));
                     pss.add(_unit.getLevel());
@@ -620,13 +620,13 @@ public class Location {
                     pss.add(_unit.getReligLevel());
                     if (!_unit.isPlayer() || ((Player) _unit).getGroup() == null) {
                         pss.add("0"); // Is a Group Leader
-                        pss.add("0"); // Group leader GUID
+                        pss.add("0"); // Group leader ID
                     } else {
                         Group group = ((Player) _unit).getGroup();
                         pss.add(group.getLeader() == _unit ? "1" : "0");
-                        pss.add(group.getLeader().getGuid());
+                        pss.add(group.getLeader().getId());
                     }
-                    pss.add(_unit.getTarget() == null ? 0 : _unit.getTarget().getGuid());
+                    pss.add(_unit.getTarget() == null ? 0 : _unit.getTarget().getId());
                     pss.add("1212413397"); // Avatar Time?
                     pss.add((int) (73d * _unit.getMana() / _unit.getParameters().value(Parameters.Mana)));
                     pss.add("0"); // Clan ID

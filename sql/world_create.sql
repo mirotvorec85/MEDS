@@ -159,10 +159,10 @@ CREATE TABLE `creature_template` (
 
 
 CREATE TABLE `creature` (
-  `guid` INT NOT NULL,
+  `id` INT NOT NULL,
   `template_id` INT UNSIGNED NOT NULL,
   `location_id` INT UNSIGNED DEFAULT NULL,
-  PRIMARY KEY (`guid`),
+  PRIMARY KEY (`id`),
   FOREIGN KEY (`location_id`) REFERENCES `location` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   FOREIGN KEY (`template_id`) REFERENCES `creature_template` (`template_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

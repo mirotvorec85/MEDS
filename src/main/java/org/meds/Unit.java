@@ -81,7 +81,7 @@ public abstract class Unit {
         void handleEvent(PositionEvent event);
     }
 
-    protected int guid;
+    protected int id;
     protected Races race;
 
     protected UnitTypes unitType;
@@ -125,7 +125,7 @@ public abstract class Unit {
     private Map<Damage.ReductionTypes, Set<Damage.AffectionHandler>> damageReductions = new HashMap<>(Damage.ReductionTypes.values().length);
 
     public Unit() {
-        this.guid = 0;
+        this.id = 0;
         this.unitType = UnitTypes.Unit;
         this.race = Races.Generic;
         this.parameters = new UnitParameters(this);
@@ -184,8 +184,8 @@ public abstract class Unit {
         handlers.remove(handler);
     }
 
-    public int getGuid() {
-        return this.guid;
+    public int getId() {
+        return this.id;
     }
 
     public abstract int getAutoSpell();
@@ -338,7 +338,7 @@ public abstract class Unit {
     }
 
     public int create() {
-        return this.guid;
+        return this.id;
     }
 
     public abstract int getLevel();
@@ -518,13 +518,13 @@ public abstract class Unit {
 
     public abstract Corpse die();
 
-    public void useMagic(int spellId, int targetGuid) {
+    public void useMagic(int spellId, int targetId) {
         Spell entry = DBStorage.SpellStore.get(spellId);
         if (entry == null) {
             return;
         }
 
-        Unit target = World.getInstance().getUnit(targetGuid);
+        Unit target = World.getInstance().getUnit(targetId);
         if (target == null) {
             target = this;
         }
@@ -699,16 +699,16 @@ public abstract class Unit {
 
         Unit unit = (Unit) o;
 
-        return this.guid == unit.guid;
+        return this.id == unit.id;
     }
 
     @Override
     public int hashCode() {
-        return this.guid;
+        return this.id;
     }
 
     @Override
     public String toString() {
-        return String.format("%s \"%s\" (GUID: %d)", this.unitType.toString(), this.getName(), this.getGuid());
+        return String.format("%s \"%s\" (ID: %d)", this.unitType.toString(), this.getName(), this.getId());
     }
 }

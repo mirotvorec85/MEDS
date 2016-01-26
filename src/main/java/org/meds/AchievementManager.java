@@ -130,7 +130,7 @@ public class AchievementManager {
             CharacterAchievement charAchieve = this.player.getAchievement(achievement.getId());
             if (charAchieve == null) {
                 charAchieve = new CharacterAchievement();
-                charAchieve.setCharacterId(this.player.getGuid());
+                charAchieve.setCharacterId(this.player.getId());
                 charAchieve.setAchievementId(achievement.getId());
                 this.player.addAchievement(charAchieve);
             }

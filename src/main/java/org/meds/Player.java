@@ -90,9 +90,9 @@ public class Player extends Unit {
 
     private Trade trade;
 
-    public Player(int guid) {
+    public Player(int id) {
         super();
-        this.guid = guid;
+        this.id = id;
         this.unitType = UnitTypes.Player;
 
         this.statuses = new EnumFlags<>();
@@ -369,7 +369,7 @@ public class Player extends Unit {
         CharacterCurrency currency = this.info.getCurrencies().get(currencyId);
         // Create new record
         if (currency == null) {
-            currency = new CharacterCurrency(this.guid, currencyId);
+            currency = new CharacterCurrency(this.id, currencyId);
             this.info.getCurrencies().put(currencyId, currency);
         }
 
@@ -426,7 +426,7 @@ public class Player extends Unit {
         this.group = new Group(this);
         if (this.session != null) {
             this.session.send(new ServerPacket(ServerCommands.GroupCreated).add("1") // Created as leader
-                    .add(this.getGuid()) // Leader's GUID
+                    .add(this.getId()) // Leader's ID
             )
                     .send(this.group.getSettingsData())
                     .send(this.group.getTeamLootData())
@@ -457,7 +457,7 @@ public class Player extends Unit {
                         // "You join the group of {LEADER_NAME}
                         .sendServerMessage(273, group.getLeader().getName());
             }
-            // Say to everyone that the player changes its Leader's GUID
+            // Say to everyone that the player changes its Leader's ID
             onVisualChanged();
             return true;
         }
@@ -471,7 +471,7 @@ public class Player extends Unit {
 
         if (this.group.leave(this)) {
             this.group = null;
-            // Say to everyone that the player changes its Leader's GUID
+            // Say to everyone that the player changes its Leader's ID
             onVisualChanged();
             return true;
         }
@@ -514,7 +514,7 @@ public class Player extends Unit {
 
     private boolean load() {
 
-        this.info = DAOFactory.getFactory().getCharacterDAO().getCharacterInfo(this.guid);
+        this.info = DAOFactory.getFactory().getCharacterDAO().getCharacterInfo(this.id);
 
         // Lazy loading of collections
         this.info.getAchievements().size();
@@ -545,7 +545,7 @@ public class Player extends Unit {
             CharacterProfession charProf = this.info.getProfessions().get(professions.getValue());
             if (charProf == null) {
                 charProf = new CharacterProfession();
-                charProf.setCharacterId(this.guid);
+                charProf.setCharacterId(this.id);
                 charProf.setProfessionId(professions.getValue());
                 this.info.getProfessions().put(professions.getValue(), charProf);
             }
@@ -642,7 +642,7 @@ public class Player extends Unit {
 
     public ServerPacket getParametersData() {
         return new ServerPacket(ServerCommands.PlayerInfo)
-                .add(this.guid)
+                .add(this.id)
                 .add(this.getName())
                 .add(this.getAvatar())
                 .add("1248860848") // Seems like a date. but what the date???
@@ -761,7 +761,7 @@ public class Player extends Unit {
                     return;
             }
 
-            charGuild = new CharacterGuild(this.guid, guildId);
+            charGuild = new CharacterGuild(this.id, guildId);
             this.info.getGuilds().put(guildId, charGuild);
         }
 
@@ -807,7 +807,7 @@ public class Player extends Unit {
             case Spell:
                 CharacterSpell characterSpell = this.info.getSpells().get(id);
                 if (characterSpell == null) {
-                    characterSpell = new CharacterSpell(this.guid, id, 0);
+                    characterSpell = new CharacterSpell(this.id, id, 0);
                     this.info.getSpells().put(id, characterSpell);
                 }
                 characterSpell.setLevel(characterSpell.getLevel() + count);
@@ -1277,7 +1277,7 @@ public class Player extends Unit {
                 return false;
 
             CharacterQuest charQuest = new CharacterQuest();
-            charQuest.setCharacterId(this.getGuid());
+            charQuest.setCharacterId(this.getId());
             charQuest.setQuestTemplateId(template.getId());
             this.info.getQuests().put(questId, charQuest);
             quest = new Quest(this, template, charQuest);

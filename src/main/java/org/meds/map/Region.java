@@ -43,7 +43,7 @@ public class Region {
             // Otherwise just notify everyone about location changed
             } else {
                 Region.this.send(new ServerPacket(ServerCommands.PlayerLocation)
-                        .add(player.getGuid())
+                        .add(player.getId())
                         .add(event.getNewLocation().getId()));
             }
         }
@@ -136,7 +136,7 @@ public class Region {
 
         // Notify the region about player entered
         send(new ServerPacket(ServerCommands.PlayerLocation)
-                .add(player.getGuid())
+                .add(player.getId())
                 .add(player.getPosition().getId()));
         player.addPositionChangedListener(this.positionChangedHandler);
     }
@@ -148,7 +148,7 @@ public class Region {
 
         // Notify the region about player left
         send(new ServerPacket(ServerCommands.PlayerLocation)
-                .add(player.getGuid())
+                .add(player.getId())
                 .add(0));
         player.removePositionChangedListener(this.positionChangedHandler);
     }
@@ -185,7 +185,7 @@ public class Region {
         synchronized (this.players) {
             packet.add(this.players.size());
             for (Player player : this.players) {
-                packet.add(player.getGuid());
+                packet.add(player.getId());
                 packet.add(player.getPosition().getId());
             }
         }

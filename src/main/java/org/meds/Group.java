@@ -170,7 +170,7 @@ public class Group implements Iterable<Player> {
             packet = new ServerPacket(
                     ServerCommands.GroupCreated)
                     .add(groupMember == this.leader ? "1" : "0")
-                    .add(this.leader.getGuid());
+                    .add(this.leader.getId());
             // Send group settings to the new leader
             if (groupMember == this.leader) {
                 packet.add(this.getSettingsData());
@@ -383,7 +383,7 @@ public class Group implements Iterable<Player> {
 
     public ServerPacket getSettingsData() {
         ServerPacket packet = new ServerPacket(ServerCommands.GroupSettings);
-        packet.add(this.leader.getGuid())
+        packet.add(this.leader.getId())
                 .add(this.minLevel)
                 .add(this.maxLevel)
                 .add(this.noReligionAllowed ? "1" : "0")

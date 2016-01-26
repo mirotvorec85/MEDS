@@ -207,7 +207,7 @@ public class Inventory {
                 }
 
                 if (charItem == null) {
-                    charItem = new CharacterInventoryItem(this.owner.getGuid(), i);
+                    charItem = new CharacterInventoryItem(this.owner.getId(), i);
                     this.characterItems.put(i, charItem);
                 }
 

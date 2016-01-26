@@ -9,7 +9,7 @@ import org.meds.map.Map;
 
 public class Corpse {
 
-    private int guid;
+    private int id;
     private Set<Item> loot;
     private int gold;
     private Unit owner;
@@ -18,7 +18,7 @@ public class Corpse {
     public Corpse(Unit owner) {
         Logging.Debug.log("Create corpse for " + owner);
         this.owner = owner;
-        this.guid = Map.getInstance().getNextCorpseGuid();
+        this.id = Map.getInstance().getNextCorpseId();
         setPosition(owner.getPosition());
         this.loot = new HashSet<>();
     }
@@ -53,8 +53,8 @@ public class Corpse {
         return this.owner;
     }
 
-    public int getGuid() {
-        return this.guid;
+    public int getId() {
+        return this.id;
     }
 
     @Override
@@ -68,11 +68,11 @@ public class Corpse {
 
         Corpse corpse = (Corpse) o;
 
-        return this.guid == corpse.guid;
+        return this.id == corpse.id;
     }
 
     @Override
     public int hashCode() {
-        return this.guid;
+        return this.id;
     }
 }

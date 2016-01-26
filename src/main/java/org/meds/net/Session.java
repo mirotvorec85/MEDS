@@ -7,7 +7,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.util.*;
 
-import org.hibernate.Transaction;
 import org.meds.*;
 import org.meds.Item.Prototype;
 import org.meds.Locale;
@@ -674,7 +673,7 @@ public class Session implements Runnable {
         public void handle(String[] data) {
             /*
              * data[0] = Attack type ("udar", "run")
-             * data[1] = victim GUID
+             * data[1] = victim ID
              */
             if (data[0].equals("run")) {
                 Session.this.player.runAway();
@@ -683,11 +682,11 @@ public class Session implements Runnable {
                 if (data.length < 2)
                     return;
 
-                String victimGuid = data[1];
+                String victimId = data[1];
                 // TODO: Find out why
-                // HACK: remove last symbol of the victim guid
-                victimGuid = victimGuid.substring(0, victimGuid.length() - 1);
-                Unit victim = World.getInstance().getUnit(SafeConvert.toInt32(victimGuid));
+                // HACK: remove last symbol of the victim id
+                victimId = victimId.substring(0, victimId.length() - 1);
+                Unit victim = World.getInstance().getUnit(SafeConvert.toInt32(victimId));
                 // target is not found
                 if (victim == null)
                     return;
@@ -706,8 +705,8 @@ public class Session implements Runnable {
         @Override
         public void handle(String[] data) {
             int spellId = SafeConvert.toInt32(data[0]);
-            int targetGuid = SafeConvert.toInt32(data[1]);
-            Session.this.player.useMagic(spellId, targetGuid);
+            int targetId = SafeConvert.toInt32(data[1]);
+            Session.this.player.useMagic(spellId, targetId);
         }
     }
 
@@ -812,7 +811,7 @@ public class Session implements Runnable {
 
         @Override
         public void handle(String[] data) {
-            int guid = SafeConvert.toInt32(data[0], 0);
+            int id = SafeConvert.toInt32(data[0], 0);
 
             int itemModification = SafeConvert.toInt32(data[1]);
             int itemDurability = SafeConvert.toInt32(data[2]);
@@ -823,16 +822,16 @@ public class Session implements Runnable {
             // TODO: sound 26 on gold collect. Sound 27 on item collect
 
             // Loot a corpse
-            if (guid > 0) {
-                Corpse corpse = Session.this.player.getPosition().getCorpse(guid);
+            if (id > 0) {
+                Corpse corpse = Session.this.player.getPosition().getCorpse(id);
                 if (corpse == null)
                     return;
 
                 Session.this.player.lootCorpse(corpse);
             }
             // Pick up an item
-            else if (guid < 0) {
-                Prototype proto = new Prototype(-guid, itemModification, itemDurability);
+            else if (id < 0) {
+                Prototype proto = new Prototype(-id, itemModification, itemDurability);
                 Item item = Session.this.player.getPosition().getItem(proto);
                 if (item == null)
                     return;
@@ -1264,14 +1263,14 @@ public class Session implements Runnable {
 
             // No matter a group has been create or has not
             // send a group relation anyway
-            int leaderGuid;
+            int leaderId;
             if (Session.this.player.getGroup() == null) {
-                leaderGuid = 0;
+                leaderId = 0;
             } else {
-                leaderGuid = Session.this.player.getGroup().getLeader().getGuid();
+                leaderId = Session.this.player.getGroup().getLeader().getId();
             }
             Session.this.send(new ServerPacket(ServerCommands.GroupCreated).add("0") // Not a leader
-                    .add(leaderGuid));
+                    .add(leaderId));
         }
     }
 
