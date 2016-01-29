@@ -351,7 +351,7 @@
     </class>
 
     <class name="org.meds.Creature" table="`creature`">
-        <id name="getId" type="int" column="`id`">
+        <id name="id" type="int" column="`id`">
             <generator class="increment" />
         </id>
         <property name="templateId" type="int">

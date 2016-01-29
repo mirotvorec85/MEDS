@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.*;
 
 import org.meds.*;
@@ -142,7 +143,7 @@ public class Session implements Runnable {
 
         this.packetBuffer = new ServerPacket();
 
-        this.key = Random.nextInt();
+        this.key = Random.nextInt(2000000000) + 100000000;
 
         this.sessionToString = "Session [" + this.socket.getInetAddress().toString() + "]: ";
     }
@@ -230,9 +231,13 @@ public class Session implements Runnable {
                 Session.sendBuffers();
             }
         } catch (IOException e) {
-            // Then the Server is stopping this exception is the expected
-            if (!Server.isStopping())
+            // This exception is expected on server shutdown
+            if (!Server.isStopping()) {
                 Logging.Error.log(toString() + "An exception while reading a socket.", e);
+                if (e.getClass() == SocketException.class) {
+                    disconnect();
+                }
+            }
         }
     }
 
