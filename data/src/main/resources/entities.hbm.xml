@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC
 "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<hibernate-mapping package="org.meds.database.entity">
+<hibernate-mapping package="org.meds.data.domain">
 
     <class name="org.meds.data.domain.Achievement" table="`achievement`">
         <id name="id" type="int" column="`id`">
@@ -347,6 +347,15 @@
         </property>
         <property name="count" type="int">
             <column name="`count`" />
+        </property>
+    </class>
+
+    <class name="org.meds.data.domain.Continent" table="continent">
+        <id name="id" type="int" column="id" >
+            <generator class="assigned"/>
+        </id>
+        <property name="name" type="string">
+            <column name="name" />
         </property>
     </class>
 
