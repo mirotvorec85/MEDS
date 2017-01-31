@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.Map;
 
 import org.meds.data.domain.Spell;
-import org.meds.database.DBStorage;
+import org.meds.database.DataStorage;
 import org.meds.enums.*;
 import org.meds.logging.Logging;
 import org.meds.map.*;
@@ -519,7 +519,7 @@ public abstract class Unit {
     public abstract Corpse die();
 
     public void useMagic(int spellId, int targetId) {
-        Spell entry = DBStorage.SpellStore.get(spellId);
+        Spell entry = DataStorage.SpellRepository.get(spellId);
         if (entry == null) {
             return;
         }

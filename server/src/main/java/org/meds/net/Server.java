@@ -11,7 +11,7 @@ import org.meds.data.dao.DAOFactory;
 import org.meds.data.hibernate.dao.HibernateDAOFactory;
 import org.meds.map.Map;
 import org.meds.World;
-import org.meds.database.DBStorage;
+import org.meds.database.DataStorage;
 import org.meds.logging.Logging;
 import org.meds.util.DateFormatter;
 import org.meds.util.Random;
@@ -112,7 +112,7 @@ public class Server {
             // Set Hibernate DAO Factory
             DAOFactory.setFactory(new HibernateDAOFactory());
 
-            DBStorage.load();
+            DataStorage.load();
             Logging.Info.log("Database is loaded.");
 
             // Initialize Map instance and load its data

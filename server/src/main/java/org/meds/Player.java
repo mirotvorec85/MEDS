@@ -1,13 +1,11 @@
 package org.meds;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.meds.data.dao.DAOFactory;
 import org.meds.data.domain.*;
-import org.meds.database.DBStorage;
+import org.meds.data.domain.Currency;
+import org.meds.database.DataStorage;
 import org.meds.database.LevelCost;
 import org.meds.enums.*;
 import org.meds.item.Item;
@@ -536,7 +534,7 @@ public class Player extends Unit {
         // Accept all the quests
         this.quests = new HashMap<>();
         for (CharacterQuest charQuest : this.info.getQuests().values()) {
-            Quest quest = new Quest(this, DBStorage.QuestTemplateStore.get(charQuest.getQuestTemplateId()), charQuest);
+            Quest quest = new Quest(this, DataStorage.QuestTemplateRepository.get(charQuest.getQuestTemplateId()), charQuest);
             quest.accept();
             this.quests.put(quest.getQuestTemplate().getId(), quest);
         }
@@ -687,12 +685,12 @@ public class Player extends Unit {
 
     public ServerPacket getGuildData() {
         ServerPacket packet = new ServerPacket(ServerCommands.GuildInfo);
-        packet.add(DBStorage.GuildStore.size());
-        for (Map.Entry<Integer, Guild> entry : DBStorage.GuildStore.entrySet()) {
-            packet.add(entry.getValue().getId())
-                    .add(entry.getValue().getName())
-                    .add(entry.getValue().getPrevId());
-            CharacterGuild characterGuild = this.info.getGuilds().get(entry.getValue().getId());
+        packet.add(DataStorage.GuildRepository.size());
+        for (Guild guild : DataStorage.GuildRepository) {
+            packet.add(guild.getId())
+                    .add(guild.getName())
+                    .add(guild.getPrevId());
+            CharacterGuild characterGuild = this.info.getGuilds().get(guild.getId());
             if (characterGuild == null)
                 packet.add("0");
             else
@@ -703,13 +701,13 @@ public class Player extends Unit {
 
     public ServerPacket getMagicData() {
         ServerPacket packet = new ServerPacket(ServerCommands.MagicInfo);
-        packet.add(DBStorage.SpellStore.size());
+        packet.add(DataStorage.SpellRepository.size());
 
-        for (Map.Entry<Integer, Spell> entry : DBStorage.SpellStore.entrySet()) {
-            packet.add(entry.getValue().getId())
-                    .add(entry.getValue().getType().toString())
-                    .add(entry.getValue().getName());
-            CharacterSpell characterSpell = this.info.getSpells().get(entry.getValue().getId());
+        for (Spell spell : DataStorage.SpellRepository) {
+            packet.add(spell.getId())
+                    .add(spell.getType().toString())
+                    .add(spell.getName());
+            CharacterSpell characterSpell = this.info.getSpells().get(spell.getId());
             if (characterSpell == null)
                 packet.add("0");
             else
@@ -720,12 +718,12 @@ public class Player extends Unit {
 
     public ServerPacket getSkillData() {
         ServerPacket packet = new ServerPacket(ServerCommands.SkillInfo);
-        packet.add(DBStorage.SkillStore.size());
+        packet.add(DataStorage.SkillRepository.size());
 
-        for (Map.Entry<Integer, Skill> entry : DBStorage.SkillStore.entrySet()) {
-            packet.add(entry.getValue().getId())
-                    .add(entry.getValue().getName());
-            CharacterSkill characterSkill = this.info.getSkills().get(entry.getValue().getId());
+        for (Skill skill : DataStorage.SkillRepository) {
+            packet.add(skill.getId())
+                    .add(skill.getName());
+            CharacterSkill characterSkill = this.info.getSkills().get(skill.getId());
             if (characterSkill == null)
                 packet.add("0");
             else
@@ -740,7 +738,7 @@ public class Player extends Unit {
         packet.add(this.info.getGuilds().size());
         Guild guildEntry;
         for (CharacterGuild guild : this.info.getGuilds().values()) {
-            guildEntry = DBStorage.GuildStore.get(guild.getGuildId());
+            guildEntry = DataStorage.GuildRepository.get(guild.getGuildId());
             packet.add(guildEntry.getName());
             packet.add(guild.getLevel());
         }
@@ -771,7 +769,8 @@ public class Player extends Unit {
         if (charGuild.getLevel() == 15)
             return;
 
-        GuildLesson lesson = DBStorage.GuildLessonStore.get(guildId).get(charGuild.getLevel() + 1);
+        // Next guild lesson
+        GuildLesson lesson = DataStorage.GuildLessonRepository.get(guildId, charGuild.getLevel() + 1);
         if (!this.changeCurrency(Currencies.Gold.getValue(), -LevelCost.getGold(this.guildLevel + 1)))
             return;
 
@@ -841,7 +840,7 @@ public class Player extends Unit {
             // TODO: Should be checked all guilds where 'prevId' is this guild
         }
 
-        GuildLesson lesson = DBStorage.GuildLessonStore.get(guild.getId()).get(charGuild.getLevel());
+        GuildLesson lesson = DataStorage.GuildLessonRepository.get(guild.getId(), charGuild.getLevel());
 
         this.cancelGuildImprovement(lesson.getImprovementType1(), lesson.getId1(), lesson.getCount1());
         this.cancelGuildImprovement(lesson.getImprovementType2(), lesson.getId2(), lesson.getCount2());
@@ -896,7 +895,7 @@ public class Player extends Unit {
         ServerPacket packet = new ServerPacket(ServerCommands.AchievementList);
         packet.add(0); // List of all achievements
 
-        for (Achievement achievement : DBStorage.AchievementStore.values()) {
+        for (Achievement achievement : DataStorage.AchievementRepository) {
             packet.add(achievement.getId());
             packet.add(achievement.getTitle());
             packet.add(achievement.getDescription());
@@ -920,7 +919,7 @@ public class Player extends Unit {
 
     public ServerPacket getCurrencyData() {
         ServerPacket packet = new ServerPacket(ServerCommands.Currencies);
-        for (Currency currency : DBStorage.CurrencyStore.values()) {
+        for (Currency currency : DataStorage.CurrencyRepository) {
             packet.add(currency.getId())
                     .add(currency.getUnk2())
                     .add(currency.getTitle())
@@ -1193,19 +1192,19 @@ public class Player extends Unit {
 
             // Quests
             if (creature.getTemplate().hasFlag(CreatureFlags.QuestGiver)) {
-
                 // Does the creature have any quests
-                Map<Integer, CreatureQuestRelation> creatureQuests = DBStorage.CreatureQuestRelationStore.get(creature.getTemplateId());
-                if (creatureQuests == null)
+                Collection<CreatureQuestRelation> creatureQuests = DataStorage.CreatureQuestRelationRepository.get(creature.getTemplateId());
+                if (creatureQuests.isEmpty()) {
                     return;
+                }
 
                 Quest quest;
 
                 int nextQuestId = 0;
 
                 // Look through all the quests to define whether the player has not completed that quests
-                for (Integer questTemplateId : creatureQuests.keySet()) {
-                    quest = getQuest(questTemplateId);
+                for (CreatureQuestRelation creatureQuest : creatureQuests) {
+                    quest = getQuest(creatureQuest.getQuestTemplateId());
                     if (quest == null)
                         continue;
 
@@ -1228,8 +1227,8 @@ public class Player extends Unit {
                 ServerPacket packet = new ServerPacket(ServerCommands.NpcQuestList);
                 int count = 0;
                 // Search through quest relations of the NPC
-                for (CreatureQuestRelation creatureQuest : creatureQuests.values()) {
-                    QuestTemplate template = DBStorage.QuestTemplateStore.get(creatureQuest.getQuestTemplateId());
+                for (CreatureQuestRelation creatureQuest : creatureQuests) {
+                    QuestTemplate template = DataStorage.QuestTemplateRepository.get(creatureQuest.getQuestTemplateId());
                     // NPC can give a quest
                     // The quest is valid
                     // The player level is enough
@@ -1263,7 +1262,7 @@ public class Player extends Unit {
     }
 
     public boolean tryAcceptQuest(int questId) {
-        QuestTemplate template = DBStorage.QuestTemplateStore.get(questId);
+        QuestTemplate template = DataStorage.QuestTemplateRepository.get(questId);
         if (template == null) {
             Logging.Warn.log("%s tries to accept not existing quest template %d", toString(), questId);
             return false;

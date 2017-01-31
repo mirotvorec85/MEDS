@@ -9,7 +9,7 @@ import org.meds.item.Item;
 import org.meds.item.ItemClasses;
 import org.meds.item.ItemPrototype;
 import org.meds.Player;
-import org.meds.database.DBStorage;
+import org.meds.database.DataStorage;
 import org.meds.logging.Logging;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
@@ -25,7 +25,7 @@ public class Shop {
 
     public void load() {
         for (ShopItem item : this.entry.getItems()) {
-            ItemTemplate template = DBStorage.ItemTemplateStore.get(item.getItemTemplateId());
+            ItemTemplate template = DataStorage.ItemTemplateRepository.get(item.getItemTemplateId());
             if (template == null) {
                 Logging.Warn.log("Shop " + this.entry.getId() + " has item with template=" + item.getItemTemplateId() + " which does not exist. Skipped.");
                 continue;
@@ -94,7 +94,7 @@ public class Shop {
      * @return A boolean value indicating whether the transaction was completed.
      */
     public boolean sellItem(Player buyer, ItemPrototype prototype, int count) {
-        ItemTemplate template = DBStorage.ItemTemplateStore.get(prototype.getTemplateId());
+        ItemTemplate template = DataStorage.ItemTemplateRepository.get(prototype.getTemplateId());
         if (template == null)
             return false;
 
@@ -139,7 +139,7 @@ public class Shop {
     }
 
     public boolean isAppropriateItem(ItemPrototype prototype) {
-        return this.isAppropriateItem(DBStorage.ItemTemplateStore.get(prototype.getTemplateId()));
+        return this.isAppropriateItem(DataStorage.ItemTemplateRepository.get(prototype.getTemplateId()));
     }
 
     public boolean isAppropriateItem(Item item) {

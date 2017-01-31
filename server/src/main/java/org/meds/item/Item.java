@@ -1,13 +1,12 @@
 package org.meds.item;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.meds.Locale;
 import org.meds.Player;
 import org.meds.data.domain.ItemTemplate;
-import org.meds.database.DBStorage;
+import org.meds.database.DataStorage;
 import org.meds.enums.*;
 import org.meds.logging.Logging;
 import org.meds.net.ServerCommands;
@@ -18,7 +17,7 @@ import org.meds.util.EnumFlags;
 public class Item {
 
     public static int getMaxDurability(int templateId) {
-        return Item.getMaxDurability(DBStorage.ItemTemplateStore.get(templateId));
+        return Item.getMaxDurability(DataStorage.ItemTemplateRepository.get(templateId));
     }
 
     public static int getMaxDurability(ItemTemplate template) {
@@ -32,7 +31,7 @@ public class Item {
     }
 
     public static int getWeight(int templateId) {
-        return Item.getWeight(DBStorage.ItemTemplateStore.get(templateId));
+        return Item.getWeight(DataStorage.ItemTemplateRepository.get(templateId));
     }
 
     public static int getWeight(ItemTemplate template) {
@@ -71,7 +70,7 @@ public class Item {
     }
 
     public static boolean isEquipment(int templateId) {
-        return isEquipment(DBStorage.ItemTemplateStore.get(templateId));
+        return isEquipment(DataStorage.ItemTemplateRepository.get(templateId));
     }
 
     public static boolean isEquipment(ItemTemplate template) {
@@ -165,11 +164,11 @@ public class Item {
     }
 
     public Item(int templateId) {
-        this(DBStorage.ItemTemplateStore.get(templateId));
+        this(DataStorage.ItemTemplateRepository.get(templateId));
     }
 
     public Item(int templateId, int count) {
-        this(DBStorage.ItemTemplateStore.get(templateId));
+        this(DataStorage.ItemTemplateRepository.get(templateId));
         this.count = count;
     }
 

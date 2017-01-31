@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.meds.data.dao.DAOFactory;
 import org.meds.data.domain.*;
-import org.meds.database.DBStorage;
+import org.meds.database.DataStorage;
 import org.meds.enums.CreatureTypes;
 import org.meds.map.Map;
 import org.meds.net.Server;
@@ -186,8 +186,8 @@ public class World implements Runnable {
     public void createCreatures() {
 
         // Generate CreatureTypes
-        this.creatureTypes = new HashMap<>(DBStorage.CreatureTemplateStore.size());
-        for (CreatureTemplate creatureTemplate : DBStorage.CreatureTemplateStore.values()) {
+        this.creatureTypes = new HashMap<>(DataStorage.CreatureTemplateRepository.size());
+        for (CreatureTemplate creatureTemplate : DataStorage.CreatureTemplateRepository) {
             // Level 30 and higher
             if (creatureTemplate.getLevel() < 30)
                 continue;

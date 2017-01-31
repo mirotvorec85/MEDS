@@ -4,7 +4,7 @@ import java.util.*;
 
 import org.meds.data.domain.CreatureLoot;
 import org.meds.data.domain.CreatureTemplate;
-import org.meds.database.DBStorage;
+import org.meds.database.DataStorage;
 import org.meds.enums.*;
 import org.meds.item.Item;
 import org.meds.logging.Logging;
@@ -128,7 +128,7 @@ public class Creature extends Unit {
 
     @Override
     public int create() {
-        this.template = DBStorage.CreatureTemplateStore.get(this.getTemplateId());
+        this.template = DataStorage.CreatureTemplateRepository.get(this.getTemplateId());
 
         if (this.template == null)
             return 0;
@@ -363,15 +363,13 @@ public class Creature extends Unit {
         this.setPosition(location);
         // Add Loot
         this.loot.clear();
-        Map<Integer, CreatureLoot> loot = DBStorage.CreatureLootStore.get(this.getTemplateId());
-        if (loot != null) {
-            for (CreatureLoot creatureLoot : loot.values()) {
-                if (Random.nextDouble() * 100 > creatureLoot.getChance())
-                    continue;
-                Item item = new Item(creatureLoot.getItemTemplateId(), creatureLoot.getCount());
-                item.getModification().generateTotemicType();
-                this.loot.add(item);
-            }
+        Collection<CreatureLoot> loot = DataStorage.CreatureLootRepository.get(this.getTemplateId());
+        for (CreatureLoot creatureLoot : loot) {
+            if (Random.nextDouble() * 100 > creatureLoot.getChance())
+                continue;
+            Item item = new Item(creatureLoot.getItemTemplateId(), creatureLoot.getCount());
+            item.getModification().generateTotemicType();
+            this.loot.add(item);
         }
 
         if (!this.template.hasFlag(CreatureFlags.Beast))

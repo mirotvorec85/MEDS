@@ -19,7 +19,7 @@ import org.meds.item.Item;
 import org.meds.item.ItemFlags;
 import org.meds.item.ItemPrototype;
 import org.meds.Locale;
-import org.meds.database.DBStorage;
+import org.meds.database.DataStorage;
 import org.meds.enums.*;
 import org.meds.logging.Logging;
 import org.meds.map.Location;
@@ -449,9 +449,9 @@ public class Session implements Runnable {
             packet.add(LoginResults.OK);
 
             // Add New Messages
-            if (DBStorage.NewMessageStore.size() != 0) {
+            if (DataStorage.NewMessageRepository.size() != 0) {
                 packet.add(ServerCommands.MessageList);
-                for (NewMessage message : DBStorage.NewMessageStore.values()) {
+                for (NewMessage message : DataStorage.NewMessageRepository) {
                     packet.add(message.getId()).add(message.getTypeId()).add(message.getMessage());
                 }
             }
@@ -741,7 +741,7 @@ public class Session implements Runnable {
             if (Session.this.player.getPosition().getSpecialLocationType() != SpecialLocationTypes.MagicSchool)
                 return;
 
-            Session.this.player.learnGuildLesson(DBStorage.GuildStore.get(SafeConvert.toInt32(data[0])));
+            Session.this.player.learnGuildLesson(DataStorage.GuildRepository.get(SafeConvert.toInt32(data[0])));
         }
     }
 
@@ -758,7 +758,7 @@ public class Session implements Runnable {
             if (Session.this.player.getPosition().getSpecialLocationType() != SpecialLocationTypes.MagicSchool)
                 return;
 
-            Session.this.player.removeGuildLesson(DBStorage.GuildStore.get(SafeConvert.toInt32(data[0])));
+            Session.this.player.removeGuildLesson(DataStorage.GuildRepository.get(SafeConvert.toInt32(data[0])));
         }
     }
 
@@ -1068,7 +1068,7 @@ public class Session implements Runnable {
         @Override
         public void handle(String[] data) {
             int questId = SafeConvert.toInt32(data[0]);
-            QuestTemplate template = DBStorage.QuestTemplateStore.get(questId);
+            QuestTemplate template = DataStorage.QuestTemplateRepository.get(questId);
             if (template != null)
                 send(Quest.getQuestInfoData(template));
         }
@@ -1171,7 +1171,7 @@ public class Session implements Runnable {
 
         @Override
         public void handle(String[] data) {
-            ServerPacket lessonData = DBStorage.getGuildLessonInfo(SafeConvert.toInt32(data[0], -1));
+            ServerPacket lessonData = DataStorage.getGuildLessonInfo(SafeConvert.toInt32(data[0], -1));
             if (lessonData != null) {
                 Session.this.send(lessonData);
             }

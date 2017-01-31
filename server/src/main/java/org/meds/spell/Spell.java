@@ -11,7 +11,7 @@ import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.Unit;
 import org.meds.UnitTypes;
-import org.meds.database.DBStorage;
+import org.meds.database.DataStorage;
 import org.meds.enums.Parameters;
 import org.meds.util.Random;
 
@@ -40,7 +40,7 @@ public class Spell {
     }
 
     public Spell(int spellId, Unit caster, int level, Unit target, Item item) {
-        this(DBStorage.SpellStore.get(spellId), caster, level, target, item);
+        this(DataStorage.SpellRepository.get(spellId), caster, level, target, item);
     }
 
     public Spell(int spellId, Unit caster, int level, Unit target) {
@@ -88,7 +88,7 @@ public class Spell {
                 if (this.caster.hasAura(1000)) {
                     this.caster.removeAura(1000);
                 } else {
-                    this.caster.addAura(Aura.createAura(DBStorage.SpellStore.get(1000), this.caster, -1, -10));
+                    this.caster.addAura(Aura.createAura(DataStorage.SpellRepository.get(1000), this.caster, -1, -10));
                 }
                 break;
             default:

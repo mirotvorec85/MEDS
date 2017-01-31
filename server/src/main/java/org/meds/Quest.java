@@ -4,7 +4,7 @@ import org.meds.data.domain.CharacterQuest;
 import org.meds.data.domain.CreatureTemplate;
 import org.meds.data.domain.ItemTemplate;
 import org.meds.data.domain.QuestTemplate;
-import org.meds.database.DBStorage;
+import org.meds.database.DataStorage;
 import org.meds.enums.Currencies;
 import org.meds.enums.QuestStatuses;
 import org.meds.enums.QuestTypes;
@@ -132,7 +132,7 @@ public class Quest {
 
         switch (template.getType()) {
             case Kill:
-                CreatureTemplate creatureTemplate = DBStorage.CreatureTemplateStore.get(template.getRequiredCreatureId());
+                CreatureTemplate creatureTemplate = DataStorage.CreatureTemplateRepository.get(template.getRequiredCreatureId());
                 if (creatureTemplate == null) {
                     packet.add("").add("").add("");
                 } else {
@@ -158,14 +158,14 @@ public class Quest {
 
         ItemTemplate itemTemplate;
         if (template.getRewardItem1Count() != 0 && template.getRewardItem1Id() != 0) {
-            itemTemplate = DBStorage.ItemTemplateStore.get(template.getRewardItem1Id());
+            itemTemplate = DataStorage.ItemTemplateRepository.get(template.getRewardItem1Id());
             if (itemTemplate != null) {
                 packet.add(template.getRewardItem1Count() + " x " + itemTemplate.getTitle());
                 ++rewardCount;
             }
         }
         if (template.getRewardItem2Count() != 0 && template.getRewardItem2Id() != 0) {
-            itemTemplate = DBStorage.ItemTemplateStore.get(template.getRewardItem2Id());
+            itemTemplate = DataStorage.ItemTemplateRepository.get(template.getRewardItem2Id());
             if (itemTemplate != null) {
                 packet.add(template.getRewardItem2Count() + " x " + itemTemplate.getTitle());
                 ++rewardCount;
@@ -239,7 +239,7 @@ public class Quest {
         // Reward
         if (this.questTemplate.getRewardGold() != 0) {
             if (this.player.getSession() != null) {
-                this.player.getSession().send(new ServerPacket(ServerCommands.ServerMessage).add(1096).add(this.questTemplate.getRewardGold()).add(DBStorage.CurrencyStore.get(Currencies.Gold.getValue()).getTitle()));
+                this.player.getSession().send(new ServerPacket(ServerCommands.ServerMessage).add(1096).add(this.questTemplate.getRewardGold()).add(DataStorage.CurrencyRepository.get(Currencies.Gold.getValue()).getTitle()));
             }
             this.player.changeCurrency(Currencies.Gold, this.questTemplate.getRewardGold());
         }

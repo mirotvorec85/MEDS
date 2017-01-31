@@ -3,7 +3,7 @@ package org.meds;
 import org.meds.data.domain.Achievement;
 import org.meds.data.domain.AchievementCriterion;
 import org.meds.data.domain.CharacterAchievement;
-import org.meds.database.DBStorage;
+import org.meds.database.DataStorage;
 import org.meds.enums.AchievementCategories;
 import org.meds.enums.AchievementCriterionTypes;
 import org.meds.enums.Currencies;
@@ -24,7 +24,7 @@ public class AchievementManager {
         this.achievements = new HashMap<>(AchievementCategories.values().length);
 
         // Create a collection with non-completed achievements
-        for (Achievement achievement : DBStorage.AchievementStore.values()) {
+        for (Achievement achievement : DataStorage.AchievementRepository) {
             AchievementCategories category = AchievementCategories.parse(achievement.getCategoryId());
             CharacterAchievement charAchieve = this.player.getAchievement(achievement.getId());
             if (charAchieve != null && charAchieve.isCompleted()) {
@@ -32,7 +32,7 @@ public class AchievementManager {
             }
             HashSet<Achievement> categoryAchievements = this.achievements.get(category);
             if (categoryAchievements == null) {
-                categoryAchievements = new HashSet<>(DBStorage.AchievementStore.size());
+                categoryAchievements = new HashSet<>(DataStorage.AchievementRepository.size());
                 this.achievements.put(category, categoryAchievements);
             }
             categoryAchievements.add(achievement);
