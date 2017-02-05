@@ -9,6 +9,7 @@ import java.net.SocketException;
 import java.util.*;
 
 import org.meds.*;
+import org.meds.chat.ChatHandler;
 import org.meds.data.dao.CharacterDAO;
 import org.meds.data.dao.DAOFactory;
 import org.meds.data.domain.Character;
