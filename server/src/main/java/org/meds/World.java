@@ -10,7 +10,7 @@ import org.meds.data.domain.*;
 import org.meds.database.DataStorage;
 import org.meds.enums.CreatureTypes;
 import org.meds.map.Map;
-import org.meds.net.Server;
+import org.meds.server.Server;
 import org.meds.logging.Logging;
 
 import org.meds.net.ServerCommands;

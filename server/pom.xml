@@ -11,6 +11,10 @@
 
     <artifactId>server</artifactId>
 
+    <properties>
+        <springframework.version>4.3.9.RELEASE</springframework.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.meds</groupId>
@@ -35,6 +39,19 @@
             <artifactId>log4j-core</artifactId>
             <version>2.1</version>
         </dependency>
+
+        <!-- Spring Framework-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${springframework.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -46,7 +63,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>org.meds.net.Server</mainClass>
+                            <mainClass>org.meds.server.Server</mainClass>
                             <classpathPrefix>dependency-jars/</classpathPrefix>
                         </manifest>
                     </archive>

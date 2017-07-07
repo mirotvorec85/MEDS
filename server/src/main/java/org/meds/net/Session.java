@@ -27,6 +27,7 @@ import org.meds.map.Location;
 import org.meds.map.Map;
 import org.meds.map.Region;
 import org.meds.map.Shop;
+import org.meds.server.Server;
 import org.meds.util.DateFormatter;
 import org.meds.util.MD5Hasher;
 import org.meds.util.Random;

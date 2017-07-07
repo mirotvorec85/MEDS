@@ -1,8 +1,7 @@
 package org.meds.chat.commands;
 
 import org.meds.Player;
-import org.meds.chat.commands.AbstractChatCommand;
-import org.meds.net.Server;
+import org.meds.server.Server;
 import org.meds.util.DateFormatter;
 
 import java.util.Date;

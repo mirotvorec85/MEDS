@@ -11,6 +11,7 @@ import org.meds.data.domain.CharacterInfo;
 import org.meds.data.domain.CharacterSpell;
 import org.meds.enums.Races;
 import org.meds.logging.Logging;
+import org.meds.server.Server;
 import org.meds.util.MD5Hasher;
 
 public class ServerCommandHandler implements Runnable {

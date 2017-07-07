@@ -1,4 +1,4 @@
-package org.meds.net;
+package org.meds.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -13,9 +13,16 @@ import org.meds.map.Map;
 import org.meds.World;
 import org.meds.database.DataStorage;
 import org.meds.logging.Logging;
+import org.meds.net.ServerCommandHandler;
+import org.meds.net.Session;
 import org.meds.util.DateFormatter;
 import org.meds.util.Random;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Server {
 
     public interface StopListener extends EventListener {
@@ -101,6 +108,8 @@ public class Server {
     }
 
     public static void main(String[] args) {
+        ApplicationContext applicationContext = new AnnotationConfigApplicationContext(ServerConfiguration.class);
+
         try {
             Random.initialize();
 
@@ -121,10 +130,10 @@ public class Server {
 
             Locale.load();
 
-            Server server = new Server();
             World.getInstance().createCreatures();
 
-            server.Start();
+            Server server = applicationContext.getBean(Server.class);
+            server.start();
         } catch (Exception ex) {
             Logging.Fatal.log("An exception has occurred while starting the Server", ex);
         }
@@ -133,28 +142,15 @@ public class Server {
     private java.util.Map<Session, Socket> sessions;
     private ServerSocket serverSocket;
 
-    private boolean isLoaded;
-
     private SessionDisconnect sessionDisconnector;
 
-    public Server() throws IOException {
+    public Server() {
         Server.instance = this;
-
-        this.isLoaded = false;
-
         this.sessions = new HashMap<>(100);
-
-        this.serverSocket = new ServerSocket(Configuration.getInt(Configuration.Keys.Port));
-
         this.sessionDisconnector = new SessionDisconnect();
-
-        this.isLoaded = true;
     }
 
-    public void Start() {
-        if (!this.isLoaded)
-            return;
-
+    public void start() {
         Server.startTimeMillis = (int) System.currentTimeMillis();
         Server.serverStartTime = DateFormatter.format(new Date());
 
@@ -163,6 +159,13 @@ public class Server {
         new Thread(World.getInstance(), "World updater").start();
 
         Logging.Info.log("Waiting for connections...");
+
+        try {
+            this.serverSocket = new ServerSocket(Configuration.getInt(Configuration.Keys.Port));
+        } catch (IOException e) {
+            Logging.Fatal.log("An exception on creating the server socket", e);
+            return;
+        }
 
         while (true) {
             try {
