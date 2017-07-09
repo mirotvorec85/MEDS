@@ -13,14 +13,16 @@ import org.meds.map.Map;
 import org.meds.World;
 import org.meds.database.DataStorage;
 import org.meds.logging.Logging;
-import org.meds.net.ServerCommandHandler;
 import org.meds.net.Session;
+import org.meds.server.command.ServerCommandWorker;
 import org.meds.util.DateFormatter;
 import org.meds.util.Random;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 
 @Component
 public class Server {
@@ -47,22 +49,11 @@ public class Server {
 
     private static String serverStartTime;
     private static int startTimeMillis;
-    private static Server instance;
 
     private static boolean isStopping;
 
-    private static Set<StopListener> stopListeners = new HashSet<>();
-
     public static boolean isStopping() {
         return Server.isStopping;
-    }
-
-    public static void addStopListener(StopListener listener) {
-        stopListeners.add(listener);
-    }
-
-    public static void removeStopListener(StopListener listener) {
-        stopListeners.remove(listener);
     }
 
     public static String getServerStartTime() {
@@ -71,40 +62,6 @@ public class Server {
 
     public static int getServerTimeMillis() {
         return (int) System.currentTimeMillis() - startTimeMillis;
-    }
-
-    public static void exit() {
-        Server.isStopping = true;
-
-        // Stop server socket
-        try {
-            Server.instance.serverSocket.close();
-        } catch (IOException ex) {
-            Logging.Error.log("IOException while stopping the server socket", ex);
-        }
-
-
-        // Then close all the session sockets
-        for (Socket socket : Server.instance.sessions.values())
-            try {
-                socket.close();
-            } catch (IOException ex) {
-                Logging.Error.log("IOException while closing the session socket", ex);
-            }
-
-        // Stop all the listeners
-        for (StopListener listener : stopListeners)
-            listener.stop();
-
-        // 5 seconds is enough for World to stop all the updated and save all the players
-        Logging.Info.log("The server will be shut down in 5 seconds...");
-        try {
-            Thread.sleep(5000);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            System.exit(0);
-        }
     }
 
     public static void main(String[] args) {
@@ -130,8 +87,6 @@ public class Server {
 
             Locale.load();
 
-            World.getInstance().createCreatures();
-
             Server server = applicationContext.getBean(Server.class);
             server.start();
         } catch (Exception ex) {
@@ -139,22 +94,35 @@ public class Server {
         }
     }
 
+    @Autowired
+    public ServerCommandWorker serverCommandWorker;
+
+    @Autowired
+    public World world;
+
     private java.util.Map<Session, Socket> sessions;
     private ServerSocket serverSocket;
 
     private SessionDisconnect sessionDisconnector;
+    private Set<StopListener> stopListeners = new HashSet<>();
 
     public Server() {
-        Server.instance = this;
         this.sessions = new HashMap<>(100);
+        this.stopListeners = new HashSet<>();
         this.sessionDisconnector = new SessionDisconnect();
     }
 
+    @PostConstruct
+    public void init() {
+
+    }
+
     public void start() {
+        world.createCreatures();
         Server.startTimeMillis = (int) System.currentTimeMillis();
         Server.serverStartTime = DateFormatter.format(new Date());
 
-        new Thread(new ServerCommandHandler(), "Server Commands handler").start();
+        new Thread(serverCommandWorker, "Server Commands worker").start();
 
         new Thread(World.getInstance(), "World updater").start();
 
@@ -183,6 +151,47 @@ public class Server {
                     Logging.Error.log("IO Exception while accepting a socket", ex);
                 break;
             }
+        }
+    }
+
+    public void addStopListener(StopListener listener) {
+        this.stopListeners.add(listener);
+    }
+
+    public void removeStopListener(StopListener listener) {
+        this.stopListeners.remove(listener);
+    }
+
+    public void shutdown() {
+        Server.isStopping = true;
+
+        // Stop server socket
+        try {
+            this.serverSocket.close();
+        } catch (IOException ex) {
+            Logging.Error.log("IOException while stopping the server socket", ex);
+        }
+
+
+        // Then close all the session sockets
+        for (Socket socket : this.sessions.values())
+            try {
+                socket.close();
+            } catch (IOException ex) {
+                Logging.Error.log("IOException while closing the session socket", ex);
+            }
+
+        // Stop all the listeners
+        this.stopListeners.forEach(StopListener::stop);
+
+        // 5 seconds is enough for World to stop all the updated and save all the players
+        Logging.Info.log("The server will be shut down in 5 seconds...");
+        try {
+            Thread.sleep(5000);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            System.exit(0);
         }
     }
 }

@@ -16,8 +16,14 @@ import org.meds.logging.Logging;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.Random;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class World implements Runnable {
+
+    @Autowired
+    public Server server;
 
     private static World instance;
 
@@ -64,11 +70,7 @@ public class World implements Runnable {
 
         this.dayTime = 0;
 
-        Server.addStopListener(() -> {
-            // Set isStopping value and the World.stop() method
-            // will be called just before the next update.
-            World.this.isStopping = true;
-        });
+        World.instance = this;
     }
 
     public void playerLoggedIn(Player player) {
@@ -239,6 +241,12 @@ public class World implements Runnable {
 
     @Override
     public void run() {
+        server.addStopListener(() -> {
+            // Set isStopping value and the World.stop() method
+            // will be called just before the next update.
+            World.this.isStopping = true;
+        });
+
         long lastTickDuration = 0;
         long sleepTime = 0;
 
