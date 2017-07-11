@@ -1,17 +1,33 @@
 package org.meds;
 
-import java.util.*;
-
 import org.meds.data.domain.CreatureLoot;
 import org.meds.data.domain.CreatureTemplate;
-import org.meds.database.DataStorage;
+import org.meds.database.BiRepository;
+import org.meds.database.Repository;
 import org.meds.enums.*;
 import org.meds.item.Item;
+import org.meds.item.ItemFactory;
 import org.meds.logging.Logging;
 import org.meds.map.Location;
 import org.meds.util.Random;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+import java.util.*;
+
+@Component
+@Scope("prototype")
 public class Creature extends Unit {
+
+    @Autowired
+    private Locale locale;
+    @Autowired
+    private BiRepository<CreatureLoot> creatureLootRepository;
+    @Autowired
+    private Repository<CreatureTemplate> creatureTemplateRepository;
+    @Autowired
+    private ItemFactory itemFactory;
 
     /**
      * Creature Respawn time after death. In milliseconds.
@@ -50,7 +66,7 @@ public class Creature extends Unit {
         this.skills = new HashMap<>();
         this.loot = new HashSet<>();
         this.bossType = CreatureBossTypes.Normal;
-        this.spawnLocation = org.meds.map.Map.getInstance().getLocation(entry.getLocationId());
+        this.spawnLocation = mapManager.getLocation(entry.getLocationId());
     }
 
     public CreatureTemplate getTemplate() {
@@ -128,7 +144,7 @@ public class Creature extends Unit {
 
     @Override
     public int create() {
-        this.template = DataStorage.CreatureTemplateRepository.get(this.getTemplateId());
+        this.template = creatureTemplateRepository.get(this.getTemplateId());
 
         if (this.template == null)
             return 0;
@@ -352,7 +368,7 @@ public class Creature extends Unit {
             location = this.spawnLocation;
         } else {
             // Find random location at creature's region
-            location = org.meds.map.Map.getInstance().getRegion(this.template.getRegionId()).getRandomLocation(false);
+            location = mapManager.getRegion(this.template.getRegionId()).getRandomLocation(false);
         }
 
         if (location == null) {
@@ -363,11 +379,11 @@ public class Creature extends Unit {
         this.setPosition(location);
         // Add Loot
         this.loot.clear();
-        Collection<CreatureLoot> loot = DataStorage.CreatureLootRepository.get(this.getTemplateId());
+        Collection<CreatureLoot> loot = creatureLootRepository.get(this.getTemplateId());
         for (CreatureLoot creatureLoot : loot) {
             if (Random.nextDouble() * 100 > creatureLoot.getChance())
                 continue;
-            Item item = new Item(creatureLoot.getItemTemplateId(), creatureLoot.getCount());
+            Item item = itemFactory.create(creatureLoot.getItemTemplateId(), creatureLoot.getCount());
             item.getModification().generateTotemicType();
             this.loot.add(item);
         }
@@ -387,7 +403,7 @@ public class Creature extends Unit {
         if (this.cashGold == 0 && this.loot.size() == 0)
             corpse = null;
         else {
-            corpse = new Corpse(this);
+            corpse = new Corpse(mapManager.getNextCorpseId(), this);
             corpse.fillWithLoot(this.loot, this.cashGold);
         }
 
@@ -399,12 +415,12 @@ public class Creature extends Unit {
         StringBuilder nameBuilder = new StringBuilder(this.template.getName());
         CreatureTypes type = getCreatureType();
         if (type != CreatureTypes.Normal)
-            nameBuilder.append("(").append(Locale.getString(type.getTitleStringId())).append(")");
+            nameBuilder.append("(").append(locale.getString(type.getTitleStringId())).append(")");
         if (this.template.hasFlag(CreatureFlags.Unique)) {
-            nameBuilder.append("(").append(Locale.getString(33)).append(")");
+            nameBuilder.append("(").append(locale.getString(33)).append(")");
         }
         if (this.bossType != CreatureBossTypes.Normal) {
-            nameBuilder.append("(").append(Locale.getString(this.bossType.getTitleStringId())).append(")");
+            nameBuilder.append("(").append(locale.getString(this.bossType.getTitleStringId())).append(")");
         }
         this.fullName = nameBuilder.toString();
     }
@@ -426,15 +442,17 @@ public class Creature extends Unit {
                 // 10% chance for motion
                 if (Random.nextDouble() < 0.05) {
                     MovementDirections direction = this.position.getRandomDirection(false, true);
-                    if (direction != MovementDirections.None)
-                        org.meds.map.Map.getInstance().registerMovement(this, direction);
+                    if (direction != MovementDirections.None) {
+                        mapManager.registerMovement(this, direction);
+                    }
                 }
                 break;
             case Dead:
                 if (this.respawnTimer < 0) {
                     spawn();
-                } else
+                } else {
                     this.respawnTimer -= time;
+                }
                 break;
         }
     }

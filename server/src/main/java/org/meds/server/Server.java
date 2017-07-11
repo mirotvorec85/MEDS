@@ -1,18 +1,11 @@
 package org.meds.server;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.*;
-
 import org.meds.Configuration;
 import org.meds.Locale;
-import org.meds.data.dao.DAOFactory;
-import org.meds.data.hibernate.dao.HibernateDAOFactory;
-import org.meds.map.Map;
 import org.meds.World;
 import org.meds.database.DataStorage;
 import org.meds.logging.Logging;
+import org.meds.map.MapManager;
 import org.meds.net.Session;
 import org.meds.server.command.ServerCommandWorker;
 import org.meds.util.DateFormatter;
@@ -23,6 +16,10 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.*;
 
 @Component
 public class Server {
@@ -75,17 +72,12 @@ public class Server {
                 return;
             }
 
-            // Set Hibernate DAO Factory
-            DAOFactory.setFactory(new HibernateDAOFactory());
-
-            DataStorage.load();
-            Logging.Info.log("Database is loaded.");
-
-            // Initialize Map instance and load its data
-            Map.getInstance().load();
+            // Load map data
+            MapManager mapManager = applicationContext.getBean(MapManager.class);
             Logging.Info.log("Map is loaded");
 
-            Locale.load();
+            // Load locale
+            applicationContext.getBean(Locale.class);
 
             Server server = applicationContext.getBean(Server.class);
             server.start();
@@ -95,10 +87,13 @@ public class Server {
     }
 
     @Autowired
-    public ServerCommandWorker serverCommandWorker;
+    private ServerCommandWorker serverCommandWorker;
 
     @Autowired
-    public World world;
+    private World world;
+
+    @Autowired
+    private DataStorage dataStorage;
 
     private java.util.Map<Session, Socket> sessions;
     private ServerSocket serverSocket;
@@ -114,7 +109,8 @@ public class Server {
 
     @PostConstruct
     public void init() {
-
+        dataStorage.loadRepositories();
+        Logging.Info.log("Database is loaded.");
     }
 
     public void start() {

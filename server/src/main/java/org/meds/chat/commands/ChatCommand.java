@@ -1,10 +1,21 @@
 package org.meds.chat.commands;
 
-import org.meds.Player;
+import org.springframework.stereotype.Component;
 
-public interface ChatCommand {
+import java.lang.annotation.*;
 
-    int getMinArgsCount();
+/**
+ * Indicates that annotated class is a Chat command handler.
+ * Commands are applied with as a chat message.
+ * <p>
+ * This annotation should be applied to a class that implements
+ * {@link org.meds.chat.commands.ChatCommandHandler} interface.
+ */
+@Documented
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Component
+public @interface ChatCommand {
 
-    void handle(Player player, String[] args);
+    String value();
 }

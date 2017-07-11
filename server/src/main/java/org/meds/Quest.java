@@ -239,7 +239,11 @@ public class Quest {
         // Reward
         if (this.questTemplate.getRewardGold() != 0) {
             if (this.player.getSession() != null) {
-                this.player.getSession().send(new ServerPacket(ServerCommands.ServerMessage).add(1096).add(this.questTemplate.getRewardGold()).add(DataStorage.CurrencyRepository.get(Currencies.Gold.getValue()).getTitle()));
+                ServerPacket packet = new ServerPacket(ServerCommands.ServerMessage)
+                        .add(1096)
+                        .add(this.questTemplate.getRewardGold())
+                        .add(DataStorage.CurrencyRepository.get(Currencies.Gold.getValue()).getTitle());
+                this.player.getSession().send(packet);
             }
             this.player.changeCurrency(Currencies.Gold, this.questTemplate.getRewardGold());
         }

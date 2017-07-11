@@ -1,5 +1,35 @@
 package org.meds.net;
 
+import org.meds.*;
+import org.meds.Locale;
+import org.meds.chat.ChatHandler;
+import org.meds.data.dao.DAOFactory;
+import org.meds.data.domain.Character;
+import org.meds.data.domain.Guild;
+import org.meds.data.domain.NewMessage;
+import org.meds.data.domain.QuestTemplate;
+import org.meds.database.DataStorage;
+import org.meds.database.LevelCost;
+import org.meds.database.Repository;
+import org.meds.enums.*;
+import org.meds.item.Item;
+import org.meds.item.ItemFlags;
+import org.meds.item.ItemPrototype;
+import org.meds.logging.Logging;
+import org.meds.map.Location;
+import org.meds.map.MapManager;
+import org.meds.map.Region;
+import org.meds.map.Shop;
+import org.meds.server.Server;
+import org.meds.util.DateFormatter;
+import org.meds.util.MD5Hasher;
+import org.meds.util.Random;
+import org.meds.util.SafeConvert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -8,31 +38,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.*;
 
-import org.meds.*;
-import org.meds.chat.ChatHandler;
-import org.meds.data.dao.CharacterDAO;
-import org.meds.data.dao.DAOFactory;
-import org.meds.data.domain.Character;
-import org.meds.data.domain.NewMessage;
-import org.meds.data.domain.QuestTemplate;
-import org.meds.database.LevelCost;
-import org.meds.item.Item;
-import org.meds.item.ItemFlags;
-import org.meds.item.ItemPrototype;
-import org.meds.Locale;
-import org.meds.database.DataStorage;
-import org.meds.enums.*;
-import org.meds.logging.Logging;
-import org.meds.map.Location;
-import org.meds.map.Map;
-import org.meds.map.Region;
-import org.meds.map.Shop;
-import org.meds.server.Server;
-import org.meds.util.DateFormatter;
-import org.meds.util.MD5Hasher;
-import org.meds.util.Random;
-import org.meds.util.SafeConvert;
-
+@Component
+@Scope("prototype")
 public class Session implements Runnable {
 
     public interface DisconnectListener extends EventListener {
@@ -40,10 +47,6 @@ public class Session implements Runnable {
     }
 
     private static Set<Session> sessionsToSend;
-
-    private static CharacterDAO getCharacterDao() {
-        return DAOFactory.getFactory().getCharacterDAO();
-    }
 
     static {
         sessionsToSend = new HashSet<>();
@@ -58,6 +61,25 @@ public class Session implements Runnable {
             }
         }
     }
+
+    @Autowired
+    private DAOFactory daoFactory;
+    @Autowired
+    private ChatHandler chatHandler;
+    @Autowired
+    private ApplicationContext applicationContext;
+    @Autowired
+    private Repository<NewMessage> newMessageRepository;
+    @Autowired
+    private Repository<QuestTemplate> questTemplateRepository;
+    @Autowired
+    private Repository<Guild> guildRepository;
+    @Autowired
+    private MapManager mapManager;
+    @Autowired
+    private DataStorage dataStorage;
+    @Autowired
+    private Locale locale;
 
     /**
      * Related Socket for this session.
@@ -397,7 +419,7 @@ public class Session implements Runnable {
             // Response packet starts with login_result
             ServerPacket packet = new ServerPacket(ServerCommands.LoginResult);
             String playerLogin = data[0].toLowerCase();
-            Character character = getCharacterDao().findCharacter(playerLogin);
+            Character character = daoFactory.getCharacterDAO().findCharacter(playerLogin);
 
             // Player is not found
             // Sending "Wrong login or password" result
@@ -441,7 +463,7 @@ public class Session implements Runnable {
 
                 character.setLastLoginIp(Session.this.currentIp);
                 character.setLastLoginDate((int) (now.getTime() / 1000));
-                getCharacterDao().update(character);
+                daoFactory.getCharacterDAO().update(character);
             } catch (Exception ex) {
                 Logging.Error.log("Exception while saving the last login data for " + Session.this.toString(), ex);
                 packet.add(LoginResults.InnerServerError);
@@ -451,9 +473,9 @@ public class Session implements Runnable {
             packet.add(LoginResults.OK);
 
             // Add New Messages
-            if (DataStorage.NewMessageRepository.size() != 0) {
+            if (newMessageRepository.size() != 0) {
                 packet.add(ServerCommands.MessageList);
-                for (NewMessage message : DataStorage.NewMessageRepository) {
+                for (NewMessage message : newMessageRepository) {
                     packet.add(message.getId()).add(message.getTypeId()).add(message.getMessage());
                 }
             }
@@ -621,7 +643,7 @@ public class Session implements Runnable {
             if (direction == null)
                 return;
 
-            Map.getInstance().registerMovement(Session.this.player, direction);
+            mapManager.registerMovement(Session.this.player, direction);
         }
     }
 
@@ -743,7 +765,7 @@ public class Session implements Runnable {
             if (Session.this.player.getPosition().getSpecialLocationType() != SpecialLocationTypes.MagicSchool)
                 return;
 
-            Session.this.player.learnGuildLesson(DataStorage.GuildRepository.get(SafeConvert.toInt32(data[0])));
+            Session.this.player.learnGuildLesson(guildRepository.get(SafeConvert.toInt32(data[0])));
         }
     }
 
@@ -760,7 +782,7 @@ public class Session implements Runnable {
             if (Session.this.player.getPosition().getSpecialLocationType() != SpecialLocationTypes.MagicSchool)
                 return;
 
-            Session.this.player.removeGuildLesson(DataStorage.GuildRepository.get(SafeConvert.toInt32(data[0])));
+            Session.this.player.removeGuildLesson(guildRepository.get(SafeConvert.toInt32(data[0])));
         }
     }
 
@@ -779,7 +801,7 @@ public class Session implements Runnable {
 
         @Override
         public void handle(String[] data) {
-            ChatHandler.handleSay(Session.this.player, data[0]);
+            chatHandler.handleSay(Session.this.player, data[0]);
         }
     }
 
@@ -864,15 +886,17 @@ public class Session implements Runnable {
     }
 
     private class EnterShopCommandHandler extends CommandHandler {
+
         @Override
         public void handle(String[] data) {
             Location location = Session.this.player.getPosition();
             if (location.getSpecialLocationType() == SpecialLocationTypes.Generic)
                 return;
 
-            Shop shop = Map.getInstance().getShop(location.getSpecialLocationId());
-            if (shop == null)
+            Shop shop = mapManager.getShop(location.getSpecialLocationId());
+            if (shop == null) {
                 return;
+            }
 
             Session.this.send(shop.getData());
         }
@@ -897,7 +921,7 @@ public class Session implements Runnable {
             if (player.getPosition().getSpecialLocationType() == SpecialLocationTypes.Generic)
                 return;
 
-            Shop shop = Map.getInstance().getShop(player.getPosition().getSpecialLocationId());
+            Shop shop = mapManager.getShop(player.getPosition().getSpecialLocationId());
             // There is no shop with this id
             if (shop == null)
                 return;
@@ -926,7 +950,7 @@ public class Session implements Runnable {
             if (player.getPosition().getSpecialLocationType() == SpecialLocationTypes.Generic)
                 return;
 
-            Shop shop = Map.getInstance().getShop(player.getPosition().getSpecialLocationId());
+            Shop shop = mapManager.getShop(player.getPosition().getSpecialLocationId());
             // There is no shop with this id
             if (shop == null)
                 return;
@@ -1003,7 +1027,7 @@ public class Session implements Runnable {
 
         @Override
         public void handle(String[] data) {
-            ChatHandler.handleWhisper(Session.this.player, data[0]);
+            chatHandler.handleWhisper(Session.this.player, data[0]);
         }
     }
 
@@ -1070,7 +1094,7 @@ public class Session implements Runnable {
         @Override
         public void handle(String[] data) {
             int questId = SafeConvert.toInt32(data[0]);
-            QuestTemplate template = DataStorage.QuestTemplateRepository.get(questId);
+            QuestTemplate template = questTemplateRepository.get(questId);
             if (template != null)
                 send(Quest.getQuestInfoData(template));
         }
@@ -1145,7 +1169,7 @@ public class Session implements Runnable {
 
         @Override
         public void handle(String[] data) {
-            Location location = Map.getInstance().getLocation(SafeConvert.toInt32(data[0]));
+            Location location = mapManager.getLocation(SafeConvert.toInt32(data[0]));
             if (location != null)
                 Session.this.send(location.getInfoData());
         }
@@ -1159,7 +1183,7 @@ public class Session implements Runnable {
 
         @Override
         public void handle(String[] data) {
-            Region region = Map.getInstance().getRegion(SafeConvert.toInt32(data[0]));
+            Region region = mapManager.getRegion(SafeConvert.toInt32(data[0]));
             if (region != null)
                 Session.this.send(region.getLocationListData());
         }
@@ -1173,7 +1197,7 @@ public class Session implements Runnable {
 
         @Override
         public void handle(String[] data) {
-            ServerPacket lessonData = DataStorage.getGuildLessonInfo(SafeConvert.toInt32(data[0], -1));
+            ServerPacket lessonData = dataStorage.getGuildLessonInfo(SafeConvert.toInt32(data[0], -1));
             if (lessonData != null) {
                 Session.this.send(lessonData);
             }
@@ -1198,7 +1222,7 @@ public class Session implements Runnable {
             packet.add(LevelCost.getTotalGold(Session.this.player.getGuildLevel() + 1, Session.this.player.getLevel()));
 
             // Lessons reset cost
-            packet.add(Locale.getString(3));
+            packet.add(locale.getString(3));
 
             // ??? Maybe next reset cost?
             packet.add("+100500 gold");

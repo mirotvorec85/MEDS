@@ -1,12 +1,12 @@
 package org.meds.map;
 
-import java.util.*;
-
 import org.meds.Player;
 import org.meds.Unit;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.Random;
+
+import java.util.*;
 
 public class Region {
     private class PlayerPositionChanged implements Unit.PositionChangedListener {
@@ -76,7 +76,7 @@ public class Region {
 
     public Region(org.meds.data.domain.Region entry) {
         this.entry = entry;
-        this.kingdom = Map.getInstance().getKingdom(entry.getKingdomId());
+        this.kingdom = MapManager.getInstance().getKingdom(entry.getKingdomId());
         if (this.kingdom == null) {
             throw new IllegalArgumentException(String.format("Region %d references to a non-existing kingdom %d",
                     entry.getId(), entry.getKingdomId()));

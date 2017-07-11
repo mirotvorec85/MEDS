@@ -3,7 +3,8 @@ package org.meds.chat.commands;
 import org.meds.Player;
 import org.meds.util.SafeConvert;
 
-public class SetLevelChatCommand extends AbstractChatCommand {
+@ChatCommand("set_level")
+public class SetLevelChatCommandHandler extends AbstractChatCommandHandler {
 
     @Override
     public int getMinArgsCount() {

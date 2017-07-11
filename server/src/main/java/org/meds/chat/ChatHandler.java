@@ -5,22 +5,26 @@ import org.meds.World;
 import org.meds.logging.Logging;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-public final class ChatHandler {
+@Component
+public class ChatHandler {
 
     public final static String Separator = "\u0002";
     public final static String MessageSeparator = "\u0030";
     public final static String SayChar = "\u0031";
     public final static String SystemChar = "\u0034";
 
-    private static ChatCommandHandler commandHandler = new ChatCommandHandler();
+    @Autowired
+    private ChatCommandManager commandHandler;
 
-    public static ServerPacket constructSystemMessage(String message) {
+    public ServerPacket constructSystemMessage(String message) {
         return new ServerPacket(ServerCommands.ChatMessage)
                 .add(new StringBuilder(Separator).append(SystemChar).append(message));
     }
 
-    public static void sendSystemMessage(Player player, String message) {
+    public void sendSystemMessage(Player player, String message) {
         if (player == null || player.getSession() == null || message == null || message.length() == 0) {
             return;
         }
@@ -28,14 +32,14 @@ public final class ChatHandler {
         player.getSession().send(constructSystemMessage(message));
     }
 
-    public static void sendSystemMessage(String message) {
+    public void sendSystemMessage(String message) {
         if (message == null || message.length() == 0)
             return;
 
         World.getInstance().send(constructSystemMessage(message));
     }
 
-    public static void handleSay(Player player, String message) {
+    public void handleSay(Player player, String message) {
         // Ignore empty messages
         if (message == null || message.length() == 0) {
             return;
@@ -86,7 +90,7 @@ public final class ChatHandler {
         player.getPosition().getRegion().send(packet);
     }
 
-    public static void handleWhisper(Player player, String message) {
+    public void handleWhisper(Player player, String message) {
         // TODO: Implement whispering
     }
 

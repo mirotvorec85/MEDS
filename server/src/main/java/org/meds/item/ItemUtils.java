@@ -1,18 +1,112 @@
 package org.meds.item;
 
-import org.meds.logging.Logging;
+import org.meds.data.domain.ItemTemplate;
+import org.meds.database.Repository;
+import org.meds.net.ServerCommands;
+import org.meds.net.ServerPacket;
 import org.meds.util.SafeConvert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Romman on 05.11.2016.
+ * @author Romman
  */
+@Component
 public final class ItemUtils {
 
-    private ItemUtils() { }
+
+
+    @Autowired
+    private Repository<ItemTemplate> itemTemplateRepository;
+    @Autowired
+    private ItemFactory itemFactory;
+
+    public int getMaxDurability(ItemTemplate template) {
+        if (template == null) {
+            return 0;
+        }
+
+        if (template.getLevel() == 0) {
+            return 30;
+        }
+
+        return template.getLevel() * 75 + 75;
+    }
+
+    public int getWeight(ItemTemplate template) {
+        if (template == null) {
+            return 0;
+        }
+
+        switch (template.getItemClass()) {
+            case Ring:
+                return 2;
+
+            case Neck:
+            case Hands:
+            case Waist:
+            case Foot:
+                return 3;
+
+            case Back:
+            case Legs:
+            case Component:
+                return 4;
+
+            case Head:
+                return 5;
+
+            case Shield:
+                return 8;
+
+            case Body:
+            case Weapon:
+                return 10;
+
+            default:
+                return 1;
+        }
+    }
+
+    public boolean isEquipment(Item item) {
+        return isEquipment(item.Template);
+    }
+
+    public boolean isEquipment(ItemTemplate template) {
+        if (template == null) {
+            return false;
+        }
+
+        switch (template.getItemClass()) {
+            case Head:
+            case Neck:
+            case Back:
+            case Hands:
+            case Body:
+            case Ring:
+            case Weapon:
+            case Shield:
+            case Waist:
+            case Legs:
+            case Foot:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public boolean areStackable(Item itemA, Item itemB) {
+        // Equipment may not be stacked
+        if (isEquipment(itemA) || isEquipment(itemB)) {
+            return false;
+        }
+
+        // Only items with the same prototypes can be stacked
+        return itemA.equals(itemB);
+    }
 
     public static class BonusParsingException extends Exception {
 
@@ -29,7 +123,7 @@ public final class ItemUtils {
         }
     }
 
-    public static Map<ItemBonusParameters, Integer> parseTemplateBonuses(String bonuses) throws BonusParsingException {
+    public Map<ItemBonusParameters, Integer> parseTemplateBonuses(String bonuses) throws BonusParsingException {
         String[] keyValues = bonuses.split(";");
         Map<ItemBonusParameters, Integer> bonusMap = new HashMap<>(keyValues.length);
         for (int i = 0; i < keyValues.length; ++i) {
@@ -54,5 +148,33 @@ public final class ItemUtils {
             bonusMap.put(parameter, value);
         }
         return bonusMap;
+    }
+
+    public ServerPacket getItemInfo(int templateId, int modification, ServerPacket packet) {
+        ItemPrototype prototype = new ItemPrototype(templateId, modification, 0);
+        Item item = itemFactory.create(prototype);
+        if (item.Template == null) {
+            return packet;
+        }
+
+        packet.add(ServerCommands.ItemInfo)
+                .add(item.Template.getId())
+                .add(item.getModification())
+                .add(item.getFullTitle())
+                .add(item.Template.getImageId())
+                .add(item.Template.getItemClass())
+                .add(item.Template.getLevel())
+                .add(item.Template.getCost())
+                .add(item.Template.getCurrencyId())
+                .add("1187244746") // Image (or even Item itself) date
+                .add(getMaxDurability(item.Template))
+                .add(getWeight(item.Template));
+
+        // TODO: Spring fix build
+//        for (Map.Entry<ItemBonusParameters, Integer> entry : item.bonusParameters.entrySet()) {
+//            packet.add(entry.getKey());
+//            packet.add(entry.getValue());
+//        }
+        return packet;
     }
 }

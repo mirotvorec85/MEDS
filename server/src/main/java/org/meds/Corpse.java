@@ -1,12 +1,11 @@
 package org.meds;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.meds.item.Item;
 import org.meds.logging.Logging;
 import org.meds.map.Location;
-import org.meds.map.Map;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class Corpse {
 
@@ -16,10 +15,10 @@ public class Corpse {
     private Unit owner;
     private Location position;
 
-    public Corpse(Unit owner) {
+    public Corpse(int corpseId, Unit owner) {
         Logging.Debug.log("Create corpse for " + owner);
         this.owner = owner;
-        this.id = Map.getInstance().getNextCorpseId();
+        this.id = corpseId;
         setPosition(owner.getPosition());
         this.loot = new HashSet<>();
     }

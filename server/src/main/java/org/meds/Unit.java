@@ -1,22 +1,31 @@
 package org.meds;
 
-import java.util.*;
-import java.util.Map;
-
 import org.meds.data.domain.Spell;
-import org.meds.database.DataStorage;
+import org.meds.database.repository.SpellRepository;
 import org.meds.enums.*;
 import org.meds.logging.Logging;
-import org.meds.map.*;
+import org.meds.map.Location;
+import org.meds.map.MapManager;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.net.Session;
 import org.meds.spell.Aura;
 import org.meds.spell.Aura.States;
+import org.meds.spell.SpellFactory;
 import org.meds.util.KeyValuePair;
 import org.meds.util.Random;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.*;
 
 public abstract class Unit {
+
+    @Autowired
+    protected SpellRepository spellRepository;
+    @Autowired
+    protected SpellFactory spellFactory;
+    @Autowired
+    protected MapManager mapManager;
 
     public interface TargetDiedListener {
 
@@ -519,7 +528,7 @@ public abstract class Unit {
     public abstract Corpse die();
 
     public void useMagic(int spellId, int targetId) {
-        Spell entry = DataStorage.SpellRepository.get(spellId);
+        Spell entry = spellRepository.get(spellId);
         if (entry == null) {
             return;
         }
@@ -615,10 +624,10 @@ public abstract class Unit {
 
     public boolean castSpell(int spellId, Unit target) {
         int level = this.getSpellLevel(spellId);
-        if (level == 0)
+        if (level == 0) {
             return false;
-        org.meds.spell.Spell spell = new org.meds.spell.Spell(spellId, this, level, target);
-        return spell.cast();
+        }
+        return spellFactory.create(spellId, this, level, target).cast();
     }
 
     protected void onVisualChanged() {

@@ -1,16 +1,21 @@
 package org.meds;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.meds.data.domain.CharacterInventoryItem;
 import org.meds.item.*;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.Valued;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Component
+@Scope("prototype")
 public class Inventory {
 
     public enum Slots implements Valued {
@@ -139,6 +144,11 @@ public class Inventory {
         }
     }
 
+    @Autowired
+    private ItemUtils itemUtils;
+    @Autowired
+    private ItemFactory itemFactory;
+
     private int capacity;
 
     public int weight;
@@ -149,9 +159,12 @@ public class Inventory {
     private Map<Integer, CharacterInventoryItem> characterItems = new HashMap<>();
 
 
-    public Inventory(Player owner) {
-        this.owner = owner;
+    public Inventory() {
         this.inventorySlots = new Item[EquipmentSlotCount + InventorySlotCount];
+    }
+
+    public void setOwner(Player player) {
+        this.owner = player;
     }
 
     public Item get(int slot) {
@@ -177,7 +190,7 @@ public class Inventory {
         for (CharacterInventoryItem charItem : items.values()) {
             ItemPrototype prototype = new ItemPrototype(charItem.getItemTemplateId(), charItem.getModification(),
                     charItem.getDurability());
-            Item item = new Item(prototype, charItem.getCount());
+            Item item = itemFactory.create(prototype, charItem.getCount());
             // Item is valid
             if (item.Template != null) {
                 this.inventorySlots[charItem.getSlot()] = item;
@@ -296,13 +309,13 @@ public class Inventory {
                 }
             }
             // Stack items
-            else if(targetItem.isStackableWith(sourceItem) && !isEquipmentSlot(newSlot)) {
+            else if(itemUtils.areStackable(targetItem, sourceItem) && !isEquipmentSlot(newSlot)) {
                 // Swap the whole stack
                 if (sourceItem.getCount() == count) {
                     this.inventorySlots[currentSlot] = null;
-                    targetItem.tryStackItem(sourceItem);
+                    targetItem.stackItem(sourceItem);
                 } else {
-                    targetItem.tryStackItem(sourceItem.unstackItem(count));
+                    targetItem.stackItem(sourceItem.unstackItem(count));
                 }
             }
             // Swap items
@@ -336,7 +349,7 @@ public class Inventory {
             if (item == null) {
                 continue;
             }
-            weight += item.weight;
+            weight += itemUtils.getWeight(item.Template);
         }
 
         // TODO: Check weight after implementation
@@ -347,7 +360,7 @@ public class Inventory {
             if (item == null)
                 continue;
             // Equipment cannot be stacked
-            if (item.isEquipment()) {
+            if (itemUtils.isEquipment(item)) {
                 slots += item.getCount();
                 continue;
             }
@@ -467,7 +480,7 @@ public class Inventory {
         for (int i = Slots.Inventory1.getValue(); i <= Slots.Inventory25.getValue(); ++i) {
             if (this.inventorySlots[i] != null) {
                 // Tries to stack (includes items comparability checking)
-                if (this.inventorySlots[i].tryStackItem(item, count)) {
+                if (this.inventorySlots[i].stackItem(item, count)) {
                     onInventoryChanged();
                     return true;
                 }
@@ -554,7 +567,7 @@ public class Inventory {
         do {
             if (item == null) {
                 item = this.inventorySlots[itemSlots[i]].unstackItem(count);
-            } else {
+            } else if (itemUtils.areStackable(item, this.inventorySlots[itemSlots[i]])) {
                 item.transfer(this.inventorySlots[itemSlots[i]], count - item.getCount());
             }
 
@@ -636,7 +649,7 @@ public class Inventory {
             return;
 
         // Using equipment items is like to equip it
-        if (item.isEquipment()) {
+        if (itemUtils.isEquipment(item)) {
             this.swapItem(slot, getEquipmentSlot(item).getValue(), 1);
             return;
         }

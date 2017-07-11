@@ -1,18 +1,30 @@
 package org.meds.map;
 
-import java.util.*;
-
 import org.meds.*;
+import org.meds.enums.MovementDirections;
+import org.meds.enums.Parameters;
 import org.meds.enums.SpecialLocationTypes;
 import org.meds.item.Item;
 import org.meds.item.ItemPrototype;
-import org.meds.enums.MovementDirections;
-import org.meds.enums.Parameters;
+import org.meds.item.ItemUtils;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.Random;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.util.*;
+
+@Component // Possibly it shouldn't be a bean
+@Scope("prototype")
 public class Location {
+
+    @Autowired
+    private MapManager mapManager;
+    @Autowired
+    private ItemUtils itemUtils;
 
     private org.meds.data.domain.Location entry;
 
@@ -42,7 +54,11 @@ public class Location {
         this.unitsView = Collections.unmodifiableSet(this.units);
         this.corpses = new HashMap<>();
         this.items = new HashMap<>();
-        this.region = Map.getInstance().getRegion(entry.getRegionId());
+    }
+
+    @PostConstruct
+    private void init() {
+        this.region = mapManager.getRegion(entry.getRegionId());
     }
 
     public int getId() {
@@ -75,7 +91,7 @@ public class Location {
         }
         this.updatable = updatable;
         if (updatable) {
-            Map.getInstance().addLocationUpdate(this);
+            mapManager.addLocationUpdate(this);
         }
     }
 
@@ -149,7 +165,7 @@ public class Location {
                 return null;
         }
 
-        return Map.getInstance().getLocation(neighbourId);
+        return mapManager.getLocation(neighbourId);
     }
 
 
@@ -255,8 +271,8 @@ public class Location {
 
     public void addItem(Item item) {
         Item _item = this.items.get(item.getPrototype());
-        if (_item != null) {
-            _item.tryStackItem(item);
+        if (_item != null && itemUtils.areStackable(_item, item)) {
+            _item.stackItem(item);
         } else {
             this.items.put(item.getPrototype(), item);
         }

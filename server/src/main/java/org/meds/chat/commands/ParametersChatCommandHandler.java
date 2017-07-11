@@ -5,8 +5,13 @@ import org.meds.UnitParameters;
 import org.meds.chat.ChatHandler;
 import org.meds.enums.Parameters;
 import org.meds.util.SafeConvert;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class ParametersChatCommand extends AbstractChatCommand {
+@ChatCommand("parameters")
+public class ParametersChatCommandHandler extends AbstractChatCommandHandler {
+
+    @Autowired
+    private ChatHandler chatHandler;
 
     @Override
     public void handle(Player player, String[] args) {
@@ -19,30 +24,30 @@ public class ParametersChatCommand extends AbstractChatCommand {
         switch (index) {
             case 0:
                 parameter = player.getParameters().base();
-                ChatHandler.sendSystemMessage(player, "Base Parameters:");
+                chatHandler.sendSystemMessage(player, "Base Parameters:");
                 break;
             case 1:
                 parameter = player.getParameters().guild();
-                ChatHandler.sendSystemMessage(player, "Guild Parameters:");
+                chatHandler.sendSystemMessage(player, "Guild Parameters:");
                 break;
             case 2:
                 parameter = player.getParameters().equipment();
-                ChatHandler.sendSystemMessage(player, "Equipment Parameters:");
+                chatHandler.sendSystemMessage(player, "Equipment Parameters:");
                 break;
             case 3:
                 parameter = player.getParameters().magic();
-                ChatHandler.sendSystemMessage(player, "Magic Parameters:");
+                chatHandler.sendSystemMessage(player, "Magic Parameters:");
                 break;
         }
 
         if (parameter == null) {
-            ChatHandler.sendSystemMessage(player, "Total Parameters:");
+            chatHandler.sendSystemMessage(player, "Total Parameters:");
             for (Parameters value : Parameters.values()) {
-                ChatHandler.sendSystemMessage(player, value.name() + " = " + player.getParameters().value(value));
+                chatHandler.sendSystemMessage(player, value.name() + " = " + player.getParameters().value(value));
             }
         } else {
             for (Parameters value : Parameters.values()) {
-                ChatHandler.sendSystemMessage(player, value.name() + " = " + parameter.value(value));
+                chatHandler.sendSystemMessage(player, value.name() + " = " + parameter.value(value));
             }
         }
     }

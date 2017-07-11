@@ -1,20 +1,30 @@
 package org.meds.map;
 
-import java.util.Map;
-import java.util.Set;
-
+import org.meds.Player;
 import org.meds.data.domain.ItemTemplate;
 import org.meds.data.domain.ShopItem;
-import org.meds.item.Item;
-import org.meds.item.ItemClasses;
-import org.meds.item.ItemPrototype;
-import org.meds.Player;
-import org.meds.database.DataStorage;
+import org.meds.database.Repository;
+import org.meds.item.*;
 import org.meds.logging.Logging;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+import java.util.Map;
+import java.util.Set;
+
+@Component
+@Scope("prototype")
 public class Shop {
+
+    @Autowired
+    private Repository<ItemTemplate> itemTemplateRepository;
+    @Autowired
+    private ItemUtils itemUtils;
+    @Autowired
+    private ItemFactory itemFactory;
 
     private org.meds.data.domain.Shop entry;
     private Map<ItemTemplate, Integer> items = new java.util.HashMap<>();
@@ -25,7 +35,7 @@ public class Shop {
 
     public void load() {
         for (ShopItem item : this.entry.getItems()) {
-            ItemTemplate template = DataStorage.ItemTemplateRepository.get(item.getItemTemplateId());
+            ItemTemplate template = itemTemplateRepository.get(item.getItemTemplateId());
             if (template == null) {
                 Logging.Warn.log("Shop " + this.entry.getId() + " has item with template=" + item.getItemTemplateId() + " which does not exist. Skipped.");
                 continue;
@@ -47,7 +57,7 @@ public class Shop {
         for (Map.Entry<ItemTemplate, Integer> entry : this.items.entrySet()) {
             packet.add(entry.getKey().getId())
                 .add("0") // Modification (Standard shops have only default items
-                .add(Item.getMaxDurability(entry.getKey()));
+                .add(itemUtils.getMaxDurability(entry.getKey()));
             // -1 in DB mean an infinite count
             // But for the client this number is 999,999
             if (entry.getValue() == -1) {
@@ -94,7 +104,7 @@ public class Shop {
      * @return A boolean value indicating whether the transaction was completed.
      */
     public boolean sellItem(Player buyer, ItemPrototype prototype, int count) {
-        ItemTemplate template = DataStorage.ItemTemplateRepository.get(prototype.getTemplateId());
+        ItemTemplate template = itemTemplateRepository.get(prototype.getTemplateId());
         if (template == null)
             return false;
 
@@ -114,7 +124,7 @@ public class Shop {
             count = buyer.getCurrencyAmount(this.entry.getCurrencyId()) / template.getCost();
         }
 
-        Item item = new Item(template, count);
+        Item item = itemFactory.create(template, count);
         if (!buyer.getInventory().tryStoreItem(item)) {
             return false;
         }
@@ -139,7 +149,7 @@ public class Shop {
     }
 
     public boolean isAppropriateItem(ItemPrototype prototype) {
-        return this.isAppropriateItem(DataStorage.ItemTemplateRepository.get(prototype.getTemplateId()));
+        return this.isAppropriateItem(itemTemplateRepository.get(prototype.getTemplateId()));
     }
 
     public boolean isAppropriateItem(Item item) {

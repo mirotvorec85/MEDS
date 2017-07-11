@@ -9,7 +9,15 @@ public class MapBiRepository<T> implements BiRepository<T> {
 
     private int size;
 
+    public MapBiRepository() {
+        this.data = Collections.emptyMap();
+    }
+
     public MapBiRepository(List<T> data, Function<T, Integer> firstKeyGetter, Function<T, Integer> secondKeyGetter) {
+        setData(data, firstKeyGetter, secondKeyGetter);
+    }
+
+    public void setData(List<T> data, Function<T, Integer> firstKeyGetter, Function<T, Integer> secondKeyGetter) {
         this.data = new HashMap<>(data.size());
         this.size = 0;
         for(T element : data) {

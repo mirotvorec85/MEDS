@@ -1,29 +1,37 @@
 package org.meds;
 
+import org.meds.data.dao.DAOFactory;
+import org.meds.data.domain.CreatureTemplate;
+import org.meds.database.Repository;
+import org.meds.enums.CreatureTypes;
+import org.meds.logging.Logging;
+import org.meds.map.MapManager;
+import org.meds.net.ServerCommands;
+import org.meds.net.ServerPacket;
+import org.meds.server.Server;
+import org.meds.util.Random;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.meds.data.dao.DAOFactory;
-import org.meds.data.domain.*;
-import org.meds.database.DataStorage;
-import org.meds.enums.CreatureTypes;
-import org.meds.map.Map;
-import org.meds.server.Server;
-import org.meds.logging.Logging;
-
-import org.meds.net.ServerCommands;
-import org.meds.net.ServerPacket;
-import org.meds.util.Random;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 @Component
 public class World implements Runnable {
 
     @Autowired
-    public Server server;
+    private ApplicationContext applicationContext;
+    @Autowired
+    private Server server;
+    @Autowired
+    private Repository<CreatureTemplate> creatureTemplateRepository;
+    @Autowired
+    private DAOFactory daoFactory;
+    @Autowired
+    private MapManager mapManager;
 
     private static World instance;
 
@@ -175,7 +183,7 @@ public class World implements Runnable {
             return player;
         }
 
-        player = new Player(playerId);
+        player = applicationContext.getBean(Player.class, playerId);
 
         // Error occurred while player was creating or loading
         if (player.create() == 0) {
@@ -188,8 +196,8 @@ public class World implements Runnable {
     public void createCreatures() {
 
         // Generate CreatureTypes
-        this.creatureTypes = new HashMap<>(DataStorage.CreatureTemplateRepository.size());
-        for (CreatureTemplate creatureTemplate : DataStorage.CreatureTemplateRepository) {
+        this.creatureTypes = new HashMap<>(creatureTemplateRepository.size());
+        for (CreatureTemplate creatureTemplate : creatureTemplateRepository) {
             // Level 30 and higher
             if (creatureTemplate.getLevel() < 30)
                 continue;
@@ -202,9 +210,9 @@ public class World implements Runnable {
 
 
         // Load and spawn all the Creatures
-        List<org.meds.data.domain.Creature> creatures = DAOFactory.getFactory().getWorldDAO().getCreatures();
+        List<org.meds.data.domain.Creature> creatures = daoFactory.getWorldDAO().getCreatures();
         for (org.meds.data.domain.Creature entry : creatures) {
-            Creature creature = new Creature(entry);
+            Creature creature = applicationContext.getBean(Creature.class, entry);
             // For some reasons can not create this creature
             if (creature.create() == 0) {
                 continue;
@@ -354,7 +362,7 @@ public class World implements Runnable {
         }
 
         // Update locations data (Movement, Unit list, etc.)
-        Map.getInstance().update(time);
+        mapManager.update(time);
 
         // Add Server Time Data and send the packet
         synchronized (this.players) {

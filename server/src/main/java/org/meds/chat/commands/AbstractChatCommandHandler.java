@@ -1,6 +1,6 @@
 package org.meds.chat.commands;
 
-public abstract class AbstractChatCommand implements ChatCommand {
+public abstract class AbstractChatCommandHandler implements ChatCommandHandler {
 
     @Override
     public int getMinArgsCount() {

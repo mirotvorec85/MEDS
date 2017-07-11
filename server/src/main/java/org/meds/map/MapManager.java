@@ -1,10 +1,5 @@
 package org.meds.map;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.meds.Group;
 import org.meds.Player;
 import org.meds.Unit;
@@ -12,21 +7,21 @@ import org.meds.data.dao.DAOFactory;
 import org.meds.data.dao.MapDAO;
 import org.meds.enums.MovementDirections;
 import org.meds.logging.Logging;
-
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-public class Map {
+import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
-    private static Map instance;
+@Component
+public class MapManager {
 
-    public static Map getInstance() {
-        if (Map.instance == null) {
-            Map.instance = new Map();
-        }
-
-        return Map.instance;
-    }
+    @Autowired
+    private DAOFactory daoFactory;
 
     private HashMap<Integer, Kingdom> kingdoms;
     private HashMap<Integer, Region> regions;
@@ -40,7 +35,7 @@ public class Map {
 
     private HashSet<Location> updatedLocations;
 
-    private Map() {
+    private MapManager() {
         this.kingdoms = new HashMap<>();
         this.regions = new HashMap<>();
         this.locations = new HashMap<>();
@@ -67,8 +62,9 @@ public class Map {
         return this.shops.get(shopId);
     }
 
+    @PostConstruct
     public void load() {
-        MapDAO mapDAO = DAOFactory.getFactory().getMapDAO();
+        MapDAO mapDAO = daoFactory.getMapDAO();
         List<org.meds.data.domain.Kingdom> kingdomEntries = mapDAO.getKingdoms();
         for (org.meds.data.domain.Kingdom entry : kingdomEntries) {
             this.kingdoms.put(entry.getId(), new Kingdom(entry));

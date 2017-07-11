@@ -1,12 +1,11 @@
 package org.meds;
 
-import java.util.*;
-
 import org.meds.data.dao.DAOFactory;
 import org.meds.data.domain.*;
 import org.meds.data.domain.Currency;
-import org.meds.database.DataStorage;
+import org.meds.database.BiRepository;
 import org.meds.database.LevelCost;
+import org.meds.database.Repository;
 import org.meds.enums.*;
 import org.meds.item.Item;
 import org.meds.logging.Logging;
@@ -16,7 +15,15 @@ import org.meds.net.ServerPacket;
 import org.meds.profession.Profession;
 import org.meds.spell.Aura;
 import org.meds.util.EnumFlags;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.util.*;
+
+@Component
+@Scope("prototype")
 public class Player extends Unit {
 
     private class SessionDisconnect implements org.meds.net.Session.DisconnectListener {
@@ -59,6 +66,27 @@ public class Player extends Unit {
         }
     }
 
+    @Autowired
+    private DAOFactory daoFactory;
+    @Autowired
+    private BiRepository<CreatureQuestRelation> creatureQuestRelationRepository;
+    @Autowired
+    private Repository<QuestTemplate> questTemplateRepository;
+    @Autowired
+    private Repository<Guild> guildRepository;
+    @Autowired
+    private BiRepository<GuildLesson> guildLessonRepository;
+    @Autowired
+    private Repository<Skill> skillRepository;
+    @Autowired
+    private Repository<Achievement> achievementRepository;
+    @Autowired
+    private Repository<Currency> currencyRepository;
+    @Autowired
+    private Inventory inventory;
+    @Autowired
+    private Locale locale;
+
     protected static final int SaveTime = 60000;
     protected static final int SyncTime = 20000;
 
@@ -71,7 +99,6 @@ public class Player extends Unit {
     private int saverTimer;
     private int syncTimer;
 
-    private Inventory inventory;
     private Inn inn;
 
     private CharacterInfo info;
@@ -99,13 +126,17 @@ public class Player extends Unit {
         this.settings = new EnumFlags<>();
 
         this.inn = new Inn(this);
-        this.inventory = new Inventory(this);
 
         this.saverTimer = SaveTime;
         this.syncTimer = SyncTime;
 
         this.disconnector = new SessionDisconnect();
         this.addKillingBlowListener(new KillingBlowHandler());
+    }
+
+    @PostConstruct
+    private void init() {
+        this.inventory.setOwner(this);
     }
 
     @Override
@@ -148,7 +179,7 @@ public class Player extends Unit {
     }
 
     public Location getHome() {
-        return org.meds.map.Map.getInstance().getLocation(this.info.getHomeId());
+        return mapManager.getLocation(this.info.getHomeId());
     }
 
     public void setHome() {
@@ -514,7 +545,7 @@ public class Player extends Unit {
 
     private boolean load() {
 
-        this.info = DAOFactory.getFactory().getCharacterDAO().getCharacterInfo(this.id);
+        this.info = daoFactory.getCharacterDAO().getCharacterInfo(this.id);
 
         // Lazy loading of collections
         this.info.getAchievements().size();
@@ -534,7 +565,7 @@ public class Player extends Unit {
         // Accept all the quests
         this.quests = new HashMap<>();
         for (CharacterQuest charQuest : this.info.getQuests().values()) {
-            Quest quest = new Quest(this, DataStorage.QuestTemplateRepository.get(charQuest.getQuestTemplateId()), charQuest);
+            Quest quest = new Quest(this, questTemplateRepository.get(charQuest.getQuestTemplateId()), charQuest);
             quest.accept();
             this.quests.put(quest.getQuestTemplate().getId(), quest);
         }
@@ -583,7 +614,7 @@ public class Player extends Unit {
         this.parameters.guild().value(Parameters.LightningResistance, this.info.getGuildShockResist());
 
         // Location
-        this.position = org.meds.map.Map.getInstance().getLocation(this.info.getLocationId());
+        this.position = mapManager.getLocation(this.info.getLocationId());
 
         // Home
         // Directly from info
@@ -637,7 +668,7 @@ public class Player extends Unit {
         this.inventory.save();
         this.inn.save();
 
-        DAOFactory.getFactory().getCharacterDAO().update(this.info);
+        daoFactory.getCharacterDAO().update(this.info);
     }
 
     public ServerPacket getParametersData() {
@@ -685,8 +716,8 @@ public class Player extends Unit {
 
     public ServerPacket getGuildData() {
         ServerPacket packet = new ServerPacket(ServerCommands.GuildInfo);
-        packet.add(DataStorage.GuildRepository.size());
-        for (Guild guild : DataStorage.GuildRepository) {
+        packet.add(guildRepository.size());
+        for (Guild guild : guildRepository) {
             packet.add(guild.getId())
                     .add(guild.getName())
                     .add(guild.getPrevId());
@@ -701,9 +732,9 @@ public class Player extends Unit {
 
     public ServerPacket getMagicData() {
         ServerPacket packet = new ServerPacket(ServerCommands.MagicInfo);
-        packet.add(DataStorage.SpellRepository.size());
+        packet.add(spellRepository.size());
 
-        for (Spell spell : DataStorage.SpellRepository) {
+        for (Spell spell : spellRepository) {
             packet.add(spell.getId())
                     .add(spell.getType().toString())
                     .add(spell.getName());
@@ -718,9 +749,9 @@ public class Player extends Unit {
 
     public ServerPacket getSkillData() {
         ServerPacket packet = new ServerPacket(ServerCommands.SkillInfo);
-        packet.add(DataStorage.SkillRepository.size());
+        packet.add(skillRepository.size());
 
-        for (Skill skill : DataStorage.SkillRepository) {
+        for (Skill skill : skillRepository) {
             packet.add(skill.getId())
                     .add(skill.getName());
             CharacterSkill characterSkill = this.info.getSkills().get(skill.getId());
@@ -738,7 +769,7 @@ public class Player extends Unit {
         packet.add(this.info.getGuilds().size());
         Guild guildEntry;
         for (CharacterGuild guild : this.info.getGuilds().values()) {
-            guildEntry = DataStorage.GuildRepository.get(guild.getGuildId());
+            guildEntry = guildRepository.get(guild.getGuildId());
             packet.add(guildEntry.getName());
             packet.add(guild.getLevel());
         }
@@ -770,7 +801,7 @@ public class Player extends Unit {
             return;
 
         // Next guild lesson
-        GuildLesson lesson = DataStorage.GuildLessonRepository.get(guildId, charGuild.getLevel() + 1);
+        GuildLesson lesson = guildLessonRepository.get(guildId, charGuild.getLevel() + 1);
         if (!this.changeCurrency(Currencies.Gold.getValue(), -LevelCost.getGold(this.guildLevel + 1)))
             return;
 
@@ -840,7 +871,7 @@ public class Player extends Unit {
             // TODO: Should be checked all guilds where 'prevId' is this guild
         }
 
-        GuildLesson lesson = DataStorage.GuildLessonRepository.get(guild.getId(), charGuild.getLevel());
+        GuildLesson lesson = guildLessonRepository.get(guild.getId(), charGuild.getLevel());
 
         this.cancelGuildImprovement(lesson.getImprovementType1(), lesson.getId1(), lesson.getCount1());
         this.cancelGuildImprovement(lesson.getImprovementType2(), lesson.getId2(), lesson.getCount2());
@@ -895,7 +926,7 @@ public class Player extends Unit {
         ServerPacket packet = new ServerPacket(ServerCommands.AchievementList);
         packet.add(0); // List of all achievements
 
-        for (Achievement achievement : DataStorage.AchievementRepository) {
+        for (Achievement achievement : achievementRepository) {
             packet.add(achievement.getId());
             packet.add(achievement.getTitle());
             packet.add(achievement.getDescription());
@@ -919,7 +950,7 @@ public class Player extends Unit {
 
     public ServerPacket getCurrencyData() {
         ServerPacket packet = new ServerPacket(ServerCommands.Currencies);
-        for (Currency currency : DataStorage.CurrencyRepository) {
+        for (Currency currency : currencyRepository) {
             packet.add(currency.getId())
                     .add(currency.getUnk2())
                     .add(currency.getTitle())
@@ -935,7 +966,7 @@ public class Player extends Unit {
         ServerPacket packet = new ServerPacket(ServerCommands.Professions);
         packet.add(this.professions.length);
         for (Profession profession : this.professions) {
-            packet.add(Locale.getString(profession.getProfession().getTitleId()))
+            packet.add(locale.getString(profession.getProfession().getTitleId()))
                     .add(profession.getLevel())
                     .add(profession.getExperience());
         }
@@ -982,13 +1013,13 @@ public class Player extends Unit {
         // Money
         if (corpse.getGold() > 0) {
             if (this.session != null)
-                this.session.sendServerMessage(998, corpse.getOwner().getName(), Integer.toString(corpse.getGold()), Locale.getString(2));
+                this.session.sendServerMessage(998, corpse.getOwner().getName(), Integer.toString(corpse.getGold()), locale.getString(2));
             this.position.send(this,
                     new ServerPacket(ServerCommands.ServerMessage)
                             .add("999").add(this.getName())
                             .add(corpse.getOwner().getName())
                             .add(corpse.getGold())
-                            .add(Locale.getString(2)));
+                            .add(locale.getString(2)));
             this.changeCurrency(Currencies.Gold, corpse.getGold());
         }
 
@@ -1165,9 +1196,9 @@ public class Player extends Unit {
 
             String typeTitle;
             if (creature.getTemplate().hasFlag(CreatureFlags.Unique)) {
-                typeTitle = Locale.getString(33);
+                typeTitle = locale.getString(33);
             } else {
-                typeTitle = Locale.getString(34);
+                typeTitle = locale.getString(34);
             }
 
             ServerPacket total = new ServerPacket(ServerCommands.ServerMessage);
@@ -1193,7 +1224,7 @@ public class Player extends Unit {
             // Quests
             if (creature.getTemplate().hasFlag(CreatureFlags.QuestGiver)) {
                 // Does the creature have any quests
-                Collection<CreatureQuestRelation> creatureQuests = DataStorage.CreatureQuestRelationRepository.get(creature.getTemplateId());
+                Collection<CreatureQuestRelation> creatureQuests = creatureQuestRelationRepository.get(creature.getTemplateId());
                 if (creatureQuests.isEmpty()) {
                     return;
                 }
@@ -1228,7 +1259,7 @@ public class Player extends Unit {
                 int count = 0;
                 // Search through quest relations of the NPC
                 for (CreatureQuestRelation creatureQuest : creatureQuests) {
-                    QuestTemplate template = DataStorage.QuestTemplateRepository.get(creatureQuest.getQuestTemplateId());
+                    QuestTemplate template = questTemplateRepository.get(creatureQuest.getQuestTemplateId());
                     // NPC can give a quest
                     // The quest is valid
                     // The player level is enough
@@ -1262,7 +1293,7 @@ public class Player extends Unit {
     }
 
     public boolean tryAcceptQuest(int questId) {
-        QuestTemplate template = DataStorage.QuestTemplateRepository.get(questId);
+        QuestTemplate template = questTemplateRepository.get(questId);
         if (template == null) {
             Logging.Warn.log("%s tries to accept not existing quest template %d", toString(), questId);
             return false;
@@ -1312,8 +1343,9 @@ public class Player extends Unit {
         // TODO: also recalculate aura bonus parameters
         if (this.syncTimer < 0) {
             // Update Heroic Shield effect
-            if (!this.isInCombat())
-                new org.meds.spell.Spell(1141, this, 1).cast();
+            if (!this.isInCombat()) {
+                spellFactory.createSelf(1141, this, 1).cast();
+            }
 
             if (this.session != null && this.auras.size() != 0) {
                 synchronized (this.auras) {

@@ -3,17 +3,23 @@ package org.meds;
 import org.meds.data.domain.Achievement;
 import org.meds.data.domain.AchievementCriterion;
 import org.meds.data.domain.CharacterAchievement;
-import org.meds.database.DataStorage;
+import org.meds.database.Repository;
 import org.meds.enums.AchievementCategories;
 import org.meds.enums.AchievementCriterionTypes;
 import org.meds.enums.Currencies;
 import org.meds.logging.Logging;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
+@Component
+@Scope("prototype")
 public class AchievementManager {
+
+    private Repository<Achievement> achievementRepository;
 
     private final Player player;
 
@@ -24,7 +30,7 @@ public class AchievementManager {
         this.achievements = new HashMap<>(AchievementCategories.values().length);
 
         // Create a collection with non-completed achievements
-        for (Achievement achievement : DataStorage.AchievementRepository) {
+        for (Achievement achievement : achievementRepository) {
             AchievementCategories category = AchievementCategories.parse(achievement.getCategoryId());
             CharacterAchievement charAchieve = this.player.getAchievement(achievement.getId());
             if (charAchieve != null && charAchieve.isCompleted()) {
@@ -32,7 +38,7 @@ public class AchievementManager {
             }
             HashSet<Achievement> categoryAchievements = this.achievements.get(category);
             if (categoryAchievements == null) {
-                categoryAchievements = new HashSet<>(DataStorage.AchievementRepository.size());
+                categoryAchievements = new HashSet<>(achievementRepository.size());
                 this.achievements.put(category, categoryAchievements);
             }
             categoryAchievements.add(achievement);

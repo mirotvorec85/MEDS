@@ -1,16 +1,21 @@
 package org.meds.database;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 public class MapRepository<T> implements Repository<T> {
 
     private Map<Integer, T> data;
 
+    public MapRepository() {
+        this.data = Collections.emptyMap();
+    }
+
     public MapRepository(List<T> data, Function<T, Integer> keyGetter) {
+        setData(data, keyGetter);
+    }
+
+    public void setData(List<T> data, Function<T, Integer> keyGetter) {
         this.data = new HashMap<>(data.size());
         for(T element : data) {
             this.data.put(keyGetter.apply(element), element);

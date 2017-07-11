@@ -1,18 +1,13 @@
 package org.meds.spell;
 
-import org.meds.Damage;
-import org.meds.Inventory;
+import org.meds.*;
+import org.meds.enums.Parameters;
 import org.meds.item.Item;
-import org.meds.Player;
 import org.meds.item.ItemBonusParameters;
 import org.meds.item.ItemClasses;
 import org.meds.item.ItemSubClassWeapon;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
-import org.meds.Unit;
-import org.meds.UnitTypes;
-import org.meds.database.DataStorage;
-import org.meds.enums.Parameters;
 import org.meds.util.Random;
 
 public class Spell {
@@ -31,29 +26,10 @@ public class Spell {
         this.item = item;
     }
 
-    public Spell(org.meds.data.domain.Spell entry, Unit caster, int level, Unit target) {
-        this(entry, caster, level, target, null);
-    }
-
-    public Spell(org.meds.data.domain.Spell entry, Unit caster, int level) {
-        this(entry, caster, level, null, null);
-    }
-
-    public Spell(int spellId, Unit caster, int level, Unit target, Item item) {
-        this(DataStorage.SpellRepository.get(spellId), caster, level, target, item);
-    }
-
-    public Spell(int spellId, Unit caster, int level, Unit target) {
-        this(spellId, caster, level, target, null);
-    }
-
-    public Spell(int spellId, Unit caster, int level) {
-        this(spellId, caster, level, null, null);
-    }
-
     public boolean cast() {
-        if (this.entry == null)
+        if (this.entry == null) {
             return false;
+        }
 
         switch (this.entry.getId()) {
             // Frost, Fire and Lightning magic spells
@@ -88,7 +64,8 @@ public class Spell {
                 if (this.caster.hasAura(1000)) {
                     this.caster.removeAura(1000);
                 } else {
-                    this.caster.addAura(Aura.createAura(DataStorage.SpellRepository.get(1000), this.caster, -1, -10));
+                    // TODO: Spring fix build
+//                    this.caster.addAura(Aura.createAura(DataStorage.SpellRepository.get(1000), this.caster, -1, -10));
                 }
                 break;
             default:

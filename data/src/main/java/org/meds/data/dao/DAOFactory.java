@@ -1,20 +1,10 @@
 package org.meds.data.dao;
 
-public abstract class DAOFactory {
+public interface DAOFactory {
 
-    private static DAOFactory factory;
+    CharacterDAO getCharacterDAO();
 
-    public static DAOFactory getFactory() {
-        return factory;
-    }
+    MapDAO getMapDAO();
 
-    public static void setFactory(DAOFactory factory) {
-        DAOFactory.factory = factory;
-    }
-
-    public abstract CharacterDAO getCharacterDAO();
-
-    public abstract MapDAO getMapDAO();
-
-    public abstract WorldDAO getWorldDAO();
+    WorldDAO getWorldDAO();
 }

@@ -3,21 +3,18 @@ package org.meds.chat.commands;
 import org.meds.Group;
 import org.meds.Player;
 
-public class TeamLootChatCommand extends AbstractChatCommand {
+public abstract class TeamLootChatCommandHandler extends AbstractChatCommandHandler {
 
-    private Group.TeamLootModes mode;
-
-    public TeamLootChatCommand(Group.TeamLootModes mode) {
-        this.mode = mode;
-    }
+    public abstract Group.TeamLootModes getMode();
 
     @Override
     public void handle(Player player, String[] args) {
         Group group = player.getGroup();
-        if (group == null || group.getLeader() != player)
+        if (group == null || group.getLeader() != player) {
             return;
+        }
 
-        group.setTeamLootMode(this.mode);
+        group.setTeamLootMode(getMode());
         if (player.getSession() != null) {
             player.getSession().sendServerMessage(group.getTeamLootMode().getModeMessage())
                     .send(group.getTeamLootData());

@@ -6,14 +6,17 @@ import org.meds.data.domain.CharacterInfo;
 import org.meds.data.domain.CharacterSpell;
 import org.meds.enums.Races;
 import org.meds.util.MD5Hasher;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @ServerCommand("character")
 class CharacterCommandHandler implements CommandHandler {
+
+    @Autowired
+    private DAOFactory daoFactory;
 
     private Set<String> subCommands = new HashSet<>(Arrays.asList("ban", "create", "delete"));
 
@@ -46,7 +49,7 @@ class CharacterCommandHandler implements CommandHandler {
         character.setLogin(login);
         character.setPasswordHash(MD5Hasher.computePasswordHash(args[1]));
 
-        DAOFactory.getFactory().getCharacterDAO().insert(character);
+        daoFactory.getCharacterDAO().insert(character);
         int characterId = character.getId();
 
         CharacterInfo characterInfo = new CharacterInfo();
@@ -69,7 +72,7 @@ class CharacterCommandHandler implements CommandHandler {
         characterInfo.getSpells().put(54, new CharacterSpell(characterId, 54, 1)); // First Aid
         characterInfo.getSpells().put(60, new CharacterSpell(characterId, 60, 1)); // Relax
 
-        DAOFactory.getFactory().getCharacterDAO().insert(characterInfo);
+        daoFactory.getCharacterDAO().insert(characterInfo);
         System.out.printf("Player %s has been created%n", charName);
     }
 }

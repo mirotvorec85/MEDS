@@ -6,7 +6,7 @@ import org.meds.data.dao.MapDAO;
 import org.meds.data.dao.WorldDAO;
 import org.meds.data.hibernate.Hibernate;
 
-public class HibernateDAOFactory extends DAOFactory {
+public class HibernateDAOFactory implements DAOFactory {
 
     private CharacterDAO characterDAO;
     private MapDAO mapDAO;

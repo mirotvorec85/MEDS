@@ -6,7 +6,8 @@ import org.meds.util.DateFormatter;
 
 import java.util.Date;
 
-public class InfoChatCommand extends AbstractChatCommand {
+@ChatCommand("info")
+public class InfoChatCommandHandler extends AbstractChatCommandHandler {
 
     @Override
     public void handle(Player player, String[] args) {
