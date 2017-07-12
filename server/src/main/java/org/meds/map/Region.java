@@ -5,10 +5,16 @@ import org.meds.Unit;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.Random;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
+@Component // TODO: shouldn't be a component
+@Scope("prototype")
 public class Region {
+
     private class PlayerPositionChanged implements Unit.PositionChangedListener {
         @Override
         public void handleEvent(Unit.PositionEvent event) {
@@ -49,6 +55,9 @@ public class Region {
         }
     }
 
+    @Autowired
+    private MapManager mapManager;
+
     private org.meds.data.domain.Region entry;
 
     private Kingdom kingdom;
@@ -76,7 +85,7 @@ public class Region {
 
     public Region(org.meds.data.domain.Region entry) {
         this.entry = entry;
-        this.kingdom = MapManager.getInstance().getKingdom(entry.getKingdomId());
+        this.kingdom = mapManager.getKingdom(entry.getKingdomId());
         if (this.kingdom == null) {
             throw new IllegalArgumentException(String.format("Region %d references to a non-existing kingdom %d",
                     entry.getId(), entry.getKingdomId()));

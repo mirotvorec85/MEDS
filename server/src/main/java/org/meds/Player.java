@@ -69,6 +69,8 @@ public class Player extends Unit {
     @Autowired
     private DAOFactory daoFactory;
     @Autowired
+    private QuestInfoPacketFactory questInfoPacketFactory;
+    @Autowired
     private BiRepository<CreatureQuestRelation> creatureQuestRelationRepository;
     @Autowired
     private Repository<QuestTemplate> questTemplateRepository;
@@ -1317,7 +1319,7 @@ public class Player extends Unit {
         }
 
         if (this.session != null) {
-            this.session.send(Quest.getQuestInfoData(quest.getQuestTemplate(), true));
+            this.session.send(questInfoPacketFactory.create(quest.getQuestTemplate(), true));
         }
         return true;
     }

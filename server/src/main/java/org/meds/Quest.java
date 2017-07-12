@@ -2,14 +2,15 @@ package org.meds;
 
 import org.meds.data.domain.CharacterQuest;
 import org.meds.data.domain.CreatureTemplate;
-import org.meds.data.domain.ItemTemplate;
+import org.meds.data.domain.Currency;
 import org.meds.data.domain.QuestTemplate;
-import org.meds.database.DataStorage;
+import org.meds.database.Repository;
 import org.meds.enums.Currencies;
 import org.meds.enums.QuestStatuses;
 import org.meds.enums.QuestTypes;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 
@@ -40,6 +41,13 @@ public class Quest {
             }
         }
     }
+
+    @Autowired
+    private Locale locale;
+    @Autowired
+    private Repository<CreatureTemplate> creatureTemplateRepository;
+    @Autowired
+    private Repository<Currency> currencyRepository;
 
     private static final long serialVersionUID = 1L;
 
@@ -117,70 +125,6 @@ public class Quest {
         return this.isGoalAchieved;
     }
 
-    public static ServerPacket getQuestInfoData(QuestTemplate template) {
-        return getQuestInfoData(template, false);
-    }
-
-    public static ServerPacket getQuestInfoData(QuestTemplate template, boolean isForAccept) {
-        ServerPacket packet = new ServerPacket(isForAccept ? ServerCommands.QuestInfoForAccept : ServerCommands.QuestInfo);
-
-        packet.add(template.getId())
-                .add(template.getTitle())
-                .add(template.getType())
-                .add(template.getDescription())
-                .add(""); // Always empty
-
-        switch (template.getType()) {
-            case Kill:
-                CreatureTemplate creatureTemplate = DataStorage.CreatureTemplateRepository.get(template.getRequiredCreatureId());
-                if (creatureTemplate == null) {
-                    packet.add("").add("").add("");
-                } else {
-                    packet.add(template.getRequiredCount())
-                            .add(creatureTemplate.getName())
-                            .add("");
-                }
-                break;
-            default:
-                packet.add("").add("").add("");
-                break;
-        }
-        int rewardCount = 0;
-
-        if (template.getRewardExp() != 0) {
-            packet.add(template.getRewardExp() + Locale.getString(1));
-            ++rewardCount;
-        }
-        if (template.getRewardGold() != 0) {
-            packet.add(template.getRewardGold() + Locale.getString(2));
-            ++rewardCount;
-        }
-
-        ItemTemplate itemTemplate;
-        if (template.getRewardItem1Count() != 0 && template.getRewardItem1Id() != 0) {
-            itemTemplate = DataStorage.ItemTemplateRepository.get(template.getRewardItem1Id());
-            if (itemTemplate != null) {
-                packet.add(template.getRewardItem1Count() + " x " + itemTemplate.getTitle());
-                ++rewardCount;
-            }
-        }
-        if (template.getRewardItem2Count() != 0 && template.getRewardItem2Id() != 0) {
-            itemTemplate = DataStorage.ItemTemplateRepository.get(template.getRewardItem2Id());
-            if (itemTemplate != null) {
-                packet.add(template.getRewardItem2Count() + " x " + itemTemplate.getTitle());
-                ++rewardCount;
-            }
-        }
-
-        while (rewardCount != 3) {
-            packet.add("");
-            ++rewardCount;
-        }
-
-        packet.add(0); // ??? Tutorial?
-
-        return packet;
-    }
 
     public ServerPacket getQuestData() {
         ServerPacket packet = new ServerPacket(ServerCommands.QuestListInfo);
@@ -242,7 +186,7 @@ public class Quest {
                 ServerPacket packet = new ServerPacket(ServerCommands.ServerMessage)
                         .add(1096)
                         .add(this.questTemplate.getRewardGold())
-                        .add(DataStorage.CurrencyRepository.get(Currencies.Gold.getValue()).getTitle());
+                        .add(currencyRepository.get(Currencies.Gold.getValue()).getTitle());
                 this.player.getSession().send(packet);
             }
             this.player.changeCurrency(Currencies.Gold, this.questTemplate.getRewardGold());

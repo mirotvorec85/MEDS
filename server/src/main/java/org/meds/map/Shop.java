@@ -22,8 +22,6 @@ public class Shop {
     @Autowired
     private Repository<ItemTemplate> itemTemplateRepository;
     @Autowired
-    private ItemUtils itemUtils;
-    @Autowired
     private ItemFactory itemFactory;
 
     private org.meds.data.domain.Shop entry;
@@ -57,7 +55,7 @@ public class Shop {
         for (Map.Entry<ItemTemplate, Integer> entry : this.items.entrySet()) {
             packet.add(entry.getKey().getId())
                 .add("0") // Modification (Standard shops have only default items
-                .add(itemUtils.getMaxDurability(entry.getKey()));
+                .add(ItemUtils.getMaxDurability(entry.getKey()));
             // -1 in DB mean an infinite count
             // But for the client this number is 999,999
             if (entry.getValue() == -1) {

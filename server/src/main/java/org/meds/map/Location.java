@@ -23,8 +23,6 @@ public class Location {
 
     @Autowired
     private MapManager mapManager;
-    @Autowired
-    private ItemUtils itemUtils;
 
     private org.meds.data.domain.Location entry;
 
@@ -271,7 +269,7 @@ public class Location {
 
     public void addItem(Item item) {
         Item _item = this.items.get(item.getPrototype());
-        if (_item != null && itemUtils.areStackable(_item, item)) {
+        if (_item != null && ItemUtils.areStackable(_item, item)) {
             _item.stackItem(item);
         } else {
             this.items.put(item.getPrototype(), item);

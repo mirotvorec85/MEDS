@@ -145,8 +145,6 @@ public class Inventory {
     }
 
     @Autowired
-    private ItemUtils itemUtils;
-    @Autowired
     private ItemFactory itemFactory;
 
     private int capacity;
@@ -309,7 +307,7 @@ public class Inventory {
                 }
             }
             // Stack items
-            else if(itemUtils.areStackable(targetItem, sourceItem) && !isEquipmentSlot(newSlot)) {
+            else if(ItemUtils.areStackable(targetItem, sourceItem) && !isEquipmentSlot(newSlot)) {
                 // Swap the whole stack
                 if (sourceItem.getCount() == count) {
                     this.inventorySlots[currentSlot] = null;
@@ -349,7 +347,7 @@ public class Inventory {
             if (item == null) {
                 continue;
             }
-            weight += itemUtils.getWeight(item.Template);
+            weight += ItemUtils.getWeight(item.Template);
         }
 
         // TODO: Check weight after implementation
@@ -360,7 +358,7 @@ public class Inventory {
             if (item == null)
                 continue;
             // Equipment cannot be stacked
-            if (itemUtils.isEquipment(item)) {
+            if (ItemUtils.isEquipment(item)) {
                 slots += item.getCount();
                 continue;
             }
@@ -480,7 +478,8 @@ public class Inventory {
         for (int i = Slots.Inventory1.getValue(); i <= Slots.Inventory25.getValue(); ++i) {
             if (this.inventorySlots[i] != null) {
                 // Tries to stack (includes items comparability checking)
-                if (this.inventorySlots[i].stackItem(item, count)) {
+                if (ItemUtils.areStackable(this.inventorySlots[i], item)) {
+                    this.inventorySlots[i].stackItem(item, count);
                     onInventoryChanged();
                     return true;
                 }
@@ -567,7 +566,7 @@ public class Inventory {
         do {
             if (item == null) {
                 item = this.inventorySlots[itemSlots[i]].unstackItem(count);
-            } else if (itemUtils.areStackable(item, this.inventorySlots[itemSlots[i]])) {
+            } else if (ItemUtils.areStackable(item, this.inventorySlots[itemSlots[i]])) {
                 item.transfer(this.inventorySlots[itemSlots[i]], count - item.getCount());
             }
 
@@ -618,8 +617,9 @@ public class Inventory {
 
     public boolean destroyItem(int slot, int count) {
         Item item = this.inventorySlots[slot];
-        if (item == null)
+        if (item == null) {
             return false;
+        }
         if (count >= item.getCount()) {
             this.inventorySlots[slot] = null;
         }
@@ -635,22 +635,24 @@ public class Inventory {
             this.owner.getPosition().addItem(item);
         }
 
-        if (isEquipmentSlot(slot))
+        if (isEquipmentSlot(slot)) {
             onEquipmentChanged();
-        else
+        } else {
             onInventoryChanged();
+        }
 
         return true;
     }
 
     public void useItem(int slot) {
         Item item = this.inventorySlots[slot];
-        if (item == null)
+        if (item == null) {
             return;
+        }
 
         // Using equipment items is like to equip it
-        if (itemUtils.isEquipment(item)) {
-            this.swapItem(slot, getEquipmentSlot(item).getValue(), 1);
+        if (ItemUtils.isEquipment(item)) {
+            swapItem(slot, getEquipmentSlot(item).getValue(), 1);
             return;
         }
 

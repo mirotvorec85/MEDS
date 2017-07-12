@@ -12,13 +12,10 @@ import org.springframework.stereotype.Component;
 public class ItemFactory {
 
     @Autowired
-    private ItemUtils itemUtils;
-
-    @Autowired
     private Repository<ItemTemplate> itemTemplateRepository;
 
     public Item create(ItemTemplate template, int count) {
-        int durability = itemUtils.getMaxDurability(template);
+        int durability = ItemUtils.getMaxDurability(template);
         return new Item(template, count, durability, 0);
     }
 

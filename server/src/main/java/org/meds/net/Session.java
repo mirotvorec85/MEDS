@@ -13,6 +13,7 @@ import org.meds.database.LevelCost;
 import org.meds.database.Repository;
 import org.meds.enums.*;
 import org.meds.item.Item;
+import org.meds.item.ItemFactory;
 import org.meds.item.ItemFlags;
 import org.meds.item.ItemPrototype;
 import org.meds.logging.Logging;
@@ -80,6 +81,10 @@ public class Session implements Runnable {
     private DataStorage dataStorage;
     @Autowired
     private Locale locale;
+    @Autowired
+    private ItemFactory itemFactory;
+    @Autowired
+    private QuestInfoPacketFactory questInfoPacketFactory;
 
     /**
      * Related Socket for this session.
@@ -721,8 +726,9 @@ public class Session implements Runnable {
                 victimId = victimId.substring(0, victimId.length() - 1);
                 Unit victim = World.getInstance().getUnit(SafeConvert.toInt32(victimId));
                 // target is not found
-                if (victim == null)
+                if (victim == null) {
                     return;
+                }
 
                 Session.this.player.interact(victim);
             }
@@ -1095,8 +1101,9 @@ public class Session implements Runnable {
         public void handle(String[] data) {
             int questId = SafeConvert.toInt32(data[0]);
             QuestTemplate template = questTemplateRepository.get(questId);
-            if (template != null)
-                send(Quest.getQuestInfoData(template));
+            if (template != null) {
+                send(questInfoPacketFactory.create(template));
+            }
         }
     }
 
@@ -1432,11 +1439,12 @@ public class Session implements Runnable {
             Trade.Supply supply = trade.new Supply();
             int counter = 1;
             for (int i = 0; i < 3; ++i) {
-                Item item = new Item(new ItemPrototype(
+                ItemPrototype prototype = new ItemPrototype(
                         SafeConvert.toInt32(data[counter++]),
                         SafeConvert.toInt32(data[counter++]),
-                        SafeConvert.toInt32(data[counter++])),
                         SafeConvert.toInt32(data[counter++]));
+                Item item = itemFactory.create(prototype, SafeConvert.toInt32(data[counter++]));
+
                 // An item has not been constructed right
                 if (item.Template == null || item.getCount() == 0)
                     continue;
@@ -1475,11 +1483,12 @@ public class Session implements Runnable {
 
                 Trade.Supply demand = trade.new Supply();
                 for (int i = 0; i < 3; ++i) {
-                    Item item = new Item(new ItemPrototype(
+                    ItemPrototype prototype = new ItemPrototype(
                             SafeConvert.toInt32(data[counter++]),
                             SafeConvert.toInt32(data[counter++]),
-                            SafeConvert.toInt32(data[counter++])),
                             SafeConvert.toInt32(data[counter++]));
+                    Item item = itemFactory.create(prototype, SafeConvert.toInt32(data[counter++]));
+
                     if (item.Template == null || item.getCount() == 0)
                         continue;
                     demand.setItem(i, item);

@@ -54,7 +54,7 @@ public class Item {
     }
 
     public boolean isEquipment() {
-        return isEquipment(this.Template);
+        return ItemUtils.isEquipment(this.Template);
     }
 
     public boolean isWeapon() {

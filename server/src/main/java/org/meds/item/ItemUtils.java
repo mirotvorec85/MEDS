@@ -1,12 +1,9 @@
 package org.meds.item;
 
 import org.meds.data.domain.ItemTemplate;
-import org.meds.database.Repository;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.SafeConvert;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,17 +11,11 @@ import java.util.Map;
 /**
  * @author Romman
  */
-@Component
 public final class ItemUtils {
 
+    private ItemUtils() {}
 
-
-    @Autowired
-    private Repository<ItemTemplate> itemTemplateRepository;
-    @Autowired
-    private ItemFactory itemFactory;
-
-    public int getMaxDurability(ItemTemplate template) {
+    public static int getMaxDurability(ItemTemplate template) {
         if (template == null) {
             return 0;
         }
@@ -36,7 +27,7 @@ public final class ItemUtils {
         return template.getLevel() * 75 + 75;
     }
 
-    public int getWeight(ItemTemplate template) {
+    public static int getWeight(ItemTemplate template) {
         if (template == null) {
             return 0;
         }
@@ -71,11 +62,11 @@ public final class ItemUtils {
         }
     }
 
-    public boolean isEquipment(Item item) {
+    public static boolean isEquipment(Item item) {
         return isEquipment(item.Template);
     }
 
-    public boolean isEquipment(ItemTemplate template) {
+    public static boolean isEquipment(ItemTemplate template) {
         if (template == null) {
             return false;
         }
@@ -98,7 +89,7 @@ public final class ItemUtils {
         }
     }
 
-    public boolean areStackable(Item itemA, Item itemB) {
+    public static boolean areStackable(Item itemA, Item itemB) {
         // Equipment may not be stacked
         if (isEquipment(itemA) || isEquipment(itemB)) {
             return false;
@@ -123,6 +114,7 @@ public final class ItemUtils {
         }
     }
 
+    // TODO: Move to a new class
     public Map<ItemBonusParameters, Integer> parseTemplateBonuses(String bonuses) throws BonusParsingException {
         String[] keyValues = bonuses.split(";");
         Map<ItemBonusParameters, Integer> bonusMap = new HashMap<>(keyValues.length);
@@ -150,6 +142,7 @@ public final class ItemUtils {
         return bonusMap;
     }
 
+    // TODO: possibly new component ItemInfoPacketFactory?
     public ServerPacket getItemInfo(int templateId, int modification, ServerPacket packet) {
         ItemPrototype prototype = new ItemPrototype(templateId, modification, 0);
         Item item = itemFactory.create(prototype);
