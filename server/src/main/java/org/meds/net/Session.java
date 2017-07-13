@@ -83,12 +83,14 @@ public class Session implements Runnable {
     private ItemInfoPacketFactory itemInfoPacketFactory;
     @Autowired
     private QuestInfoPacketFactory questInfoPacketFactory;
+    @Autowired
+    private ThreadSessionContext sessionContext;
 
     /**
      * Related Socket for this session.
      */
     private Socket socket;
-    private HashMap<ClientCommands, CommandHandler> commandHandlers;
+    private HashMap<ClientCommandTypes, CommandHandler> commandHandlers;
 
     private Player player;
 
@@ -118,65 +120,71 @@ public class Session implements Runnable {
         this.listeners = new HashSet<>();
 
         this.commandHandlers = new HashMap<>();
-        this.commandHandlers.put(ClientCommands.Verification, new VerificationCommandHandler());
-        this.commandHandlers.put(ClientCommands.Login, new LoginCommandHandler());
-        this.commandHandlers.put(ClientCommands.Ready, new ReadyCommandHandler());
-        this.commandHandlers.put(ClientCommands.Ping, new PingCommandHandler());
-        this.commandHandlers.put(ClientCommands.Movement, new MovementCommandHandler());
-        this.commandHandlers.put(ClientCommands.PutMoney, new PutMoneyCommandHandler());
-        this.commandHandlers.put(ClientCommands.TakeMoney, new TakeMoneyCommandHandler());
-        this.commandHandlers.put(ClientCommands.BankExchange, new BankExchangeCommandHandler());
-        this.commandHandlers.put(ClientCommands.Attack, new AttackCommandHandler());
-        this.commandHandlers.put(ClientCommands.UseMagic, new UseMagicCommandHandler());
-        this.commandHandlers.put(ClientCommands.Relax, new RelaxCommandHandler());
-        this.commandHandlers.put(ClientCommands.GuildLearn, new GuildLearnCommandHandler());
-        this.commandHandlers.put(ClientCommands.RemoveLevel, new RemoveLevelCommandHandler());
-        this.commandHandlers.put(ClientCommands.GetGuildLevels, new GetGuildLevelsCommandHandler());
-        this.commandHandlers.put(ClientCommands.Say, new SayCommandHandler());
-        this.commandHandlers.put(ClientCommands.GetItemInfo, new GetItemInfoCommandHandler());
-        this.commandHandlers.put(ClientCommands.SwapItem, new SwapItemsCommandHandler());
-        this.commandHandlers.put(ClientCommands.LootCorpse, new LootCorpseCommandHandler());
-        this.commandHandlers.put(ClientCommands.EnterShop, new EnterShopCommandHandler());
-        this.commandHandlers.put(ClientCommands.SellItem, new SellItemCommandHandler());
-        this.commandHandlers.put(ClientCommands.BuyItem, new BuyItemCommandHandler());
-        this.commandHandlers.put(ClientCommands.SetAutoLoot, new SetAutoLootCommandHandler());
-        this.commandHandlers.put(ClientCommands.GetInn, new GetInnCommandHandler());
-        this.commandHandlers.put(ClientCommands.InnStore, new InnStoreCommandHandler());
-        this.commandHandlers.put(ClientCommands.InnGet, new InnGetCommandHandler());
-        this.commandHandlers.put(ClientCommands.Whisper, new WhisperCommandHandler());
-        this.commandHandlers.put(ClientCommands.DestroyItem, new DestroyItemCommandHandler());
-        this.commandHandlers.put(ClientCommands.UseItem, new UseItemCommandHandler());
-        this.commandHandlers.put(ClientCommands.QuestListFilter, new QuestListFilterCommandHandler());
-        this.commandHandlers.put(ClientCommands.GetQuestInfo, new GetQuestInfoCommandHandler());
-        this.commandHandlers.put(ClientCommands.QuestInfoForAccept, new GetQuestInfoForAcceptCommandHandler());
-        this.commandHandlers.put(ClientCommands.QuestAccept, new QuestAcceptCommandHandler());
-        this.commandHandlers.put(ClientCommands.SetAutoSpell, new SetAutoSpellCommandHandler());
-        this.commandHandlers.put(ClientCommands.EnterStar, new EnterStarCommandHandler());
-        this.commandHandlers.put(ClientCommands.SetHome, new SetHomeCommandHandler());
-        this.commandHandlers.put(ClientCommands.GetLocationInfo, new LocationInfoCommandHandler());
-        this.commandHandlers.put(ClientCommands.RegionLocations, new RegionLocationsCommandHandler());
-        this.commandHandlers.put(ClientCommands.GuildLessonsInfo, new GuildLessonsInfoCommandHandler());
-        this.commandHandlers.put(ClientCommands.LearnGuildInfo, new LearnGuildInfoCommandHandler());
-        this.commandHandlers.put(ClientCommands.GroupCreate, new GroupCreateCommandHandler());
-        this.commandHandlers.put(ClientCommands.GroupSettingsChange, new GroupSettingsChangeCommandHandler());
-        this.commandHandlers.put(ClientCommands.GroupJoin, new GroupJoinCommandHandler());
-        this.commandHandlers.put(ClientCommands.GroupDisband, new GroupDisbandCommandHandler());
-        this.commandHandlers.put(ClientCommands.GroupQuit, new GroupQuitCommandHandler());
-        this.commandHandlers.put(ClientCommands.GroupKick, new GroupKickCommandHandler());
-        this.commandHandlers.put(ClientCommands.GroupChangeLeader, new GroupChangeLeaderCommandHandler());
-        this.commandHandlers.put(ClientCommands.GetTrade, new GetTradeCommandHandler());
-        this.commandHandlers.put(ClientCommands.TradeUpdate, new TradeUpdateCommandHandler(false));
-        this.commandHandlers.put(ClientCommands.TradeApply, new TradeUpdateCommandHandler(true));
-        this.commandHandlers.put(ClientCommands.TradeCancel, new TradeCancelCommandHandler());
-        this.commandHandlers.put(ClientCommands.SetAsceticism, new SetAsceticismCommandHandler());
-        this.commandHandlers.put(ClientCommands.GetProfessions, new GetProfessionsCommandHandler());
-        this.commandHandlers.put(ClientCommands.SaveNotepad, new SaveNotepadCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.Verification, new VerificationCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.Login, new LoginCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.Ready, new ReadyCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.Ping, new PingCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.Movement, new MovementCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.PutMoney, new PutMoneyCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.TakeMoney, new TakeMoneyCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.BankExchange, new BankExchangeCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.Attack, new AttackCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.UseMagic, new UseMagicCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.Relax, new RelaxCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.GuildLearn, new GuildLearnCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.RemoveLevel, new RemoveLevelCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.GetGuildLevels, new GetGuildLevelsCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.Say, new SayCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.GetItemInfo, new GetItemInfoCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.SwapItem, new SwapItemsCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.LootCorpse, new LootCorpseCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.EnterShop, new EnterShopCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.SellItem, new SellItemCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.BuyItem, new BuyItemCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.SetAutoLoot, new SetAutoLootCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.GetInn, new GetInnCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.InnStore, new InnStoreCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.InnGet, new InnGetCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.Whisper, new WhisperCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.DestroyItem, new DestroyItemCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.UseItem, new UseItemCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.QuestListFilter, new QuestListFilterCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.GetQuestInfo, new GetQuestInfoCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.QuestInfoForAccept, new GetQuestInfoForAcceptCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.QuestAccept, new QuestAcceptCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.SetAutoSpell, new SetAutoSpellCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.EnterStar, new EnterStarCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.SetHome, new SetHomeCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.GetLocationInfo, new LocationInfoCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.RegionLocations, new RegionLocationsCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.GuildLessonsInfo, new GuildLessonsInfoCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.LearnGuildInfo, new LearnGuildInfoCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.GroupCreate, new GroupCreateCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.GroupSettingsChange, new GroupSettingsChangeCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.GroupJoin, new GroupJoinCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.GroupDisband, new GroupDisbandCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.GroupQuit, new GroupQuitCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.GroupKick, new GroupKickCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.GroupChangeLeader, new GroupChangeLeaderCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.GetTrade, new GetTradeCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.TradeUpdate, new TradeUpdateCommandHandler(false));
+        this.commandHandlers.put(ClientCommandTypes.TradeApply, new TradeUpdateCommandHandler(true));
+        this.commandHandlers.put(ClientCommandTypes.TradeCancel, new TradeCancelCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.SetAsceticism, new SetAsceticismCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.GetProfessions, new GetProfessionsCommandHandler());
+        this.commandHandlers.put(ClientCommandTypes.SaveNotepad, new SaveNotepadCommandHandler());
 
         this.packetBuffer = new ServerPacket();
 
         this.key = Random.nextInt(2000000000) + 100000000;
 
         this.sessionToString = "Session [" + this.socket.getInetAddress().toString() + "]: ";
+
+        this.sessionContext.setSession(this);
+    }
+
+    public int getKey() {
+        return this.key;
     }
 
     public String getLastLoginIp() {
@@ -227,7 +235,7 @@ public class Session implements Runnable {
                 for (PacketCommand command : packet.getPacketCommands()) {
                     if (!command.isValid())
                         continue;
-                    ClientCommands clientCommand = ClientCommands.parse(command.getCommand());
+                    ClientCommandTypes clientCommand = ClientCommandTypes.parse(command.getCommand());
                     if (clientCommand == null) {
                         Logging.Warn.log(toString() + "Received unknown command \"" + command.getCommand() + "\".");
                         continue;

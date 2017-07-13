@@ -29,10 +29,9 @@ public class AchievementManager {
 
     public void setPlayer(Player player) {
         this.player = player;
-        init();
     }
 
-    private void init() {
+    public void load() {
         this.achievements = new HashMap<>(AchievementCategories.values().length);
 
         // Create a collection with non-completed achievements

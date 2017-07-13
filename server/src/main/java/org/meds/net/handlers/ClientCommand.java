@@ -1,15 +1,15 @@
-package org.meds.chat.commands;
+package org.meds.net.handlers;
 
+import org.meds.net.ClientCommandTypes;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.*;
 
 /**
- * Indicates that annotated class is a Chat command handler.
- * Commands are applied with as a chat message.
+ * Indicates that annotated class is a Client Packet Command handler.
  * <p>
  * This annotation should be applied to a class that implements
- * {@link org.meds.chat.commands.ChatCommandHandler} interface.
+ * {@link ClientCommandHandler} interface.
  *
  * @author Romman
  */
@@ -17,7 +17,6 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Component
-public @interface ChatCommand {
-
-    String value();
+public @interface ClientCommand {
+    ClientCommandTypes value();
 }

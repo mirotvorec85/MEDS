@@ -42,7 +42,7 @@ public class ChatCommandManager {
     }
 
     public void handle(Player player, String command, String commandArgs) {
-        // Parsing commands
+        // Parsing handlers
         // Each word except surrounding with quotes
 
         List<String> list = new ArrayList<>();

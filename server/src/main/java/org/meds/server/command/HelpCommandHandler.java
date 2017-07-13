@@ -17,7 +17,7 @@ class HelpCommandHandler implements CommandHandler {
 
     @Override
     public void handle(String[] args) {
-        System.out.println("Available commands:");
+        System.out.println("Available handlers:");
         serverCommandWorker.getAvailableCommands().forEach(command -> {
             System.out.println(" " + command);
         });

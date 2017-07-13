@@ -3,7 +3,7 @@ package org.meds.net;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum ClientCommands {
+public enum ClientCommandTypes {
 
     Ping("0"),
     SetHome("acity"),
@@ -63,20 +63,20 @@ public enum ClientCommands {
     Verification("ver"),
     Whisper("wisp");
 
-    private static final Map<String, ClientCommands> values = new HashMap<>();
+    private static final Map<String, ClientCommandTypes> values = new HashMap<>();
 
     static {
-        for (ClientCommands command : ClientCommands.values())
-            ClientCommands.values.put(command.value, command);
+        for (ClientCommandTypes command : ClientCommandTypes.values())
+            ClientCommandTypes.values.put(command.value, command);
     }
 
-    public static ClientCommands parse(String command) {
-        return ClientCommands.values.get(command);
+    public static ClientCommandTypes parse(String command) {
+        return ClientCommandTypes.values.get(command);
     }
 
     private final String value;
 
-    ClientCommands(String value) {
+    ClientCommandTypes(String value) {
         this.value = value;
     }
 

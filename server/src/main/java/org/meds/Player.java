@@ -93,6 +93,8 @@ public class Player extends Unit {
     private Locale locale;
     @Autowired
     private ItemTitleConstructor itemTitleConstructor;
+    @Autowired
+    private AchievementManager achievementManager;
 
     protected static final int SaveTime = 60000;
     protected static final int SyncTime = 20000;
@@ -116,7 +118,7 @@ public class Player extends Unit {
 
     private SessionDisconnect disconnector;
 
-    private AchievementManager achievementManager;
+
 
     private Group group;
 
@@ -632,6 +634,7 @@ public class Player extends Unit {
 
         this.inventory.load(this.info.getInventoryItems());
         this.inn.load(this.info.getInnItems());
+        this.achievementManager.load();
 
         this.health = this.parameters.value(Parameters.Health);
         this.mana = this.parameters.value(Parameters.Mana);

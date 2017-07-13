@@ -37,7 +37,7 @@ public class HelpChatCommandHandler extends AbstractChatCommandHandler {
                 .add(chatHandler.constructSystemMessage("\\skills"))
                 .add(chatHandler.constructSystemMessage("\\noprotect"))
                 .add(chatHandler.constructSystemMessage("\\total_filter"))
-                // TODO: add tips for the next commands (cost, format, etc.)
+                // TODO: add tips for the next handlers (cost, format, etc.)
                 .add(chatHandler.constructSystemMessage("\\gra"))
                 .add(chatHandler.constructSystemMessage("\\invisible"))
                 .add(chatHandler.constructSystemMessage("\\doppel"))

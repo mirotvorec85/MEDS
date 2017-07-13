@@ -1,8 +1,5 @@
 package org.meds.server.command;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import org.meds.logging.Logging;
 import org.meds.server.Server;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +7,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class ServerCommandWorker implements Runnable {
@@ -73,7 +72,7 @@ public class ServerCommandWorker implements Runnable {
 
         CommandHandler handler = this.commands.get(commandArgs[0]);
         if (handler == null) {
-            System.out.println("Command \"" + commandArgs[0] + "\" not found. To see the list of all available commands type \"help\"");
+            System.out.println("Command \"" + commandArgs[0] + "\" not found. To see the list of all available handlers type \"help\"");
             return;
         }
 
