@@ -10,6 +10,7 @@ import org.meds.enums.Currencies;
 import org.meds.logging.Logging;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -19,14 +20,19 @@ import java.util.*;
 @Scope("prototype")
 public class AchievementManager {
 
+    @Autowired
     private Repository<Achievement> achievementRepository;
 
-    private final Player player;
+    private Player player;
 
-    private final java.util.Map<AchievementCategories, HashSet<Achievement>> achievements;
+    private Map<AchievementCategories, HashSet<Achievement>> achievements;
 
-    public AchievementManager(Player player) {
+    public void setPlayer(Player player) {
         this.player = player;
+        init();
+    }
+
+    private void init() {
         this.achievements = new HashMap<>(AchievementCategories.values().length);
 
         // Create a collection with non-completed achievements
@@ -44,14 +50,11 @@ public class AchievementManager {
             categoryAchievements.add(achievement);
         }
 
-        this.player.addKillingBlowListener(new Unit.KillingBlowListener() {
-            @Override
-            public void handleEvent(Unit.DamageEvent e) {
-
-                if (e.getVictim().isPlayer())
-                    updateProgress(AchievementCategories.PvP, e.getVictim());
-                else
-                    updateProgress(AchievementCategories.PvM, e.getVictim());
+        this.player.addKillingBlowListener(e -> {
+            if (e.getVictim().isPlayer()) {
+                updateProgress(AchievementCategories.PvP, e.getVictim());
+            } else {
+                updateProgress(AchievementCategories.PvM, e.getVictim());
             }
         });
     }

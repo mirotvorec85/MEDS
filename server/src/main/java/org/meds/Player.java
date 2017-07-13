@@ -8,6 +8,7 @@ import org.meds.database.LevelCost;
 import org.meds.database.Repository;
 import org.meds.enums.*;
 import org.meds.item.Item;
+import org.meds.item.ItemTitleConstructor;
 import org.meds.logging.Logging;
 import org.meds.map.Location;
 import org.meds.net.ServerCommands;
@@ -87,7 +88,11 @@ public class Player extends Unit {
     @Autowired
     private Inventory inventory;
     @Autowired
+    private Inn inn;
+    @Autowired
     private Locale locale;
+    @Autowired
+    private ItemTitleConstructor itemTitleConstructor;
 
     protected static final int SaveTime = 60000;
     protected static final int SyncTime = 20000;
@@ -100,8 +105,6 @@ public class Player extends Unit {
 
     private int saverTimer;
     private int syncTimer;
-
-    private Inn inn;
 
     private CharacterInfo info;
 
@@ -127,8 +130,6 @@ public class Player extends Unit {
         this.statuses = new EnumFlags<>();
         this.settings = new EnumFlags<>();
 
-        this.inn = new Inn(this);
-
         this.saverTimer = SaveTime;
         this.syncTimer = SyncTime;
 
@@ -139,6 +140,8 @@ public class Player extends Unit {
     @PostConstruct
     private void init() {
         this.inventory.setOwner(this);
+        this.inn.setOwner(this);
+        this.achievementManager.setPlayer(this);
     }
 
     @Override
@@ -633,8 +636,6 @@ public class Player extends Unit {
         this.health = this.parameters.value(Parameters.Health);
         this.mana = this.parameters.value(Parameters.Mana);
 
-        this.achievementManager = new AchievementManager(this);
-
         return true;
     }
 
@@ -1026,21 +1027,21 @@ public class Player extends Unit {
         }
 
         Set<Item> items = corpse.getItems();
-        if (items.size() > 0) {
-            for (Item item : items) {
-                if (this.session != null)
-                    this.session.sendServerMessage(998, corpse.getOwner().getName(), item.getCount() > 1 ? item.getCount() + " " : "", item.getTitle());
-                this.position.send(this,
-                        new ServerPacket(ServerCommands.ServerMessage)
-                                .add("999")
-                                .add(this.getName())
-                                .add(corpse.getOwner().getName())
-                                .add(item.getCount() > 1 ? item.getCount() + " " : "")
-                                .add(item.getTitle()));
-                this.inventory.tryStoreItem(item);
-                // TODO: leave corpse if a player didn't take all the loot
+        items.forEach(item -> {
+            String itemTitle = itemTitleConstructor.getTitle(item);
+            if (this.session != null) {
+                this.session.sendServerMessage(998, corpse.getOwner().getName(), item.getCount() > 1 ? item.getCount() + " " : "", itemTitle);
             }
-        }
+            this.position.send(this,
+                    new ServerPacket(ServerCommands.ServerMessage)
+                            .add("999")
+                            .add(this.getName())
+                            .add(corpse.getOwner().getName())
+                            .add(item.getCount() > 1 ? item.getCount() + " " : "")
+                            .add(itemTitle));
+            this.inventory.tryStoreItem(item);
+            // TODO: leave corpse if a player didn't take all the loot
+        });
 
         this.position.removeCorpse(corpse);
     }
@@ -1139,11 +1140,12 @@ public class Player extends Unit {
                         Iterator<Item> lootIterator = creature.getLootIterator();
                         while (lootIterator.hasNext()) {
                             Item item = lootIterator.next();
+                            String itemTitle = itemTitleConstructor.getTitle(item);
                             packet.add(ServerCommands.ServerMessage).add(1268).add(creature.getTemplate().getName());
                             if (item.getCount() == 1) {
-                                packet.add(item.getTitle());
+                                packet.add(itemTitle);
                             } else {
-                                packet.add(item.getCount() + " " + item.getTitle());
+                                packet.add(item.getCount() + " " + itemTitle);
                             }
                         }
                         break;

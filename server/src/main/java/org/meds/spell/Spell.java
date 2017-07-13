@@ -134,7 +134,8 @@ public class Spell {
 
         // Message by item
         if (item != null) {
-            SendMessage(this.target, 4, item.getTitle());
+            // TODO: Spring fix build
+//            SendMessage(this.target, 4, item.getTitle());
             return;
         }
 
@@ -206,8 +207,8 @@ public class Spell {
             Player pCaster = (Player) this.caster;
             Item rightHandItem = pCaster.getInventory().get(Inventory.Slots.RightHand);
             if (rightHandItem != null
-                    && rightHandItem.Template.getItemClass() == ItemClasses.Weapon
-                    && rightHandItem.Template.getSubClass() == ItemSubClassWeapon.Staff.getValue()) {
+                    && rightHandItem.getTemplate().getItemClass() == ItemClasses.Weapon
+                    && rightHandItem.getTemplate().getSubClass() == ItemSubClassWeapon.Staff.getValue()) {
                 minDamage = rightHandItem.getBonusValue(ItemBonusParameters.BaseMinDamage);
                 maxDamage = rightHandItem.getBonusValue(ItemBonusParameters.BaseMaxDamage);
             }

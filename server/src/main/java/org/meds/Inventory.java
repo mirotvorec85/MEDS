@@ -110,7 +110,7 @@ public class Inventory {
     }
 
     public static Slots getEquipmentSlot(Item item) {
-        return Inventory.getEquipmentSlot(item.Template.getItemClass());
+        return Inventory.getEquipmentSlot(item.getTemplate().getItemClass());
     }
 
     public static Slots getEquipmentSlot(ItemClasses itemClass) {
@@ -146,6 +146,8 @@ public class Inventory {
 
     @Autowired
     private ItemFactory itemFactory;
+    @Autowired
+    private ItemTitleConstructor itemTitleConstructor;
 
     private int capacity;
 
@@ -190,7 +192,7 @@ public class Inventory {
                     charItem.getDurability());
             Item item = itemFactory.create(prototype, charItem.getCount());
             // Item is valid
-            if (item.Template != null) {
+            if (item.getTemplate() != null) {
                 this.inventorySlots[charItem.getSlot()] = item;
             }
         }
@@ -219,7 +221,7 @@ public class Inventory {
                     this.characterItems.put(i, charItem);
                 }
 
-                charItem.setItemTemplateId(item.Template.getId());
+                charItem.setItemTemplateId(item.getTemplate().getId());
                 charItem.setModification(item.getModification().getValue());
                 charItem.setDurability(item.getDurability());
                 charItem.setCount(item.getCount());
@@ -239,7 +241,7 @@ public class Inventory {
                 continue;
             }
 
-            packet.add(this.inventorySlots[i].Template.getId());
+            packet.add(this.inventorySlots[i].getTemplate().getId());
             packet.add(this.inventorySlots[i].getModification().getValue());
             packet.add(this.inventorySlots[i].getDurability());
             packet.add(this.inventorySlots[i].getCount());
@@ -255,7 +257,7 @@ public class Inventory {
                 continue;
             }
 
-            packet.add(this.inventorySlots[i].Template.getId());
+            packet.add(this.inventorySlots[i].getTemplate().getId());
             packet.add(this.inventorySlots[i].getModification().getValue());
             packet.add(this.inventorySlots[i].getDurability());
             packet.add("1"); // Seems equipment count always equals 1.
@@ -269,7 +271,7 @@ public class Inventory {
         if (this.inventorySlots[slot] == null) {
             packet.add("0").add("0").add("0").add("0");
         } else {
-            packet.add(this.inventorySlots[slot].Template.getId());
+            packet.add(this.inventorySlots[slot].getTemplate().getId());
             packet.add(this.inventorySlots[slot].getModification().getValue());
             packet.add(this.inventorySlots[slot].getDurability());
             packet.add(this.inventorySlots[slot].getCount());
@@ -347,7 +349,7 @@ public class Inventory {
             if (item == null) {
                 continue;
             }
-            weight += ItemUtils.getWeight(item.Template);
+            weight += ItemUtils.getWeight(item.getTemplate());
         }
 
         // TODO: Check weight after implementation
@@ -415,7 +417,7 @@ public class Inventory {
             if (this.inventorySlots[i] == null) {
                 continue;
             }
-            if (this.inventorySlots[i].Template.getId() != templateId) {
+            if (this.inventorySlots[i].getTemplate().getId() != templateId) {
                 continue;
             }
             return i;
@@ -444,7 +446,7 @@ public class Inventory {
             if (this.inventorySlots[i] == null) {
                 continue;
             }
-            if (this.inventorySlots[i].Template.getId() != templateId) {
+            if (this.inventorySlots[i].getTemplate().getId() != templateId) {
                 continue;
             }
             slots.add(i);
@@ -497,34 +499,34 @@ public class Inventory {
         // Slot is equipment: check a compatibility between slot type and item type. Also check the item requirements.
         if (isEquipmentSlot(slot)) {
             // Check min level
-            if (item.Template.getLevel() > this.owner.getLevel()) {
+            if (item.getTemplate().getLevel() > this.owner.getLevel()) {
                 return false;
             }
 
             switch (Slots.parse(slot)) {
                 case Head:
-                    return item.Template.getItemClass() == ItemClasses.Head;
+                    return item.getTemplate().getItemClass() == ItemClasses.Head;
                 case Neck:
-                    return item.Template.getItemClass() == ItemClasses.Neck;
+                    return item.getTemplate().getItemClass() == ItemClasses.Neck;
                 case Back:
-                    return item.Template.getItemClass() == ItemClasses.Back;
+                    return item.getTemplate().getItemClass() == ItemClasses.Back;
                 case Body:
-                    return item.Template.getItemClass() == ItemClasses.Body;
+                    return item.getTemplate().getItemClass() == ItemClasses.Body;
                 case Hand:
-                    return item.Template.getItemClass() == ItemClasses.Hands;
+                    return item.getTemplate().getItemClass() == ItemClasses.Hands;
                 case RightHand:
-                    return item.Template.getItemClass() == ItemClasses.Weapon;
+                    return item.getTemplate().getItemClass() == ItemClasses.Weapon;
                 case LeftHand:
-                    return item.Template.getItemClass() == ItemClasses.Shield;
+                    return item.getTemplate().getItemClass() == ItemClasses.Shield;
                 case Waist:
-                    return item.Template.getItemClass() == ItemClasses.Waist;
+                    return item.getTemplate().getItemClass() == ItemClasses.Waist;
                 case Leg:
-                    return item.Template.getItemClass() == ItemClasses.Legs;
+                    return item.getTemplate().getItemClass() == ItemClasses.Legs;
                 case Foot:
-                    return item.Template.getItemClass() == ItemClasses.Foot;
+                    return item.getTemplate().getItemClass() == ItemClasses.Foot;
                 case RightHandRing:
                 case LeftHandRing:
-                    return item.Template.getItemClass() == ItemClasses.Ring;
+                    return item.getTemplate().getItemClass() == ItemClasses.Ring;
                 default:
                     // I don't know is this real but just for case
                     return false;
@@ -627,7 +629,7 @@ public class Inventory {
             item = item.unstackItem(count);
 
         // Send Message
-        this.owner.getSession().sendServerMessage(1016, count > 1 ? Integer.toString(count) + " " : "", item.getTitle());
+        this.owner.getSession().sendServerMessage(1016, count > 1 ? Integer.toString(count) + " " : "", itemTitleConstructor.getTitle(item));
 
         // Personal items are destroyed completely
         // Others are thrown to the ground

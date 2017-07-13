@@ -6,7 +6,6 @@ import org.meds.logging.Logging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,6 @@ public class Locale {
 
     private Map<Integer, String> strings;
 
-    @PostConstruct
     public void load() {
         List<LocaleString> localeStrings = daoFactory.getWorldDAO().getLocaleStrings();
         this.strings = new HashMap<>(localeStrings.size());

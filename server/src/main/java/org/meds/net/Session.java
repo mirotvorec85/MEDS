@@ -12,10 +12,7 @@ import org.meds.database.DataStorage;
 import org.meds.database.LevelCost;
 import org.meds.database.Repository;
 import org.meds.enums.*;
-import org.meds.item.Item;
-import org.meds.item.ItemFactory;
-import org.meds.item.ItemFlags;
-import org.meds.item.ItemPrototype;
+import org.meds.item.*;
 import org.meds.logging.Logging;
 import org.meds.map.Location;
 import org.meds.map.MapManager;
@@ -27,7 +24,6 @@ import org.meds.util.MD5Hasher;
 import org.meds.util.Random;
 import org.meds.util.SafeConvert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -68,8 +64,6 @@ public class Session implements Runnable {
     @Autowired
     private ChatHandler chatHandler;
     @Autowired
-    private ApplicationContext applicationContext;
-    @Autowired
     private Repository<NewMessage> newMessageRepository;
     @Autowired
     private Repository<QuestTemplate> questTemplateRepository;
@@ -83,6 +77,10 @@ public class Session implements Runnable {
     private Locale locale;
     @Autowired
     private ItemFactory itemFactory;
+    @Autowired
+    private ItemTitleConstructor itemTitleConstructor;
+    @Autowired
+    private ItemInfoPacketFactory itemInfoPacketFactory;
     @Autowired
     private QuestInfoPacketFactory questInfoPacketFactory;
 
@@ -820,7 +818,7 @@ public class Session implements Runnable {
             for (int i = 1; i < data.length; i += 2) {
                 templateId = SafeConvert.toInt32(data[i - 1]);
                 modification = SafeConvert.toInt32(data[i]);
-                Item.getItemInfo(templateId, modification, packet);
+                itemInfoPacketFactory.create(templateId, modification, packet);
             }
             send(packet);
         }
@@ -872,20 +870,23 @@ public class Session implements Runnable {
             else if (id < 0) {
                 ItemPrototype proto = new ItemPrototype(-id, itemModification, itemDurability);
                 Item item = Session.this.player.getPosition().getItem(proto);
-                if (item == null)
+                if (item == null) {
                     return;
+                }
                 int itemCount = item.getCount();
+                String itemTitle = itemTitleConstructor.getTitle(item);
                 if (Session.this.player.getInventory().tryStoreItem(item)) {
-                    Session.this.sendServerMessage(1014, itemCount > 1 ? itemCount + " " : "", item.getTitle());
+                    Session.this.sendServerMessage(1014, itemCount > 1 ? itemCount + " " : "", itemTitle);
                     Session.this.player.getPosition().send(Session.this.player,
                             new ServerPacket(ServerCommands.ServerMessage)
                                     .add("1026").add(Session.this.player.getName())
                                     .add(itemCount > 1 ? itemCount + " " : "")
-                                    .add(item.getTitle()));
-                    if (item.getCount() == 0)
+                                    .add(itemTitle));
+                    if (item.getCount() == 0) {
                         Session.this.player.getPosition().removeItem(item);
+                    }
                 } else {
-                    Session.this.sendServerMessage(1001, item.getTitle());
+                    Session.this.sendServerMessage(1001, itemTitle);
                 }
             }
         }
@@ -1446,7 +1447,7 @@ public class Session implements Runnable {
                 Item item = itemFactory.create(prototype, SafeConvert.toInt32(data[counter++]));
 
                 // An item has not been constructed right
-                if (item.Template == null || item.getCount() == 0)
+                if (item.getTemplate() == null || item.getCount() == 0)
                     continue;
                 if (item.hasFlag(ItemFlags.IsPersonal))
                     continue;
@@ -1489,7 +1490,7 @@ public class Session implements Runnable {
                             SafeConvert.toInt32(data[counter++]));
                     Item item = itemFactory.create(prototype, SafeConvert.toInt32(data[counter++]));
 
-                    if (item.Template == null || item.getCount() == 0)
+                    if (item.getTemplate() == null || item.getCount() == 0)
                         continue;
                     demand.setItem(i, item);
                 }

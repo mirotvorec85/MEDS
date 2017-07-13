@@ -66,7 +66,10 @@ public class Creature extends Unit {
         this.skills = new HashMap<>();
         this.loot = new HashSet<>();
         this.bossType = CreatureBossTypes.Normal;
-        this.spawnLocation = mapManager.getLocation(entry.getLocationId());
+    }
+
+    private void init() {
+        this.spawnLocation = mapManager.getLocation(this.entry.getLocationId());
     }
 
     public CreatureTemplate getTemplate() {

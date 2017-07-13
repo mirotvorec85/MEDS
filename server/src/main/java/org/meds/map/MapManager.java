@@ -10,6 +10,7 @@ import org.meds.logging.Logging;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -20,6 +21,8 @@ import java.util.List;
 @Component
 public class MapManager {
 
+    @Autowired
+    private ApplicationContext applicationContext;
     @Autowired
     private DAOFactory daoFactory;
 
@@ -73,7 +76,7 @@ public class MapManager {
 
         List<org.meds.data.domain.Region> regionEntries = mapDAO.getRegions();
         for (org.meds.data.domain.Region entry : regionEntries) {
-            Region region = new Region(entry);
+            Region region = new Region(entry, this.kingdoms.get(entry.getKingdomId()));
             this.regions.put(region.getId(), region);
             region.getKingdom().addRegion(region);
         }
@@ -81,7 +84,7 @@ public class MapManager {
 
         List<org.meds.data.domain.Location> locations = mapDAO.getLocations();
         for (org.meds.data.domain.Location entry : locations) {
-            Location location = new Location(entry);
+            Location location = applicationContext.getBean(Location.class, entry, getRegion(entry.getRegionId()));
             this.locations.put(entry.getId(), location);
             location.getRegion().addLocation(location);
         }
@@ -90,7 +93,7 @@ public class MapManager {
         // Filter duplicate values, that are the result of left outer join
         List<org.meds.data.domain.Shop> shops = mapDAO.getShops();
         for (org.meds.data.domain.Shop entry : shops) {
-            Shop shop = new Shop(entry);
+            Shop shop = applicationContext.getBean(Shop.class, entry);
             shop.load();
             this.shops.put(entry.getId(), shop);
         }

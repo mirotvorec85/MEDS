@@ -1,16 +1,26 @@
 package org.meds;
 
+import org.meds.data.domain.CharacterInnItem;
+import org.meds.enums.InnFilters;
+import org.meds.item.Item;
+import org.meds.item.ItemFactory;
+import org.meds.item.ItemPrototype;
+import org.meds.net.ServerCommands;
+import org.meds.net.ServerPacket;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.meds.data.domain.CharacterInnItem;
-import org.meds.item.Item;
-import org.meds.item.ItemPrototype;
-import org.meds.enums.InnFilters;
-import org.meds.net.ServerCommands;
-import org.meds.net.ServerPacket;
-
+@Component
+@Scope("prototype")
 public class Inn {
+
+    @Autowired
+    private ItemFactory itemFactory;
+
     /**
      * How much different slots a Player can use.
      */
@@ -29,12 +39,15 @@ public class Inn {
 
     private Map<ItemPrototype, CharacterInnItem> items;
 
-    public Inn(Player owner) {
-        this.owner = owner;
+    public Inn() {
         this.count = 0;
         this.items = new HashMap<>();
         this.slotCapacity = 100;
         this.countCapacity = 1000;
+    }
+
+    public void setOwner(Player player) {
+        this.owner = player;
     }
 
     public void load(Map<ItemPrototype, CharacterInnItem> items) {
@@ -75,7 +88,7 @@ public class Inn {
             return false;
         }
 
-        Item item = new Item(prototype, count);
+        Item item = itemFactory.create(prototype, count);
 
         // Item is found but an inventory can not store anymore.
         if (!this.owner.getInventory().tryStoreItem(item, count)) {

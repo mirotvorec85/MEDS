@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 @Component // Possibly it shouldn't be a bean
@@ -46,17 +45,13 @@ public class Location {
      */
     private Unit updatedUnit;
 
-    public Location(org.meds.data.domain.Location entry) {
+    public Location(org.meds.data.domain.Location entry, Region region) {
         this.entry = entry;
+        this.region = region;
         this.units = new HashSet<>();
         this.unitsView = Collections.unmodifiableSet(this.units);
         this.corpses = new HashMap<>();
         this.items = new HashMap<>();
-    }
-
-    @PostConstruct
-    private void init() {
-        this.region = mapManager.getRegion(entry.getRegionId());
     }
 
     public int getId() {
@@ -381,7 +376,7 @@ public class Location {
                 .add(corpse.getOwner().getName());
         }
         for (Item item : this.items.values()) {
-            packet.add(item.Template.getId())
+            packet.add(item.getTemplate().getId())
                 .add(item.getModification().getValue())
                 .add(item.getDurability())
                 .add(item.getCount());

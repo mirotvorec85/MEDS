@@ -87,13 +87,16 @@ public class Server {
     }
 
     @Autowired
+    private ApplicationContext applicationContext;
+    @Autowired
     private ServerCommandWorker serverCommandWorker;
-
     @Autowired
     private World world;
 
     @Autowired
     private DataStorage dataStorage;
+    @Autowired
+    private Locale locale;
 
     private java.util.Map<Session, Socket> sessions;
     private ServerSocket serverSocket;
@@ -110,6 +113,7 @@ public class Server {
     @PostConstruct
     public void init() {
         dataStorage.loadRepositories();
+        locale.load();
         Logging.Info.log("Database is loaded.");
     }
 
@@ -134,7 +138,7 @@ public class Server {
         while (true) {
             try {
                 Socket clientSocket = this.serverSocket.accept();
-                Session session = new Session(clientSocket);
+                Session session = applicationContext.getBean(Session.class, clientSocket);
                 session.addDisconnectListener(this.sessionDisconnector);
                 Thread thread = new Thread(session, "Session " + clientSocket.getInetAddress().toString() + " Worker");
                 Logging.Debug.log("New socket client: " + clientSocket.getInetAddress().toString());

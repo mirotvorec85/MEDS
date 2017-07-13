@@ -74,7 +74,7 @@ public class Trade {
                 if (this.items[i] == null) {
                     packet.add("0").add("0").add("0").add("0");
                 } else {
-                    packet.add(this.items[i].Template.getId());
+                    packet.add(this.items[i].getTemplate().getId());
                     packet.add(this.items[i].getModification());
                     packet.add(this.items[i].getDurability());
                     packet.add(this.items[i].getCount());

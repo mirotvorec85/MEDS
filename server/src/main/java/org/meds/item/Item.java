@@ -1,6 +1,5 @@
 package org.meds.item;
 
-import org.meds.Locale;
 import org.meds.Player;
 import org.meds.data.domain.ItemTemplate;
 import org.meds.enums.Parameters;
@@ -12,7 +11,7 @@ import java.util.Map;
 
 public class Item {
 
-    public final ItemTemplate Template;
+    private final ItemTemplate template;
 
     private int count;
 
@@ -25,10 +24,10 @@ public class Item {
     private EnumFlags<ItemFlags> flags;
 
     public Item(ItemTemplate template, int count, int durability, int modification) {
-        this.Template = template;
+        this.template = template;
         this.durability = durability;
 
-        if (this.Template == null) {
+        if (this.template == null) {
             this.bonusParameters = new HashMap<>();
             this.count = 0;
         } else {
@@ -36,13 +35,17 @@ public class Item {
 //            try {
 //                this.bonusParameters = ItemUtils.parseTemplateBonuses(template.getItemBonuses());
 //            } catch (ItemUtils.BonusParsingException e) {
-//                Logging.Warn.log("Item Template %d bonus parsing error: %s", template.getId(), e.getMessage());
-                this.bonusParameters = new HashMap<>();
+//                Logging.Warn.log("Item template %d bonus parsing error: %s", template.getId(), e.getMessage());
+            this.bonusParameters = new HashMap<>();
 //            }
             this.count = count;
-            this.flags = new EnumFlags<>(this.Template.getFlags());
+            this.flags = new EnumFlags<>(this.template.getFlags());
         }
         this.modification = new ItemModification(this, modification);
+    }
+
+    public ItemTemplate getTemplate() {
+        return this.template;
     }
 
     public int getCount() {
@@ -50,15 +53,15 @@ public class Item {
     }
 
     public ItemPrototype getPrototype() {
-        return new ItemPrototype(this.Template.getId(), this.modification.getValue(), this.durability);
+        return new ItemPrototype(this.template.getId(), this.modification.getValue(), this.durability);
     }
 
     public boolean isEquipment() {
-        return ItemUtils.isEquipment(this.Template);
+        return ItemUtils.isEquipment(this.template);
     }
 
     public boolean isWeapon() {
-        return this.Template.getItemClass() == ItemClasses.Weapon;
+        return this.template.getItemClass() == ItemClasses.Weapon;
     }
 
     public ItemModification getModification() {
@@ -72,27 +75,8 @@ public class Item {
         return this.durability;
     }
 
-    public String getTitle() {
-        String title = this.Template.getTitle();
-        if (this.modification.getTotem() != ItemTotemicTypes.None) {
-            title += Locale.getString(4) + Locale.getString(this.modification.getTotem().getTitleStringId());
-        }
-        return title;
-    }
-
     public boolean hasFlag(ItemFlags flag) {
         return this.flags.has(flag);
-    }
-
-    /**
-     * Gets the title and description.
-     */
-    public String getFullTitle() {
-        String title = getTitle();
-        if (!this.Template.getDescription().isEmpty()) {
-            title += "\r\n" + this.Template.getDescription();
-        }
-        return title;
     }
 
     /**
@@ -162,27 +146,22 @@ public class Item {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
-        if (!(obj instanceof Item))
-            return false;
+        }
+        return obj instanceof Item && this.equals((Item) obj);
 
-        return this.equals((Item) obj);
     }
 
     public boolean equals(Item item) {
-        if (item == null)
-            return false;
-        return equals(item.getPrototype());
+        return item != null && equals(item.getPrototype());
     }
 
     public boolean equals(ItemPrototype prototype) {
-        if (prototype == null)
-            return false;
-
-        return this.Template.getId() == prototype.getTemplateId() &&
-                this.modification.getValue() == prototype.getModification() &&
-                this.durability == prototype.getDurability();
+        return prototype != null &&
+                this.template.getId() == prototype.getTemplateId() &&
+                this.modification.getValue() == prototype.getModification()
+                && this.durability == prototype.getDurability();
     }
 
     @Override
@@ -207,14 +186,14 @@ public class Item {
     protected Item clone(int count) {
         // TODO: Clone item by initialize default item and assign all the field.
         // not doing recalculating these fields values (too efficient)
-        Item newItem = new Item(this.Template, count, durability, modification.getValue());
+        Item newItem = new Item(this.template, count, durability, modification.getValue());
         newItem.bonusParameters = new HashMap<>(this.bonusParameters);
         return newItem;
     }
 
     public void use(Player user) {
         Spell spell = null;
-        switch (this.Template.getId()) {
+        switch (this.template.getId()) {
             case 64: // Small Health Potion
                 int amount = user.getParameters().value(Parameters.Health) - user.getHealth();
                 // HP is full
@@ -223,7 +202,7 @@ public class Item {
                 // TODO: level checking
                 user.setHealth(user.getParameters().value(Parameters.Health));
                 if (user.getSession() != null)
-                    user.getSession().sendServerMessage(500, this.Template.getTitle(), Integer.toString(amount));
+                    user.getSession().sendServerMessage(500, this.template.getTitle(), Integer.toString(amount));
                 break;
             case 3581: // Small Mana Potion
                 // TODO: Implement

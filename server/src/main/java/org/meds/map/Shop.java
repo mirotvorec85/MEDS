@@ -89,7 +89,7 @@ public class Shop {
 
         // Add money
         // Cost is 20% less than the item cost
-        seller.changeCurrency(this.entry.getCurrencyId(), (int)(item.Template.getCost() * 0.8) * item.getCount());
+        seller.changeCurrency(this.entry.getCurrencyId(), (int)(item.getTemplate().getCost() * 0.8) * item.getCount());
 
         return true;
     }
@@ -148,10 +148,6 @@ public class Shop {
 
     public boolean isAppropriateItem(ItemPrototype prototype) {
         return this.isAppropriateItem(itemTemplateRepository.get(prototype.getTemplateId()));
-    }
-
-    public boolean isAppropriateItem(Item item) {
-        return this.isAppropriateItem(item.Template);
     }
 
     public boolean isAppropriateItem(ItemTemplate template) {

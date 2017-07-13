@@ -1,8 +1,6 @@
 package org.meds.item;
 
 import org.meds.data.domain.ItemTemplate;
-import org.meds.net.ServerCommands;
-import org.meds.net.ServerPacket;
 import org.meds.util.SafeConvert;
 
 import java.util.HashMap;
@@ -63,7 +61,7 @@ public final class ItemUtils {
     }
 
     public static boolean isEquipment(Item item) {
-        return isEquipment(item.Template);
+        return isEquipment(item.getTemplate());
     }
 
     public static boolean isEquipment(ItemTemplate template) {
@@ -140,34 +138,5 @@ public final class ItemUtils {
             bonusMap.put(parameter, value);
         }
         return bonusMap;
-    }
-
-    // TODO: possibly new component ItemInfoPacketFactory?
-    public ServerPacket getItemInfo(int templateId, int modification, ServerPacket packet) {
-        ItemPrototype prototype = new ItemPrototype(templateId, modification, 0);
-        Item item = itemFactory.create(prototype);
-        if (item.Template == null) {
-            return packet;
-        }
-
-        packet.add(ServerCommands.ItemInfo)
-                .add(item.Template.getId())
-                .add(item.getModification())
-                .add(item.getFullTitle())
-                .add(item.Template.getImageId())
-                .add(item.Template.getItemClass())
-                .add(item.Template.getLevel())
-                .add(item.Template.getCost())
-                .add(item.Template.getCurrencyId())
-                .add("1187244746") // Image (or even Item itself) date
-                .add(getMaxDurability(item.Template))
-                .add(getWeight(item.Template));
-
-        // TODO: Spring fix build
-//        for (Map.Entry<ItemBonusParameters, Integer> entry : item.bonusParameters.entrySet()) {
-//            packet.add(entry.getKey());
-//            packet.add(entry.getValue());
-//        }
-        return packet;
     }
 }
