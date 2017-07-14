@@ -124,7 +124,7 @@ public class Server {
 
         new Thread(serverCommandWorker, "Server Commands worker").start();
 
-        new Thread(World.getInstance(), "World updater").start();
+        new Thread(world, "World updater").start();
 
         Logging.Info.log("Waiting for connections...");
 

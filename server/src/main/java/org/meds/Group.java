@@ -144,12 +144,14 @@ public class Group implements Iterable<Player> {
     }
 
     public void setLeader(Player member) {
-        if (this.disbanded)
+        if (this.disbanded) {
             return;
+        }
 
         // The same leader
-        if (member == this.leader)
+        if (member == this.leader) {
             return;
+        }
 
         // Member is in this group
         if (!this.members.contains(member))

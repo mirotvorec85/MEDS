@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 
 @Component
@@ -68,6 +69,7 @@ public class Creature extends Unit {
         this.bossType = CreatureBossTypes.Normal;
     }
 
+    @PostConstruct
     private void init() {
         this.spawnLocation = mapManager.getLocation(this.entry.getLocationId());
     }
@@ -142,7 +144,7 @@ public class Creature extends Unit {
     }
 
     public CreatureTypes getCreatureType() {
-        return World.getInstance().getCreatureType(this.getTemplateId());
+        return world.getCreatureType(this.getTemplateId());
     }
 
     @Override
@@ -162,7 +164,7 @@ public class Creature extends Unit {
 
         this.constructName();
 
-        World.getInstance().unitCreated(this);
+        world.unitCreated(this);
 
         return this.id;
     }

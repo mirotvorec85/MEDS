@@ -1339,7 +1339,7 @@ public class Player extends Unit {
      * Occurs when at least one of player parameters that are displayed in online list changes.
      */
     protected void onDisplayChanged() {
-        World.getInstance().playerUpdated(this);
+        world.playerUpdated(this);
     }
 
     @Override

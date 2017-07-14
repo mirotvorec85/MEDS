@@ -1,14 +1,14 @@
 package org.meds;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.meds.enums.BattleStates;
 import org.meds.logging.Logging;
 import org.meds.net.ServerCommands;
 import org.meds.net.ServerPacket;
 import org.meds.util.Random;
+
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class Battle {
 
@@ -20,13 +20,12 @@ public class Battle {
      * A list of units who are fleeing at the current battle update tick.
      */
     private Set<Unit> runUnits;
-    private Set<Unit> participants;
+    private final Set<Unit> participants;
 
     public Battle() {
         this.leftUnits = new LinkedHashSet<>();
         this.runUnits = new HashSet<>();
         this.participants = new HashSet<>();
-        World.getInstance().addBattle(this);
     }
 
     /**
@@ -88,11 +87,17 @@ public class Battle {
         }
     }
 
+    /**
+     * A battle is considered active unless it has no participants
+     */
+    public boolean isActive() {
+        return this.participants.isEmpty();
+    }
+
     public void update(int time) {
         // The battle has no participants from the start or
         // all the participants were left => battle is over.
-        if (this.participants.size() == 0) {
-            World.getInstance().removeBattle(this);
+        if (!isActive()) {
             return;
         }
 

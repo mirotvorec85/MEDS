@@ -14,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class World implements Runnable {
@@ -33,16 +30,6 @@ public class World implements Runnable {
     @Autowired
     private MapManager mapManager;
 
-    private static World instance;
-
-    public static World getInstance() {
-        if (World.instance == null) {
-            World.instance = new World();
-        }
-
-        return World.instance;
-    }
-
     private int dayTime;
 
     private int tickTime;
@@ -54,9 +41,8 @@ public class World implements Runnable {
     private ServerPacket updatePlayersPacket;
     private ServerPacket deletePlayersPacket;
 
-    private List<Battle> battles;
-    private LinkedList<Battle> newBattles;
-    private LinkedList<Battle> expiredBattles;
+    private final List<Battle> battles;
+    private final LinkedList<Battle> newBattles;
 
     private HashMap<Integer, CreatureTypes> creatureTypes;
 
@@ -74,11 +60,8 @@ public class World implements Runnable {
 
         this.battles = new ArrayList<>();
         this.newBattles = new LinkedList<>();
-        this.expiredBattles = new LinkedList<>();
 
         this.dayTime = 0;
-
-        World.instance = this;
     }
 
     public void playerLoggedIn(Player player) {
@@ -165,12 +148,10 @@ public class World implements Runnable {
         return type;
     }
 
-    public void addBattle(Battle battle) {
-        this.newBattles.add(battle);
-    }
-
-    public void removeBattle(Battle battle) {
-        this.expiredBattles.add(battle);
+    public Battle createBattle() {
+        Battle newBattle = new Battle();
+        this.newBattles.add(newBattle);
+        return newBattle;
     }
 
     /**
@@ -327,16 +308,16 @@ public class World implements Runnable {
             this.newBattles.clear();
         }
 
-        // Remove ended battles
-        synchronized (this.expiredBattles) {
-            this.battles.removeAll(expiredBattles);
-            this.expiredBattles.clear();
-        }
-
         // Update battle process
         synchronized (this.battles) {
-            for (Battle battle : this.battles)
+            Iterator<Battle> iterator = this.battles.iterator();
+            while (iterator.hasNext()) {
+                Battle battle = iterator.next();
                 battle.update(time);
+                if (!battle.isActive()) {
+                    iterator.remove();
+                }
+            }
         }
 
         // Update online lists

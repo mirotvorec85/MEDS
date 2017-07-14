@@ -26,6 +26,8 @@ public abstract class Unit {
     protected SpellFactory spellFactory;
     @Autowired
     protected MapManager mapManager;
+    @Autowired
+    protected World world;
 
     public interface TargetDiedListener {
 
@@ -303,7 +305,7 @@ public abstract class Unit {
                 // Target is not in battle
                 // Create new battle
                 if (target.battle == null) {
-                    this.setBattle(new Battle());
+                    this.setBattle(world.createBattle());
                 }
                 // Assign target's battle
                 else {
@@ -533,7 +535,7 @@ public abstract class Unit {
             return;
         }
 
-        Unit target = World.getInstance().getUnit(targetId);
+        Unit target = world.getUnit(targetId);
         if (target == null) {
             target = this;
         }

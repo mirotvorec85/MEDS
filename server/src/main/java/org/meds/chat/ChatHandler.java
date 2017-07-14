@@ -18,6 +18,8 @@ public class ChatHandler {
 
     @Autowired
     private ChatCommandManager commandHandler;
+    @Autowired
+    private World world;
 
     public ServerPacket constructSystemMessage(String message) {
         return new ServerPacket(ServerCommands.ChatMessage)
@@ -36,7 +38,7 @@ public class ChatHandler {
         if (message == null || message.length() == 0)
             return;
 
-        World.getInstance().send(constructSystemMessage(message));
+        world.send(constructSystemMessage(message));
     }
 
     public void handleSay(Player player, String message) {
