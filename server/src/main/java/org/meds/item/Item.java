@@ -23,24 +23,12 @@ public class Item {
 
     private EnumFlags<ItemFlags> flags;
 
-    public Item(ItemTemplate template, int count, int durability, int modification) {
+    Item(ItemTemplate template, int count, int durability, int modification, Map<ItemBonusParameters, Integer> bonuses) {
         this.template = template;
         this.durability = durability;
-
-        if (this.template == null) {
-            this.bonusParameters = new HashMap<>();
-            this.count = 0;
-        } else {
-            // TODO: Spring fix build
-//            try {
-//                this.bonusParameters = ItemUtils.parseTemplateBonuses(template.getItemBonuses());
-//            } catch (ItemUtils.BonusParsingException e) {
-//                Logging.Warn.log("Item template %d bonus parsing error: %s", template.getId(), e.getMessage());
-            this.bonusParameters = new HashMap<>();
-//            }
-            this.count = count;
-            this.flags = new EnumFlags<>(this.template.getFlags());
-        }
+        this.count = count;
+        this.bonusParameters = bonuses;
+        this.flags = new EnumFlags<>(this.template.getFlags());
         this.modification = new ItemModification(this, modification);
     }
 
@@ -185,9 +173,9 @@ public class Item {
      */
     protected Item clone(int count) {
         // TODO: Clone item by initialize default item and assign all the field.
-        // not doing recalculating these fields values (too efficient)
-        Item newItem = new Item(this.template, count, durability, modification.getValue());
-        newItem.bonusParameters = new HashMap<>(this.bonusParameters);
+        // Without values recalculation (it's too efficient)
+        HashMap<ItemBonusParameters, Integer> bonuses = new HashMap<>(this.bonusParameters);
+        Item newItem = new Item(this.template, count, durability, modification.getValue(), bonuses);
         return newItem;
     }
 

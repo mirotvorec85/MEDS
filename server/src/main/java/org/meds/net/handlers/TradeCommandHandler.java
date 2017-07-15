@@ -50,7 +50,7 @@ public abstract class TradeCommandHandler extends CommonClientCommandHandler {
             Item item = itemFactory.create(prototype, data.getInt(counter++));
 
             // An item has not been constructed right
-            if (item.getTemplate() == null || item.getCount() == 0) {
+            if (item == null || item.getCount() == 0) {
                 continue;
             }
             if (item.hasFlag(ItemFlags.IsPersonal)) {
@@ -95,7 +95,7 @@ public abstract class TradeCommandHandler extends CommonClientCommandHandler {
                         data.getInt(counter++));
                 Item item = itemFactory.create(prototype, data.getInt(counter++));
 
-                if (item.getTemplate() == null || item.getCount() == 0) {
+                if (item == null || item.getCount() == 0) {
                     continue;
                 }
                 demand.setItem(i, item);

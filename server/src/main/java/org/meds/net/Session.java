@@ -23,6 +23,8 @@ import java.util.*;
 @Scope("prototype")
 public class Session implements Runnable {
 
+    private static final int SOCKET_BUFFER_SIZE = 1024;
+
     public interface DisconnectListener extends EventListener {
         public void disconnect(Session session);
     }
@@ -90,8 +92,6 @@ public class Session implements Runnable {
         this.key = Random.nextInt(2000000000) + 100000000;
 
         this.sessionToString = "Session [" + this.socket.getInetAddress().toString() + "]: ";
-
-        this.sessionContext.setSession(this);
     }
 
     public int getKey() {
@@ -152,25 +152,14 @@ public class Session implements Runnable {
 
     @Override
     public void run() {
+        this.sessionContext.setSession(this);
         try {
-            InputStream is = this.socket.getInputStream();
-            int bufferSize = 1024;
-
             while (true) {
-                int receivedSize = 0;
-                String receivedString = "";
-                byte[] buffer = new byte[bufferSize];
-                do {
-                    receivedSize = is.read(buffer);
-                    // End Of Stream / Socket is closed
-                    if (receivedSize == -1) {
-                        Logging.Debug.log(toString() + "Received -1");
-                        disconnect();
-                        return;
-                    }
-                    receivedString += new String(Arrays.copyOf(buffer, receivedSize), "Unicode");
+                String receivedString = readSocket();
+                if (receivedString == null) {
+                    disconnect();
+                    return;
                 }
-                while (receivedSize == bufferSize);
                 Logging.Debug.log(toString() + "Received string: " + receivedString);
 
                 List<ClientCommandData> commandDataList;
@@ -206,6 +195,25 @@ public class Session implements Runnable {
         }
     }
 
+    private String readSocket() throws IOException {
+        InputStream is = this.socket.getInputStream();
+
+        int receivedSize = 0;
+        String receivedString = "";
+        byte[] buffer = new byte[SOCKET_BUFFER_SIZE];
+        do {
+            receivedSize = is.read(buffer);
+            // End Of Stream / Socket is closed
+            if (receivedSize == -1) {
+                Logging.Debug.log(toString() + "Received -1");
+                return null;
+            }
+            receivedString += new String(Arrays.copyOf(buffer, receivedSize), "Unicode");
+        }
+        while (receivedSize == SOCKET_BUFFER_SIZE);
+        return receivedString;
+    }
+
     private void disconnect() {
         try {
             this.socket.close();
@@ -213,9 +221,9 @@ public class Session implements Runnable {
             Logging.Error.log(toString() + "IOException while trying to close the Session socket", ex);
         }
 
-        for (DisconnectListener listener : this.listeners)
+        for (DisconnectListener listener : this.listeners) {
             listener.disconnect(this);
-
+        }
         this.listeners.clear();
     }
 
@@ -223,8 +231,9 @@ public class Session implements Runnable {
      * Sends an accumulated packet buffer for the current session.
      */
     private void send() {
-        if (this.packetBuffer == null || this.packetBuffer.isEmpty())
+        if (this.packetBuffer == null || this.packetBuffer.isEmpty()) {
             return;
+        }
 
         OutputStream os;
         try {

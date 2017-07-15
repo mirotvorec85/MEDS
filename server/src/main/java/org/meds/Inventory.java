@@ -191,8 +191,8 @@ public class Inventory {
             ItemPrototype prototype = new ItemPrototype(charItem.getItemTemplateId(), charItem.getModification(),
                     charItem.getDurability());
             Item item = itemFactory.create(prototype, charItem.getCount());
-            // Item is valid
-            if (item.getTemplate() != null) {
+            // Item has a valid template
+            if (item != null) {
                 this.inventorySlots[charItem.getSlot()] = item;
             }
         }
