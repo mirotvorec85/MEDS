@@ -9,10 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.IntStream;
 
 @Component
 @Scope("prototype")
@@ -148,6 +146,8 @@ public class Inventory {
     private ItemFactory itemFactory;
     @Autowired
     private ItemTitleConstructor itemTitleConstructor;
+    @Autowired
+    private ItemUsageService itemUsageService;
 
     private int capacity;
 
@@ -496,55 +496,55 @@ public class Inventory {
     }
 
     private boolean canSlotStoreItem(int slot, Item item) {
-        // Slot is equipment: check a compatibility between slot type and item type. Also check the item requirements.
-        if (isEquipmentSlot(slot)) {
-            // Check min level
-            if (item.getTemplate().getLevel() > this.owner.getLevel()) {
-                return false;
-            }
-
-            switch (Slots.parse(slot)) {
-                case Head:
-                    return item.getTemplate().getItemClass() == ItemClasses.Head;
-                case Neck:
-                    return item.getTemplate().getItemClass() == ItemClasses.Neck;
-                case Back:
-                    return item.getTemplate().getItemClass() == ItemClasses.Back;
-                case Body:
-                    return item.getTemplate().getItemClass() == ItemClasses.Body;
-                case Hand:
-                    return item.getTemplate().getItemClass() == ItemClasses.Hands;
-                case RightHand:
-                    return item.getTemplate().getItemClass() == ItemClasses.Weapon;
-                case LeftHand:
-                    return item.getTemplate().getItemClass() == ItemClasses.Shield;
-                case Waist:
-                    return item.getTemplate().getItemClass() == ItemClasses.Waist;
-                case Leg:
-                    return item.getTemplate().getItemClass() == ItemClasses.Legs;
-                case Foot:
-                    return item.getTemplate().getItemClass() == ItemClasses.Foot;
-                case RightHandRing:
-                case LeftHandRing:
-                    return item.getTemplate().getItemClass() == ItemClasses.Ring;
-                default:
-                    // I don't know is this real but just for case
-                    return false;
-            }
+        if (!isEquipmentSlot(slot)) {
+            return true;
         }
-        return true;
+        // Slot is equipment: check a compatibility between the slot type and the item type.
+        // Also check the item requirements.
+
+        // Check min level
+        if (item.getTemplate().getLevel() > this.owner.getLevel()) {
+            return false;
+        }
+
+        switch (Slots.parse(slot)) {
+            case Head:
+                return item.getTemplate().getItemClass() == ItemClasses.Head;
+            case Neck:
+                return item.getTemplate().getItemClass() == ItemClasses.Neck;
+            case Back:
+                return item.getTemplate().getItemClass() == ItemClasses.Back;
+            case Body:
+                return item.getTemplate().getItemClass() == ItemClasses.Body;
+            case Hand:
+                return item.getTemplate().getItemClass() == ItemClasses.Hands;
+            case RightHand:
+                return item.getTemplate().getItemClass() == ItemClasses.Weapon;
+            case LeftHand:
+                return item.getTemplate().getItemClass() == ItemClasses.Shield;
+            case Waist:
+                return item.getTemplate().getItemClass() == ItemClasses.Waist;
+            case Leg:
+                return item.getTemplate().getItemClass() == ItemClasses.Legs;
+            case Foot:
+                return item.getTemplate().getItemClass() == ItemClasses.Foot;
+            case RightHandRing:
+            case LeftHandRing:
+                return item.getTemplate().getItemClass() == ItemClasses.Ring;
+            default:
+                // I don't know is this real but just in case
+                return false;
+        }
     }
 
     private void onEquipmentChanged() {
+        // Clear and recalculate equipment bonus parameters
         this.owner.getParameters().equipment().clear();
-        for (int i = 0; i < EquipmentSlotCount; ++i) {
-            if (this.inventorySlots[i] == null)
-                continue;
-
-            for (Map.Entry<ItemBonusParameters, Integer> entry : this.inventorySlots[i].getBonusParameters().entrySet()) {
-                this.owner.getParameters().equipment().change(entry.getKey(), entry.getValue());
-            }
-        }
+        IntStream.range(0, EquipmentSlotCount)
+                .mapToObj(slot -> this.inventorySlots[slot])
+                .filter(Objects::nonNull)
+                .flatMap(item -> item.getBonusParameters().entrySet().stream())
+                .forEach(entry -> this.owner.getParameters().equipment().change(entry.getKey(), entry.getValue()));
     }
 
     private void onInventoryChanged() {
@@ -658,7 +658,9 @@ public class Inventory {
             return;
         }
 
-        item.use(this.owner);
+        if (itemUsageService.processUsage(this.owner, item)) {
+            item.use();
+        }
         // Used the last item in the stack
         if (item.getCount() == 0) {
             this.inventorySlots[slot] = null;

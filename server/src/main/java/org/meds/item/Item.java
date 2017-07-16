@@ -1,9 +1,6 @@
 package org.meds.item;
 
-import org.meds.Player;
 import org.meds.data.domain.ItemTemplate;
-import org.meds.enums.Parameters;
-import org.meds.spell.Spell;
 import org.meds.util.EnumFlags;
 
 import java.util.HashMap;
@@ -179,49 +176,12 @@ public class Item {
         return newItem;
     }
 
-    public void use(Player user) {
-        Spell spell = null;
-        switch (this.template.getId()) {
-            case 64: // Small Health Potion
-                int amount = user.getParameters().value(Parameters.Health) - user.getHealth();
-                // HP is full
-                if (amount < 1)
-                    return;
-                // TODO: level checking
-                user.setHealth(user.getParameters().value(Parameters.Health));
-                if (user.getSession() != null)
-                    user.getSession().sendServerMessage(500, this.template.getTitle(), Integer.toString(amount));
-                break;
-            case 3581: // Small Mana Potion
-                // TODO: Implement
-                break;
-            case 35196: // Steel Body
-                // TODO: Spring fix build
-                //spell = new Spell(16, user, 3, null, this);
-                break;
-            case 35197: // Bears Blood
-                // Level from Item level???
-                // TODO: Spring fix build
-                //spell = new Spell(17, user, 3, null, this);
-                break;
-            case 35198: // Tigers Strength
-                // TODO: Spring fix build
-                //spell = new Spell(14, user, 3, null, this);
-                break;
-            case 35199: // Feline Grace
-                // TODO: Spring fix build
-//                spell = new Spell(18, user, 3, null, this);
-                break;
-            case 35200: // Wisdom of the Owl
-                // TODO: Spring fix build
-//                spell = new Spell(37, user, 3, null, this);
-                break;
-        }
-
-        if (spell != null) {
-            if (spell.cast()) {
-                --this.count;
-            }
-        }
+    /**
+     * Uses the item if it is usable.
+     * If the item is consumable, its count decrements
+     */
+    public void use() {
+        // Check for non-consumable usable items (i.e. "Road to home")
+        --this.count;
     }
 }
