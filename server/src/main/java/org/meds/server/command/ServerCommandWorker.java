@@ -57,7 +57,7 @@ public class ServerCommandWorker implements Runnable {
             }
         } catch (Exception ex) {
             // While stopping the Server any Exception is expected here
-            if (Server.isStopping())
+            if (server.isStopping())
                 Logging.Error.log("An exception had occurred while reading the Server Command.", ex);
         }
     }

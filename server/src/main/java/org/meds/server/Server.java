@@ -32,7 +32,7 @@ public class Server {
         @Override
         public void disconnect(Session session) {
             // Ignore disconnection while stopping
-            if (Server.isStopping)
+            if (Server.this.isStopping())
                 return;
 
             Logging.Debug.log("Session disconnected");
@@ -40,26 +40,9 @@ public class Server {
         }
     }
 
-    public static final int Build = 33554443; // 2.0.0.11
+    public static final int BUILD = 33554443; // 2.0.0.11
 
-    public static final int MaxAllowedBuild = 33555200; // 2.0.3.0
-
-    private static String serverStartTime;
-    private static int startTimeMillis;
-
-    private static boolean isStopping;
-
-    public static boolean isStopping() {
-        return Server.isStopping;
-    }
-
-    public static String getServerStartTime() {
-        return serverStartTime;
-    }
-
-    public static int getServerTimeMillis() {
-        return (int) System.currentTimeMillis() - startTimeMillis;
-    }
+    public static final int MAX_ALLOWED_BUILD = 33555200; // 2.0.3.0
 
     public static void main(String[] args) {
         ApplicationContext applicationContext = new AnnotationConfigApplicationContext(ServerConfiguration.class);
@@ -98,6 +81,10 @@ public class Server {
     @Autowired
     private Locale locale;
 
+    private boolean stopping;
+    private String serverStartTime;
+    private int startTimeMillis;
+
     private java.util.Map<Session, Socket> sessions;
     private ServerSocket serverSocket;
 
@@ -117,10 +104,31 @@ public class Server {
         Logging.Info.log("Database is loaded.");
     }
 
+    public boolean isStopping() {
+        return this.stopping;
+    }
+
+    public String getServerStartTime() {
+        return this.serverStartTime;
+    }
+
+    public int getServerTimeMillis() {
+        return (int) System.currentTimeMillis() - this.startTimeMillis;
+    }
+
+    public void addStopListener(StopListener listener) {
+        this.stopListeners.add(listener);
+    }
+
+    public void removeStopListener(StopListener listener) {
+        this.stopListeners.remove(listener);
+    }
+
     public void start() {
+        this.startTimeMillis = (int) System.currentTimeMillis();
+        this.serverStartTime = DateFormatter.format(new Date());
+
         world.createCreatures();
-        Server.startTimeMillis = (int) System.currentTimeMillis();
-        Server.serverStartTime = DateFormatter.format(new Date());
 
         new Thread(serverCommandWorker, "Server Commands worker").start();
 
@@ -147,23 +155,16 @@ public class Server {
 
             } catch (IOException ex) {
                 // Stopping the Server - the next exception is the expected
-                if (!Server.isStopping)
+                if (!this.stopping) {
                     Logging.Error.log("IO Exception while accepting a socket", ex);
+                }
                 break;
             }
         }
     }
 
-    public void addStopListener(StopListener listener) {
-        this.stopListeners.add(listener);
-    }
-
-    public void removeStopListener(StopListener listener) {
-        this.stopListeners.remove(listener);
-    }
-
     public void shutdown() {
-        Server.isStopping = true;
+        this.stopping = true;
 
         // Stop server socket
         try {
@@ -174,12 +175,13 @@ public class Server {
 
 
         // Then close all the session sockets
-        for (Socket socket : this.sessions.values())
+        for (Socket socket : this.sessions.values()) {
             try {
                 socket.close();
             } catch (IOException ex) {
                 Logging.Error.log("IOException while closing the session socket", ex);
             }
+        }
 
         // Stop all the listeners
         this.stopListeners.forEach(StopListener::stop);

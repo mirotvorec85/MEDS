@@ -1,6 +1,7 @@
 package org.meds.net;
 
 /**
+ *
  * @author Romman
  */
 public interface ClientCommandData {

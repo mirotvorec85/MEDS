@@ -46,6 +46,8 @@ public class Session implements Runnable {
     }
 
     @Autowired
+    private Server server;
+    @Autowired
     private DAOFactory daoFactory;
     @Autowired
     private World world;
@@ -132,11 +134,11 @@ public class Session implements Runnable {
         // Save the last login Ip
         this.lastLoginIp = characterData.getLastLoginIp();
         Date now = new Date();
-        Session.this.currentIp = Session.this.socket.getInetAddress().getHostAddress();
+        Session.this.currentIp = this.socket.getInetAddress().getHostAddress();
         if (characterData.getLastLoginDate() != 0) {
-            Session.this.lastLoginDate = DateFormatter.format(characterData.getLastLoginDate() * 1000);
+            this.lastLoginDate = DateFormatter.format(characterData.getLastLoginDate() * 1000);
         } else {
-            Session.this.lastLoginDate = "-";
+            this.lastLoginDate = "-";
         }
 
         characterData.setLastLoginIp(Session.this.currentIp);
@@ -186,7 +188,7 @@ public class Session implements Runnable {
             }
         } catch (IOException e) {
             // This exception is expected on server shutdown
-            if (!Server.isStopping()) {
+            if (!server.isStopping()) {
                 Logging.Error.log(toString() + "An exception while reading a socket.", e);
                 if (e.getClass() == SocketException.class) {
                     disconnect();

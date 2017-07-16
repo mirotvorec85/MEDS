@@ -260,7 +260,7 @@ public class World implements Runnable {
                 this.tickTime = (int)sleepTime;
 
                 // Assign last tick to the current system time
-                lastTickDuration = Server.getServerTimeMillis();
+                lastTickDuration = server.getServerTimeMillis();
 
                 this.update(this.tickTime);
             } catch(InterruptedException ex) {
@@ -270,7 +270,7 @@ public class World implements Runnable {
             }
 
             // How much time takes the world update
-            lastTickDuration = Server.getServerTimeMillis() - lastTickDuration;
+            lastTickDuration = server.getServerTimeMillis() - lastTickDuration;
         } while(true);
     }
 
@@ -349,11 +349,11 @@ public class World implements Runnable {
         synchronized (this.players) {
             for (java.util.Map.Entry<Integer, Player> entry : this.players.entrySet())
                 if (entry.getValue().getSession() != null)
-                    entry.getValue().getSession().send(new ServerPacket(ServerCommands.ServerTime).add(Server.getServerTimeMillis()));
+                    entry.getValue().getSession().send(new ServerPacket(ServerCommands.ServerTime).add(server.getServerTimeMillis()));
         }
 
         org.meds.net.Session.sendBuffers();
 
-        Logging.Debug.log("World update ends. Server Time: " + Server.getServerTimeMillis());
+        Logging.Debug.log("World update ends. Server Time: " + server.getServerTimeMillis());
     }
 }

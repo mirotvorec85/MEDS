@@ -26,10 +26,10 @@ public class VerificationCommandHandler extends CommonClientCommandHandler {
             packet.add(0);
         } else {
             int clientBuild = data.getInt(0);
-            if (clientBuild < Server.Build || clientBuild > Server.MaxAllowedBuild) {
+            if (clientBuild < Server.BUILD || clientBuild > Server.MAX_ALLOWED_BUILD) {
                 packet.add(0);
             } else {
-                packet.add(Server.Build).add(sessionContext.getSession().getKey());
+                packet.add(Server.BUILD).add(sessionContext.getSession().getKey());
             }
         }
 
